@@ -2,7 +2,7 @@
 function App() {
   return (
     <>
-      <div>Poker Home</div>
+      <div className="text-xl font-extrabold">Poker Home</div>
     </>
   );
 }

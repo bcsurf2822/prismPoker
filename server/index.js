@@ -8,10 +8,11 @@ const http = require("http");
 const app = express();
 const server = http.createServer(app);
 const setupSockets = require("./sockets");
+const setupRoutes = require("./routes");
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000", // Update this to your client's origin in production
+    origin: "http://localhost:5173",
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
@@ -40,6 +41,7 @@ mongoose
   .catch((error) => console.error("MongoDB connection error:", error));
 
 setupSockets(io);
+setupRoutes(app);
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

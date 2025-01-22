@@ -1,7 +1,10 @@
 const router = require("express").Router();
-const Game = require("../models/gamesSchema");
+const Game = require("../models/games");
 
-router.post("/createHoldem", async (req, res) => {
+
+
+
+router.post("/", async (req, res) => {
   try {
     const gameStakes = [
       { blinds: "0.05/0.10", min: 5, max: 10 },
