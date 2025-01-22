@@ -4,6 +4,7 @@ function App() {
   return (
     <>
  <Navbar />
+ <h2>This is a test for deployment</h2>
     </>
   );
 }
