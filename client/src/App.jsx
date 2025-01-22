@@ -2,7 +2,8 @@
 function App() {
   return (
     <>
-      <div className="text-xl font-extrabold">Poker Home</div>
+      <div className="">Poker Home</div>
+      <h1 className="">Hello World</h1>
     </>
   );
 }
