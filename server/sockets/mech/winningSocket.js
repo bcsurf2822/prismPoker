@@ -1,4 +1,4 @@
-const Game = require("../../models/gamesSchema");
+const Game = require("../../models/games");
 var Hand = require("pokersolver").Hand;
 
 function resetActionNone(game) {

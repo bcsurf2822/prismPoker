@@ -1,5 +1,5 @@
-const Game = require("../../models/gamesSchema");
-const User = require("../../models/userSchema");
+const Game = require("../../models/games");
+const User = require("../../models/users");
 
 const isSeatAvailable = (seats, seatId) => {
   return seats.some(seat => seat._id.toString() === seatId && !seat.player);

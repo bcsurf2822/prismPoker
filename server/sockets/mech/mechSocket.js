@@ -1,4 +1,4 @@
-const Game = require("../../models/gamesSchema");
+const Game = require("../../models/games");
 const axios = require("axios");
 
 function cardCode(code) {

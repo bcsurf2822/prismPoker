@@ -1,5 +1,5 @@
-const Game = require("../../models/gamesSchema");
-const User = require("../../models/userSchema");
+const Game = require("../../models/games");
+const User = require("../../models/users");
 
 function leaveSocket(socket, io) {
   socket.on("leaveGame", async (data) => {
