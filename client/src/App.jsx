@@ -1,8 +1,9 @@
+import Navbar from "./components/generalUI/Navbar";
 
 function App() {
   return (
     <>
-      <div>Poker Home</div>
+ <Navbar />
     </>
   );
 }
