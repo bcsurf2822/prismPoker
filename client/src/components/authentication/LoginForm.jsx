@@ -1,11 +1,28 @@
 import { Link } from "react-router";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../features/authenticationSlice";
 
 export default function LoginForm() {
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    dispatch(loginUser(formData));
+  };
+
   return (
     <div className="card bg-base-100 w-96 shadow-xl">
       <div className="card-body">
         <h2 className="card-title">Welcome Back</h2>
-        <form className="flex flex-col gap-2" action="">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2" action="">
           <label className="input input-bordered flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -13,10 +30,17 @@ export default function LoginForm() {
               fill="currentColor"
               className="h-4 w-4 opacity-70"
             >
-              <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-              <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
+              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
             </svg>
-            <input type="text" className="grow" placeholder="Email" />
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+              className="grow"
+            />
           </label>
           <label className="input input-bordered flex items-center gap-2">
             <svg
@@ -31,13 +55,31 @@ export default function LoginForm() {
                 clipRule="evenodd"
               />
             </svg>
-            <input type="password" className="grow" value="password" />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="grow"
+            />
           </label>
           <div className="card-actions justify-end">
-            <button className="btn btn-primary px-10 mt-1">Login</button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary px-10 mt-1"
+            >
+              {" "}
+              {loading ? "Logging in..." : "Login"}
+            </button>
           </div>
         </form>
-        <Link to="/register" className="text-sm underline text-blue-500">Create Account</Link>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+        <Link to="/register" className="text-sm underline text-blue-500">
+          Create Account
+        </Link>
       </div>
     </div>
   );
