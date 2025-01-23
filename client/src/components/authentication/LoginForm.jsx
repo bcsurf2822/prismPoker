@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 export default function LoginForm() {
   return (
     <div className="card bg-base-100 w-96 shadow-xl">
@@ -35,7 +37,7 @@ export default function LoginForm() {
             <button className="btn btn-primary px-10 mt-1">Login</button>
           </div>
         </form>
-        <p className="text-sm">Create Account</p>
+        <Link to="/register" className="text-sm underline text-blue-500">Create Account</Link>
       </div>
     </div>
   );
