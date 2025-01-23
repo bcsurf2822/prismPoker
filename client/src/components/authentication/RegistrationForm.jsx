@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../../features/authenticationSlice";
+import { useNavigate } from "react-router";
 
 export default function RegistrationForm() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function RegistrationForm() {
   });
 
   const dispatch = useDispatch();
+  let navigate = useNavigate()
 
   const { loading, error } = useSelector((state) => state.auth);
 
@@ -18,9 +20,18 @@ export default function RegistrationForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(registerUser(formData));
+
+    try {
+      const result = await dispatch(registerUser(formData)).unwrap();
+      if (result) {
+        navigate("/");
+      }
+    } catch (err) {
+      console.error("Registration failed:", err);
+
+    }
   };
 
   return (
