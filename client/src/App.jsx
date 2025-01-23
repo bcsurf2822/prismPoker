@@ -1,11 +1,17 @@
-import Navbar from "./components/generalUI/Navbar";
+import LoginForm from "./components/authentication/LoginForm";
+import { useSelector } from "react-redux";
 
 function App() {
-  return (
-    <>
- <Navbar />
+  const user = useSelector((state) => state.auth.user);
 
-    </>
+  return (
+    <div>
+      {user ? (
+        <h1 className="text-2xl font-bold">Welcome back, {user.username}!</h1>
+      ) : (
+        <LoginForm />
+      )}
+    </div>
   );
 }
 
