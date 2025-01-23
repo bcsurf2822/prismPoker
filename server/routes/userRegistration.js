@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const router = require("express").Router();
+const jwt = require("jsonwebtoken");
 
 const User = require("../models/users");
 
@@ -10,7 +11,7 @@ const registerSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
-router.post("/register", async (req, res) => {
+router.post("/", async (req, res) => {
   const { error } = registerSchema.validate(req.body);
 
   if (error) {
@@ -26,10 +27,26 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
     });
 
-    await user.save();
+    const savedUser = await user.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    const token = jwt.sign(
+      { id: savedUser._id, username: savedUser.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" } //
+    );
+
+    res.status(201).json({
+      message: "User registered successfully",
+      token,
+      user: {
+        id: savedUser._id,
+        username: savedUser.username,
+        email: savedUser.email,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: error.toString() });
   }
 });
+
+module.exports = router;
