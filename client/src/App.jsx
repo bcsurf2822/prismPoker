@@ -1,10 +1,7 @@
-import Navbar from "./components/generalUI/Navbar";
-
 function App() {
   return (
     <>
- <Navbar />
-
+      <h2>Home</h2>
     </>
   );
 }
