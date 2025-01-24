@@ -1,4 +1,29 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import io from "socket.io-client";
+import { fetchGames, updateGame } from "../../features/games/gamesSlice";
+
+const socket = io("http://localhost:4000");
+
 export default function Games() {
+  const dispatch = useDispatch();
+  const { games, loading, error } = useSelector((state) => state.games);
+
+  useEffect(() => {
+    dispatch(fetchGames());
+
+    socket.on("gamesUpdated", (updatedGame) => {
+      dispatch(updateGame(updatedGame));
+    });
+
+    return () => {
+      socket.off("gameUpdated");
+    };
+  }, [dispatch]);
+
+  if (loading) return <p>Loading games...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <div className="overflow-x-auto bg-green-100 rounded-md pr-3">
       <table className="table">
@@ -14,33 +39,18 @@ export default function Games() {
           </tr>
         </thead>
         <tbody>
-          {/* row 1 */}
-          <tr className="hover">
-            <th></th>
-            <td>NAME</td>
-            <td>STAKES</td>
-            <td>MIN MAX BUYIN</td>
-            <td>0/6</td>
-            <button className="btn btn-sm btn-accent">Join</button>
-          </tr>
-          {/* row 2 */}
-          <tr className="hover">
-            <th></th>
-            <td>NAME</td>
-            <td>STAKES</td>
-            <td>MIN MAX BUYIN</td>
-            <td>0/6</td>
-            <button className="btn btn-sm btn-accent">Join</button>
-          </tr>
-          {/* row 3 */}
-          <tr className="hover">
-            <th></th>
-            <td>NAME</td>
-            <td>STAKES</td>
-            <td>MIN MAX BUYIN</td>
-            <td>0/6</td>
-            <button className="btn btn-sm btn-accent">Join</button>
-          </tr>
+          {games.map((game) => (
+            <tr key={game.id}>
+              <td></td>
+              <td>{game.name}</td>
+              <td>{game.blinds}</td>
+              <td>
+                {game.min} / ${game.max}
+              </td>
+              <td>{game.playerCount} / 6</td>
+              <button className="btn btn-primary">Join</button>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

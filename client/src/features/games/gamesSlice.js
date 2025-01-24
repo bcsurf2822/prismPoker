@@ -6,6 +6,7 @@ export const fetchGames = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiClient.get("/games");
+      console.log("Response", response)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data || error.message);
