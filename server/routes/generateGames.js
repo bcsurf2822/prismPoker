@@ -1,9 +1,6 @@
 const router = require("express").Router();
 const Game = require("../models/games");
 
-
-
-
 router.post("/", async (req, res) => {
   try {
     const gameStakes = [
