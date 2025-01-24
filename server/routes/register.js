@@ -38,11 +38,7 @@ router.post("/", async (req, res) => {
     res.status(201).json({
       message: "User registered successfully",
       token,
-      user: {
-        id: savedUser._id,
-        username: savedUser.username,
-        email: savedUser.email,
-      },
+      user: savedUser,
     });
   } catch (error) {
     res.status(500).json({ error: error.toString() });

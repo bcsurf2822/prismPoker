@@ -19,8 +19,6 @@ router.post("/", async (req, res) => {
 
   try {
     const { username, password } = req.body;
-    console.log("USER", username);
-    console.log("PAss", password);
 
     const user = await User.findOne({ username });
     if (!user) {
@@ -39,11 +37,7 @@ router.post("/", async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-      },
+      user,
     });
   } catch (error) {
     res.status(500).json({ error: error.toString() });

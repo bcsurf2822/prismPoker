@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../../features/authenticationSlice";
+import { registerUser } from "../../features/auth/authenticationSlice";
 import { useNavigate } from "react-router";
 
 export default function RegistrationForm() {
