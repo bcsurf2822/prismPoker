@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../features/authenticationSlice";
+import { loginUser } from "../../features/auth/authenticationSlice";
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ username: "", password: "" });

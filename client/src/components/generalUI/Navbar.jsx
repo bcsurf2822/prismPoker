@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router";
-import { logout } from "../../features/authenticationSlice";
+import { logout } from "../../features/auth/authenticationSlice";
 
 export default function Navbar() {
   const user = useSelector((state) => state.auth.user);
