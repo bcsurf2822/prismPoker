@@ -27,7 +27,7 @@ export default function Games() {
   return (
     <div className="overflow-x-auto bg-green-100 rounded-md pr-3">
       <table className="table">
-        {/* head */}
+
         <thead>
           <tr className="text-center">
             <th></th>
@@ -40,7 +40,7 @@ export default function Games() {
         </thead>
         <tbody>
           {games.map((game) => (
-            <tr key={game.id}>
+            <tr key={game.id} className="hover">
               <td></td>
               <td>{game.name}</td>
               <td>{game.blinds}</td>
