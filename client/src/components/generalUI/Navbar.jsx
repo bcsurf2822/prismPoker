@@ -25,9 +25,9 @@ export default function Navbar() {
         <li>
           <NavLink to="/games">Games</NavLink>
         </li>
-        <li>
+        {/* <li>
           <NavLink to="/settings">Settings</NavLink>
-        </li>
+        </li> */}
 
         {user && (
           <li>
