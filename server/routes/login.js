@@ -19,8 +19,6 @@ router.post("/", async (req, res) => {
 
   try {
     const { username, password } = req.body;
-    console.log("USER", username);
-    console.log("PAss", password);
 
     const user = await User.findOne({ username });
     if (!user) {

@@ -1,6 +1,6 @@
 const generateGamesRoute = require("./generateGames");
 const testRoute = require("./test");
-const registerRoute = require("./userRegistration")
+const registerRoute = require("./register")
 const loginRoute = require("./login")
 
 const setupRoutes = (app) => {
