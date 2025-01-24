@@ -34,8 +34,8 @@ app.use(cors());
 
 mongoose
   .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
   })
   .then(() => console.log("Successfully connected to MongoDB Atlas"))
   .catch((error) => console.error("MongoDB connection error:", error));
