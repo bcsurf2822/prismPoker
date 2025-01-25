@@ -61,7 +61,7 @@ export default function Games() {
                   onClick={() => handleNavigateToRoom(game._id)}
                   className="btn btn-primary"
                 >
-                  Join
+                  View
                 </button>
               </td>
             </tr>
