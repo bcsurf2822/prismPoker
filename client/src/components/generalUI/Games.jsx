@@ -7,6 +7,7 @@ const socket = io("http://localhost:4000");
 
 export default function Games() {
   const dispatch = useDispatch();
+
   const { games, loading, error } = useSelector((state) => state.games);
 
   useEffect(() => {
@@ -21,13 +22,20 @@ export default function Games() {
     };
   }, [dispatch]);
 
+  const handleNavigateToRoom = (gameId) => {
+    window.open(
+      `/room/${gameId}`,
+      "_blank",
+      "width=800,height=600,top=100,left=100,noopener,noreferrer"
+    );
+  };
+
   if (loading) return <p>Loading games...</p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="overflow-x-auto bg-green-100 rounded-md pr-3">
       <table className="table">
-
         <thead>
           <tr className="text-center">
             <th></th>
@@ -40,7 +48,7 @@ export default function Games() {
         </thead>
         <tbody>
           {games.map((game) => (
-            <tr key={game.id} className="hover">
+            <tr key={game._id} className="hover">
               <td></td>
               <td>{game.name}</td>
               <td>{game.blinds}</td>
@@ -48,7 +56,14 @@ export default function Games() {
                 {game.min} / ${game.max}
               </td>
               <td>{game.playerCount} / 6</td>
-              <button className="btn btn-primary">Join</button>
+              <td>
+                <button
+                  onClick={() => handleNavigateToRoom(game._id)}
+                  className="btn btn-primary"
+                >
+                  View
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

@@ -7,22 +7,30 @@ import About from "./components/generalUI/About.jsx";
 import Layout from "./layouts/Layout.jsx";
 import Games from "./components/generalUI/Games.jsx";
 import RegistrationForm from "./components/authentication/RegistrationForm.jsx";
+import Room from "./components/tableUI/Room.jsx";
 
 import { Provider } from "react-redux";
 import { store } from "./app/store.js";
+import RoomLayout from "./layouts/RoomLayout.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/games" element={<Games />} />
-            <Route path="/register" element={<RegistrationForm />} />
-          </Routes>
-        </Layout>
+ <Provider store={store}>
+ <BrowserRouter>
+        <Routes>
+          {/* General Layout */}
+          <Route path="/" element={<Layout />}>
+            <Route index element={<App />} />
+            <Route path="about" element={<About />} />
+            <Route path="games" element={<Games />} />
+            <Route path="register" element={<RegistrationForm />} />
+          </Route>
+
+          {/* Room Layout */}
+          <Route path="/room/:roomId" element={<RoomLayout />}>
+            <Route index element={<Room />} />
+          </Route>
+        </Routes>
       </BrowserRouter>
     </Provider>
   </StrictMode>
