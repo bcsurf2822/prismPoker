@@ -2,13 +2,11 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import io from "socket.io-client";
 import { fetchGames, updateGame } from "../../features/games/gamesSlice";
-import { useNavigate } from "react-router";
 
 const socket = io("http://localhost:4000");
 
 export default function Games() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const { games, loading, error } = useSelector((state) => state.games);
 
@@ -25,17 +23,15 @@ export default function Games() {
   }, [dispatch]);
 
   const handleNavigateToRoom = (gameId) => {
-    console.log("Navigating to Room with ID:", gameId);
-    if (gameId) {
-      navigate(`/room/${gameId}`);
-    } else {
-      console.error("Game ID is undefined!");
-    }
+    window.open(
+      `/room/${gameId}`,
+      "_blank",
+      "width=800,height=600,top=100,left=100,noopener,noreferrer"
+    );
   };
 
   if (loading) return <p>Loading games...</p>;
   if (error) return <p>Error: {error}</p>;
-
 
   return (
     <div className="overflow-x-auto bg-green-100 rounded-md pr-3">
@@ -61,7 +57,7 @@ export default function Games() {
               </td>
               <td>{game.playerCount} / 6</td>
               <button
-    onClick={() => handleNavigateToRoom(game._id)}
+                onClick={() => handleNavigateToRoom(game._id)}
                 className="btn btn-primary"
               >
                 Join
