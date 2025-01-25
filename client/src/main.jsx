@@ -7,6 +7,7 @@ import About from "./components/generalUI/About.jsx";
 import Layout from "./layouts/Layout.jsx";
 import Games from "./components/generalUI/Games.jsx";
 import RegistrationForm from "./components/authentication/RegistrationForm.jsx";
+import Room from "./components/tableUI/Room.jsx";
 
 import { Provider } from "react-redux";
 import { store } from "./app/store.js";
@@ -21,6 +22,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/about" element={<About />} />
             <Route path="/games" element={<Games />} />
             <Route path="/register" element={<RegistrationForm />} />
+            <Route path="/room/:roomId" element={<Room />} />
           </Routes>
         </Layout>
       </BrowserRouter>
