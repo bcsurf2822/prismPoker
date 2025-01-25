@@ -56,12 +56,14 @@ export default function Games() {
                 {game.min} / ${game.max}
               </td>
               <td>{game.playerCount} / 6</td>
-              <button
-                onClick={() => handleNavigateToRoom(game._id)}
-                className="btn btn-primary"
-              >
-                Join
-              </button>
+              <td>
+                <button
+                  onClick={() => handleNavigateToRoom(game._id)}
+                  className="btn btn-primary"
+                >
+                  Join
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
