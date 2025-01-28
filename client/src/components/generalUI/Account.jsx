@@ -10,8 +10,13 @@ export default function Account() {
   const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
-    setAmount(e.target.value);
-    setError("");
+    const value = e.target.value;
+  
+    // Allow only numbers and a single decimal point
+    if (/^\d*\.?\d*$/.test(value)) {
+      setAmount(value);
+      setError("");
+    }
   };
 
   const handleSubmit = () => {
@@ -21,11 +26,10 @@ export default function Account() {
       return;
     }
 
-    // Dispatch the addFunds action
     dispatch(addFunds({ amount: numericAmount }))
       .unwrap()
       .then(() => {
-        setAmount(""); // Clear input on success
+        setAmount(""); 
       })
       .catch((err) => {
         console.error("Error adding funds:", err);
