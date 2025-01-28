@@ -1,6 +1,8 @@
 import { useParams } from "react-router";
 import Table from "./Table";
 import Seat from "./Seat";
+import BetControl from "./BetControl";
+import Chat from "./Chat";
 
 export default function Room() {
   let { roomId } = useParams();
@@ -27,8 +29,8 @@ export default function Room() {
       </section>
       <section>
         <div className="flex justify-between">
-          <p className="bg-green-200 w-1/2">BetBox</p>
-          <p className="bg-green-500 w-1/2">chatbox</p>
+          <BetControl />
+          <Chat />
         </div>
       </section>
     </main>
