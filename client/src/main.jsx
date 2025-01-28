@@ -12,18 +12,23 @@ import Room from "./components/tableUI/Room.jsx";
 import { Provider } from "react-redux";
 import { store } from "./app/store.js";
 import RoomLayout from "./layouts/RoomLayout.jsx";
+import Profile from "./components/generalUI/Profile.jsx";
+import Account from "./components/generalUI/Account.jsx";
+import Home from "./components/generalUI/Home.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
- <Provider store={store}>
- <BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
         <Routes>
-          {/* General Layout */}
           <Route path="/" element={<Layout />}>
             <Route index element={<App />} />
+            <Route path="/home" element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="games" element={<Games />} />
             <Route path="register" element={<RegistrationForm />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="account" element={<Account />} />
           </Route>
 
           {/* Room Layout */}
