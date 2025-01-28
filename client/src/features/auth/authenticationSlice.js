@@ -32,6 +32,28 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const rehydrateUser = createAsyncThunk(
+  "auth/rehydrateUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        return rejectWithValue("No token found");
+      }
+
+      const response = await apiClient.get("/user/user-info", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return { token, user: response.data };
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
+);
+
 export const addFunds = createAsyncThunk(
   "auth/addFunds",
   async ({ amount }, { getState, rejectWithValue }) => {
@@ -101,6 +123,19 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(rehydrateUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(rehydrateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(rehydrateUser.rejected, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.token = null;
       })
       .addCase(addFunds.pending, (state) => {
         state.loading = true;

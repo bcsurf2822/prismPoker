@@ -13,7 +13,7 @@ const setupRoutes = (app) => {
   app.use("/api/login", loginRoute)
   app.use("/api/games", fetchGamesRoute)
   app.use("/api/user/add-funds", addFundsRoute)
-  app.use("/api/user/userInfo", userInfoRoute)
+  app.use("/api/user/user-info", userInfoRoute)
 };
 
 module.exports = setupRoutes;
