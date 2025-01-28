@@ -25,19 +25,38 @@ export default function Navbar() {
         <li>
           <NavLink to="/games">Games</NavLink>
         </li>
-        {/* <li>
-          <NavLink to="/settings">Settings</NavLink>
-        </li> */}
 
         {user && (
-          <li>
-            <button
-              onClick={handleLogout}
-              className="btn btn-outline btn-error bg-neutral"
-            >
-              Log Out
-            </button>
-          </li>
+          <>
+            {/* Dropdown for Settings */}
+            <li className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="btn m-1">
+                Settings
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                <li>
+                  <NavLink to="/profile">Profile</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/account">Account</NavLink>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <p className="font-bold">SC: ${user.accountBalance}</p>
+            </li>
+            <li>
+              <button
+                onClick={handleLogout}
+                className="btn btn-outline btn-error bg-neutral"
+              >
+                Log Out
+              </button>
+            </li>
+          </>
         )}
       </ul>
     </div>

@@ -12,6 +12,8 @@ import Room from "./components/tableUI/Room.jsx";
 import { Provider } from "react-redux";
 import { store } from "./app/store.js";
 import RoomLayout from "./layouts/RoomLayout.jsx";
+import Profile from "./components/generalUI/Profile.jsx";
+import Account from "./components/generalUI/Account.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -24,6 +26,8 @@ createRoot(document.getElementById("root")).render(
             <Route path="about" element={<About />} />
             <Route path="games" element={<Games />} />
             <Route path="register" element={<RegistrationForm />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="account" element={<Account />} />
           </Route>
 
           {/* Room Layout */}
