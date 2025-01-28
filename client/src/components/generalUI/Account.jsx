@@ -11,8 +11,7 @@ export default function Account() {
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-  
-    // Allow only numbers and a single decimal point
+
     if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value);
       setError("");
@@ -29,7 +28,7 @@ export default function Account() {
     dispatch(addFunds({ amount: numericAmount }))
       .unwrap()
       .then(() => {
-        setAmount(""); 
+        setAmount("");
       })
       .catch((err) => {
         console.error("Error adding funds:", err);
@@ -56,7 +55,9 @@ export default function Account() {
             />
           </label>
           {error && <p className="text-red-500">{error}</p>}
-          <button onClick={handleSubmit} className="btn btn-success">Submit</button>
+          <button onClick={handleSubmit} className="btn btn-success">
+            Submit
+          </button>
         </div>
       </div>
     </div>
