@@ -38,7 +38,7 @@ export const addFunds = createAsyncThunk(
     try {
       const { token } = getState().auth;
       const response = await apiClient.post(
-        "/add-funds",
+        "/user/add-funds",
         { amount },
         {
           headers: {
