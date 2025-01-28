@@ -32,6 +32,30 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const addFunds = createAsyncThunk(
+  "auth/addFunds",
+  async ({ amount }, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await apiClient.post(
+        "/add-funds",
+        { amount },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (e) {
+      if (e.response && e.response.data) {
+        return rejectWithValue(e.response.data);
+      }
+      return rejectWithValue(e.message);
+    }
+  }
+);
+
 const initialState = {
   user: null,
   token: null,
@@ -75,6 +99,18 @@ const authSlice = createSlice({
         localStorage.setItem("authToken", action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addFunds.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addFunds.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+      })
+      .addCase(addFunds.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
