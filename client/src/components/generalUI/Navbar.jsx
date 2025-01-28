@@ -12,7 +12,7 @@ export default function Navbar() {
   const handleLogout = () => {
     dispatch(logout());
     localStorage.removeItem("authToken");
-    navigate("/")
+    navigate("/");
   };
 
   return (
@@ -31,7 +31,6 @@ export default function Navbar() {
 
         {user && (
           <>
-            {/* Dropdown for Settings */}
             <li className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn m-1">
                 Settings
