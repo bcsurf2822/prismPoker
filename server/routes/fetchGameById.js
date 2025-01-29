@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Game = require("../models/games");
 
-router.get("/:gameId", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const game = await Game.findById(req.params.gameId);
     if (!game) {

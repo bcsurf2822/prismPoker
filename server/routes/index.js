@@ -5,6 +5,7 @@ const loginRoute = require("./login")
 const fetchGamesRoute = require("./fetchGames")
 const addFundsRoute = require("./addFunds")
 const userInfoRoute = require("./userInfo")
+const fetchGameByIdRoute = require("./fetchGameById")
 
 const setupRoutes = (app) => {
   app.use("/api/generateGames", generateGamesRoute);
@@ -12,6 +13,7 @@ const setupRoutes = (app) => {
   app.use("/api/register", registerRoute)
   app.use("/api/login", loginRoute)
   app.use("/api/games", fetchGamesRoute)
+  app.use("/api/:gameId", fetchGameByIdRoute)
   app.use("/api/user/add-funds", addFundsRoute)
   app.use("/api/user/user-info", userInfoRoute)
 };

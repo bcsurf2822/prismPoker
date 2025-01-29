@@ -14,6 +14,18 @@ export const fetchGames = createAsyncThunk(
   }
 );
 
+export const fetchGameById = createAsyncThunk(
+  "games/fetchGameById",
+  async (gameId, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(`/games/${gameId}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data || error.message);
+    }
+  }
+);
+
 const gamesSlice = createSlice({
   name: "games",
   initialState: {
