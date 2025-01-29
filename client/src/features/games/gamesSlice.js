@@ -30,6 +30,7 @@ const gamesSlice = createSlice({
   name: "games",
   initialState: {
     games: [],
+    currentGame: null,
     loading: false,
     error: null,
   },
@@ -41,6 +42,10 @@ const gamesSlice = createSlice({
         state.games[index] = updatedGame;
       } else {
         state.games.push(updatedGame);
+      }
+
+      if (state.currentGame && state.currentGame._id === updatedGame._id) {
+        state.currentGame = updatedGame;
       }
     },
   },
@@ -55,6 +60,18 @@ const gamesSlice = createSlice({
         state.games = action.payload;
       })
       .addCase(fetchGames.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchGameById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchGameById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentGame = action.payload; // Set current game when fetched
+      })
+      .addCase(fetchGameById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
