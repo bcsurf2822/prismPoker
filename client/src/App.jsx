@@ -3,6 +3,7 @@ import LoginForm from "./components/authentication/LoginForm";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { rehydrateUser } from "./features/auth/authenticationSlice";
+import SocketService from "./features/websockets/socketService";
 
 function App() {
   const user = useSelector((state) => state.auth.user);
@@ -10,9 +11,10 @@ function App() {
 
   useEffect(() => {
     dispatch(rehydrateUser());
-    dispatch({ type: "websocket/connect" });
+    SocketService.connect(); // ✅ Connect WebSocket on App Load
+
     return () => {
-      dispatch({ type: "websocket/disconnect" });
+      SocketService.disconnect(); // ✅ Cleanup on unmount
     };
   }, [dispatch]);
 

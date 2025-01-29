@@ -4,44 +4,54 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import socketService from "../../features/websockets/socketService";
-import { useEffect } from "react";
+import SocketService from "../../features/websockets/socketService";
+import { useEffect, useState } from "react";
 import { fetchGameById, updateGame } from "../../features/games/gamesSlice";
 
 export default function Room() {
   let { roomId } = useParams();
-  console.log("ROOM ID", roomId);
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.games.currentGame);
   const currentGame = useSelector((state) => state.games.currentGame);
-  const socket = socketService.getSocket();
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    // Fetch the game when entering the room
     dispatch(fetchGameById(roomId));
 
-    // Listen for game updates
-    socket.on("gameUpdated", (updatedGame) => {
-      dispatch(updateGame(updatedGame));
-    });
+    const checkSocket = () => {
+      const activeSocket = SocketService.getSocket();
+      if (!activeSocket) {
+        console.warn("⚠️ Socket not ready, retrying...");
+        setTimeout(checkSocket, 500);
+      } else {
+        console.log("✅ WebSocket ready:", activeSocket.id);
+        setSocket(activeSocket);
 
-    // Cleanup listener when leaving the game room
-    return () => {
-      socket.off("gameUpdated");
+        activeSocket.on("gameUpdated", (updatedGame) => {
+          dispatch(updateGame(updatedGame));
+        });
+      }
     };
-  }, [dispatch, roomId]);
 
-  const handleJoinGame = (seatId, buyIn) => {
-    if (!user) return;
+    checkSocket();
 
-    // Emit event to join the game via WebSocket
-    socket.emit("playerJoin", {
-      gameId: roomId,
-      userId: user.id,
-      buyIn,
-      seatId,
-    });
-  };
+    return () => {
+      if (socket) {
+        socket.off("gameUpdated");
+      }
+    };
+  }, [dispatch, roomId, socket]);
+
+  // const handleJoinGame = (seatId, buyIn) => {
+  //   if (!user) return;
+
+  //   // Emit event to join the game via WebSocket
+  //   socket.emit("playerJoin", {
+  //     gameId: roomId,
+  //     userId: user.id,
+  //     buyIn,
+  //     seatId,
+  //   });
+  // };
 
   if (!currentGame) return <p>Loading game...</p>;
 

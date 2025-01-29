@@ -21,7 +21,8 @@ export const fetchGameById = createAsyncThunk(
       const response = await apiClient.get(`/games/${gameId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data || error.message);
+      console.error("Fetch Game Error:", error);
+      return rejectWithValue(error.response?.data || "Game not found");
     }
   }
 );
