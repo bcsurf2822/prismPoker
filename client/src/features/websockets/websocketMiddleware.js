@@ -14,6 +14,16 @@ const websocketMiddleware = (store) => (next) => (action) => {
       });
       break;
 
+    case "websocket/listenToGames":
+      socket.on("gamesUpdated", (updatedGame) => {
+        store.dispatch(updateGame(updatedGame));
+      });
+      break;
+
+    case "websocket/stopListeningToGames":
+      socket.off("gamesUpdated");
+      break;
+
     case "websocket/disconnect":
       SocketService.disconnect();
       break;
