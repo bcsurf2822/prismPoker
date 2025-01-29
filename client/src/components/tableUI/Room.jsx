@@ -57,7 +57,7 @@ export default function Room() {
 
   return (
     <main className="w-full min-h-screen flex flex-col justify-center bg-slate-200  ">
-      {/* <h1 className="text-2xl font-bold">{currentGame.name}</h1> */}
+      <h1 className="text-2xl font-bold">{currentGame.name}</h1>
       <section className="flex flex-col justify-center  items-center gap-2 w-full h-[70vh] bg-blue-700">
         {/* top */}
         <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
