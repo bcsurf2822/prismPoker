@@ -20,9 +20,14 @@
 // const positionsAndBlindsSocket = require("./mech/newRoundSocket");
 // const { winningSocket } = require("./mech/winningSocket");
 
+const handlePlayerJoin = require("./room/joinGameSocket")
+
 function setupSockets(io) {
   io.on("connection", (socket) => {
     console.log("a user connected");
+
+    handlePlayerJoin(io, socket)
+
 
     // gameSocket(socket);
     // allGamesSocket(socket);

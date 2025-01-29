@@ -18,17 +18,16 @@ const PlayerSchema = new Schema({
     ref: "User",
     required: true,
   },
-  username: String,
   chips: { type: Number, required: true, set: toDecimal },
   handCards: {
-    type: [String],
+    type: [CardSchema],
     default: [],
   },
   bet: { type: Number, required: true, set: toDecimal },
   action: {
     type: String,
-    enum: ["check","call", "bet", "all-in", "fold", "raise", "none"], 
-    default: "none"
+    enum: ["check", "call", "bet", "all-in", "fold", "raise", "none"],
+    default: "none",
   },
   checkBetFold: {
     type: Boolean,
@@ -125,7 +124,7 @@ const GameSchema = new Schema({
     default: [],
   },
   communityCards: {
-    type: [String],
+    type: [CardSchema],
     default: [],
   },
   dealtCards: {
