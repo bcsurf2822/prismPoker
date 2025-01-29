@@ -10,10 +10,13 @@ function App() {
 
   useEffect(() => {
     dispatch(rehydrateUser());
+    dispatch({ type: "websocket/connect" });
+    return () => {
+      dispatch({ type: "websocket/disconnect" });
+    };
   }, [dispatch]);
 
   if (user === undefined) {
-
     return <div>Loading...</div>;
   }
 
