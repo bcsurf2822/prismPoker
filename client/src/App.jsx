@@ -11,10 +11,9 @@ function App() {
 
   useEffect(() => {
     dispatch(rehydrateUser());
-    SocketService.connect(); // ✅ Connect WebSocket on App Load
-
+    SocketService.connect(); 
     return () => {
-      SocketService.disconnect(); // ✅ Cleanup on unmount
+      SocketService.disconnect();
     };
   }, [dispatch]);
 

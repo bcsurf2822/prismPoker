@@ -17,7 +17,7 @@ class SocketService {
 
       this.socket.on("disconnect", () => {
         console.log("❌ WebSocket disconnected");
-        this.socket = null; // Ensure it resets
+        this.socket = null; 
       });
     }
   }

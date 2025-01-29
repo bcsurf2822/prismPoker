@@ -70,7 +70,7 @@ const gamesSlice = createSlice({
       })
       .addCase(fetchGameById.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentGame = action.payload; // Set current game when fetched
+        state.currentGame = action.payload;
       })
       .addCase(fetchGameById.rejected, (state, action) => {
         state.loading = false;
