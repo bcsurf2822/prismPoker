@@ -59,7 +59,7 @@ export default function Room() {
 
     if (!socket) return;
 
-    const userId = user.id; 
+    const userId = user.id;
     socket.emit("playerJoin", {
       gameId: roomId,
       userId,
@@ -86,13 +86,13 @@ export default function Room() {
         {/* mid */}
         <div className="flex gap-5 w-full h-1/3  justify-center  text-center px-4">
           <Seat
-            seatId={currentGame.seats[2]._id}
+            seatId={currentGame.seats[5]._id}
             joinGame={handleJoinGame}
             user={user}
           />
           <Table />
           <Seat
-            seatId={currentGame.seats[5]._id}
+            seatId={currentGame.seats[2]._id}
             joinGame={handleJoinGame}
             user={user}
           />

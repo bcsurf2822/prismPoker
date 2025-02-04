@@ -1,6 +1,5 @@
 const User = require("../../models/users");
-const Game = require("../../models/games")
-
+const Game = require("../../models/games");
 
 const handlePlayerJoin = (io, socket) => {
   socket.on("playerJoin", async ({ gameId, userId, buyIn, seatId }) => {
@@ -12,22 +11,27 @@ const handlePlayerJoin = (io, socket) => {
         return socket.emit("joinError", { message: "Game or User not found" });
       }
 
-      // Check if the player has enough funds
+
       if (user.accountBalance < buyIn) {
         return socket.emit("joinError", { message: "Insufficient funds" });
       }
 
-      // Find an open seat
-      const seat = game.seats.find((seat) => seat.id === seatId);
+
+      const seat = game.seats.find(
+        (seat) => seat._id.toString() === seatId.toString()
+      );
+      console.log("SEAT SERVER", seat);
       if (!seat || seat.player) {
-        return socket.emit("joinError", { message: "Seat is already occupied" });
+        return socket.emit("joinError", {
+          message: "Seat is already occupied",
+        });
       }
 
-      // Deduct buy-in amount from user's balance
+
       user.accountBalance -= buyIn;
       await user.save();
 
-      // Add player to the seat
+
       seat.player = {
         user: user._id,
         chips: buyIn,
@@ -37,7 +41,6 @@ const handlePlayerJoin = (io, socket) => {
 
       await game.save();
 
-      // Emit update to all clients in the room
       io.to(gameId).emit("gameUpdated", game);
       socket.emit("joinSuccess", { message: "Joined successfully", game });
     } catch (error) {
