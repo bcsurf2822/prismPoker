@@ -5,34 +5,26 @@ import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
 import SocketService from "../../features/websockets/socketService";
-import { useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { fetchGameById, updateGame } from "../../features/games/gamesSlice";
+import { SocketContext } from "../../context/socketContext";
 
 export default function Room() {
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const currentGame = useSelector((state) => state.games.currentGame);
-  const [socket, setSocket] = useState(null);
+  const socket = useContext(SocketContext);
 
   useEffect(() => {
     dispatch(fetchGameById(roomId));
 
-    const checkSocket = () => {
-      const activeSocket = SocketService.getSocket();
-      if (!activeSocket) {
-        console.warn("⚠️ Socket not ready, retrying...");
-        setTimeout(checkSocket, 500);
-      } else {
-        console.log("✅ WebSocket ready:", activeSocket.id);
-        setSocket(activeSocket);
-
-        activeSocket.on("gameUpdated", (updatedGame) => {
-          dispatch(updateGame(updatedGame));
-        });
-      }
-    };
-
-    checkSocket();
+    if (socket) {
+      socket.on("gameUpdated", (updatedGame) => {
+        dispatch(updateGame(updatedGame));
+      });
+    } else {
+      console.warn("Socket is not ready");
+    }
 
     return () => {
       if (socket) {
@@ -40,18 +32,6 @@ export default function Room() {
       }
     };
   }, [dispatch, roomId, socket]);
-
-  // const handleJoinGame = (seatId, buyIn) => {
-  //   if (!user) return;
-
-  //   // Emit event to join the game via WebSocket
-  //   socket.emit("playerJoin", {
-  //     gameId: roomId,
-  //     userId: user.id,
-  //     buyIn,
-  //     seatId,
-  //   });
-  // };
 
   if (!currentGame) return <p>Loading game...</p>;
 
