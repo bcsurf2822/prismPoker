@@ -1,48 +1,71 @@
 const User = require("../../models/users");
 const Game = require("../../models/games");
 
-const handlePlayerLeave = (io, socket) => {
-  socket.on("playerLeave", async ({ gameId, userId, seatId }) => {
+const leaveGameSocket = (socket, io) => {
+  socket.on("leaveGame", async (data) => {
     try {
+      const { gameId, userId } = data;
+
       const game = await Game.findById(gameId);
+      if (!game) {
+        return socket.emit("leaveGameError", { message: "Game not found!" });
+      }
+
       const user = await User.findById(userId);
-
-      if (!game || !user) {
-        return socket.emit("joinError", { message: "Game or User not found" });
+      if (!user) {
+        return socket.emit("leaveGameError", { message: "User not found!" });
       }
 
-      if (user.accountBalance < buyIn) {
-        return socket.emit("joinError", { message: "Insufficient funds" });
-      }
 
-      const seat = game.seats.find(
-        (seat) => seat._id.toString() === seatId.toString()
+      const playerSeat = game.seats.find(
+        (seat) => seat.player && seat.player.user.toString() === userId
       );
-      if (!seat || seat.player) {
-        return socket.emit("joinError", {
-          message: "Seat is already occupied",
+      if (!playerSeat) {
+        return socket.emit("leaveGameError", {
+          message: "You are not sitting in this game!",
         });
       }
 
-      user.accountBalance -= buyIn;
+    
+      user.accountBalance += playerSeat.player.chips;
+      playerSeat.player = null;
+      game.playerCount -= 1;
+
       await user.save();
 
-      seat.player = {
-        user: user._id,
-        chips: buyIn,
-        bet: 0,
-        action: "none",
-      };
+      const remainingPlayers = game.seats.filter(
+        (seat) => seat.player !== null
+      );
+
+
+      if (remainingPlayers.length === 1) {
+        const lastPlayer = remainingPlayers[0].player;
+        lastPlayer.chips += game.pot;
+        game.pot = 0;
+        game.currentDeck = [];
+        game.communityCards = [];
+        game.dealtCards = [];
+        game.winnerData = [];
+        game.stage = "preflop";
+        game.gameEnd = false;
+        game.dealerPosition = -1;
+        game.smallBlindPosition = -1;
+        game.bigBlindPosition = -1;
+        game.currentPlayerTurn = -1;
+
+        io.to(gameId).emit("game_ended", game);
+      }
 
       await game.save();
-
-      io.to(gameId).emit("gameUpdated", game);
-      socket.emit("joinSuccess", { message: "Joined successfully", game });
-    } catch (error) {
-      console.error("Error joining game:", error);
-      socket.emit("joinError", { message: "Server error" });
+      console.log("Emitting playerLeave event...");
+      io.to(gameId).emit("playerLeft", game);
+      console.log("Emitting gameLeft event to leaving socket...");
+      socket.emit("gameLeft", { message: "Successfully left the game!", game });
+    } catch (err) {
+      console.error("Error in leaveSocket:", err);
+      socket.emit("leaveGameError", { message: err.message });
     }
   });
 };
 
-module.exports = handlePlayerLeave;
+module.exports = leaveGameSocket;

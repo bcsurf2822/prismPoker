@@ -17,7 +17,6 @@ import Account from "./components/generalUI/Account.jsx";
 import Home from "./components/generalUI/Home.jsx";
 import SocketProvider from "./context/SocketProvider.jsx";
 
-
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>

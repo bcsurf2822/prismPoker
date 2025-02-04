@@ -15,11 +15,14 @@ export default function Room() {
   const dispatch = useDispatch();
   const currentGame = useSelector((state) => state.games.currentGame);
   const user = useSelector((state) => state.auth.user);
-  console.log("USER", user);
-  console.log("C.Game: ", currentGame);
   const socket = useContext(SocketContext);
   const [joinError, setJoinError] = useState(null);
+  const [leaveError, setLeaveError] = useState(null);
 
+    console.log("USER", user);
+  // console.log("C.Game: ", currentGame);
+  
+  
   useEffect(() => {
     dispatch(fetchGameById(roomId));
 
@@ -41,15 +44,27 @@ export default function Room() {
         console.error("Join error:", data.message);
         setJoinError(data.message);
       });
+
+      socket.on("gameLeft", (data) => {
+        console.log("Leave successful:", data);
+        // Optionally, you could navigate away or update state here.
+      });
+
+      socket.on("leaveGameError", (data) => {
+        console.error("Leave game error:", data.message);
+        setLeaveError(data.message);
+      });
     } else {
       console.warn("Socket not available yet");
     }
 
-    return () => {
+   return () => {
       if (socket) {
         socket.off("gameUpdated");
         socket.off("joinSuccess");
         socket.off("joinError");
+        socket.off("gameLeft");
+        socket.off("leaveGameError");
       }
     };
   }, [dispatch, roomId, socket, user]);
@@ -68,13 +83,23 @@ export default function Room() {
     });
   };
 
+  const handleLeaveGame = () => {
+    if (!socket) return;
+    const userId = user._id || user.id;
+    console.log(`User ${userId} is leaving game ${roomId}`);
+    socket.emit("leaveGame", { gameId: roomId, userId });
+  };
+
+
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
     <main className="w-full min-h-screen flex flex-col justify-center bg-slate-200  ">
+          {joinError && <p className="text-red-500">{joinError}</p>}
+          {leaveError && <p className="text-red-500">{leaveError}</p>}
       <div className="flex justify-between mb-2">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button className="bg-red-300 rounded-md py-2 px-3">Leave</button>
+        <button onClick={handleLeaveGame}  className="bg-red-300 rounded-md py-2 px-3">Leave</button>
       </div>
 
       <section className="flex flex-col justify-center  items-center gap-2 w-full h-[70vh] bg-blue-700">

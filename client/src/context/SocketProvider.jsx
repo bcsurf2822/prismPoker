@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import SocketService from "../features/websockets/socketService";
+import PropTypes from "prop-types";
 
 export const SocketContext = createContext(null);
 
@@ -21,4 +22,6 @@ export default function SocketProvider({ children }) {
   );
 }
 
-
+SocketProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
