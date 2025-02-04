@@ -11,26 +11,21 @@ const handlePlayerJoin = (io, socket) => {
         return socket.emit("joinError", { message: "Game or User not found" });
       }
 
-
       if (user.accountBalance < buyIn) {
         return socket.emit("joinError", { message: "Insufficient funds" });
       }
 
-
       const seat = game.seats.find(
         (seat) => seat._id.toString() === seatId.toString()
       );
-      console.log("SEAT SERVER", seat);
       if (!seat || seat.player) {
         return socket.emit("joinError", {
           message: "Seat is already occupied",
         });
       }
 
-
       user.accountBalance -= buyIn;
       await user.save();
-
 
       seat.player = {
         user: user._id,

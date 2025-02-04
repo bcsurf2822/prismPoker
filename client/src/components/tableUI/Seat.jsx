@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 
-export default function Seat({ seatId, joinGame }) {
-
+export default function Seat({ seat, joinGame }) {
+  const seatId = seat._id;
 
   const buyIn = 8;
   return (
@@ -17,5 +17,23 @@ export default function Seat({ seatId, joinGame }) {
 }
 
 Seat.propTypes = {
+  seat: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+    player: PropTypes.shape({
+      user: PropTypes.string,
+      chips: PropTypes.number,
+      bet: PropTypes.number,
+      action: PropTypes.oneOf([
+        "check",
+        "call",
+        "bet",
+        "all-in",
+        "fold",
+        "raise",
+        "none",
+      ]),
+    }),
+  }).isRequired,
   joinGame: PropTypes.func.isRequired,
 };

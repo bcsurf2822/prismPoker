@@ -5,7 +5,6 @@ import { useNavigate } from "react-router";
 
 export default function Navbar() {
   const user = useSelector((state) => state.auth.user);
-  console.log("USER AT NAV", user)
   const dispatch = useDispatch();
   let navigate = useNavigate();
 

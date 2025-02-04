@@ -33,7 +33,6 @@ export default function Room() {
 
       socket.on("joinSuccess", (data) => {
         console.log("Join successful:", data);
-        // Optionally, update Redux state if needed
         dispatch(updateGame(data.game));
       });
 
@@ -77,22 +76,22 @@ export default function Room() {
         {/* top */}
         <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
           <Seat
-            seatId={currentGame.seats[0]._id}
+            seatId={currentGame.seats[0]}
             joinGame={handleJoinGame}
             user={user}
           />
-          <Seat seatId={currentGame.seats[1]._id} />
+          <Seat seatId={currentGame.seats[1]} />
         </div>
         {/* mid */}
         <div className="flex gap-5 w-full h-1/3  justify-center  text-center px-4">
           <Seat
-            seatId={currentGame.seats[5]._id}
+            seatId={currentGame.seats[5]}
             joinGame={handleJoinGame}
             user={user}
           />
           <Table />
           <Seat
-            seatId={currentGame.seats[2]._id}
+            seatId={currentGame.seats[2]}
             joinGame={handleJoinGame}
             user={user}
           />
@@ -100,12 +99,12 @@ export default function Room() {
         {/* btm */}
         <div className="flex gap-10 h-1/3 w-1/2 items-center justify-center">
           <Seat
-            seatId={currentGame.seats[4]._id}
+            seatId={currentGame.seats[4]}
             joinGame={handleJoinGame}
             user={user}
           />
           <Seat
-            seatId={currentGame.seats[3]._id}
+            seat={currentGame.seats[3]}
             joinGame={handleJoinGame}
             user={user}
           />
