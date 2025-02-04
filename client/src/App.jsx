@@ -3,7 +3,6 @@ import LoginForm from "./components/authentication/LoginForm";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { rehydrateUser } from "./features/auth/authenticationSlice";
-import SocketService from "./features/websockets/socketService";
 
 function App() {
   const user = useSelector((state) => state.auth.user);
@@ -11,10 +10,6 @@ function App() {
 
   useEffect(() => {
     dispatch(rehydrateUser());
-    SocketService.connect(); 
-    return () => {
-      SocketService.disconnect();
-    };
   }, [dispatch]);
 
   if (user === undefined) {
