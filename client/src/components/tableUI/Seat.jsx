@@ -1,13 +1,11 @@
 import PropTypes from "prop-types";
 
 export default function Seat({ seat, joinGame }) {
-  const seatId = seat._id;
-
   const buyIn = 8;
   return (
     <div className="bg-white rounded-full w-1/4 h-5/6 flex justify-center items-center">
       <button
-        onClick={() => joinGame && joinGame(seatId, buyIn)}
+        onClick={() => joinGame && joinGame(seat._id, buyIn)}
         className="bg-blue-300 rounded-md py-2 px-3"
       >
         Join
