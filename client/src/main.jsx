@@ -15,28 +15,31 @@ import RoomLayout from "./layouts/RoomLayout.jsx";
 import Profile from "./components/generalUI/Profile.jsx";
 import Account from "./components/generalUI/Account.jsx";
 import Home from "./components/generalUI/Home.jsx";
+import { SocketProvider } from "./context/socketContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<App />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="about" element={<About />} />
-            <Route path="games" element={<Games />} />
-            <Route path="register" element={<RegistrationForm />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="account" element={<Account />} />
-          </Route>
+      <SocketProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<App />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="about" element={<About />} />
+              <Route path="games" element={<Games />} />
+              <Route path="register" element={<RegistrationForm />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="account" element={<Account />} />
+            </Route>
 
-          {/* Room Layout */}
-          <Route path="/room/:roomId" element={<RoomLayout />}>
-            <Route index element={<Room />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+            {/* Room Layout */}
+            <Route path="/room/:roomId" element={<RoomLayout />}>
+              <Route index element={<Room />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </SocketProvider>
     </Provider>
   </StrictMode>
 );

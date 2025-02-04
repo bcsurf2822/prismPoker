@@ -13,7 +13,6 @@ function App() {
   }, [dispatch]);
 
   if (user === undefined) {
-
     return <div>Loading...</div>;
   }
 

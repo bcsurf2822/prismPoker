@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import io from "socket.io-client";
-import { fetchGames, updateGame } from "../../features/games/gamesSlice";
+// import io from "socket.io-client";
+import { fetchGames } from "../../features/games/gamesSlice";
 
-const socket = io("http://localhost:4000");
+// const socket = io("http://localhost:4000");
 
 export default function Games() {
   const dispatch = useDispatch();
@@ -11,14 +11,15 @@ export default function Games() {
   const { games, loading, error } = useSelector((state) => state.games);
 
   useEffect(() => {
+    // Fetch initial games from API
     dispatch(fetchGames());
 
-    socket.on("gamesUpdated", (updatedGame) => {
-      dispatch(updateGame(updatedGame));
-    });
+    // Dispatch WebSocket connection event
+    dispatch({ type: "websocket/listenToGames" });
 
     return () => {
-      socket.off("gameUpdated");
+      // Dispatch action to stop listening when component unmounts
+      dispatch({ type: "websocket/stopListeningToGames" });
     };
   }, [dispatch]);
 
