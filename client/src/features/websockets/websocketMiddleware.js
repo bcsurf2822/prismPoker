@@ -1,6 +1,9 @@
 import { updateGame } from "../games/gamesSlice";
 import SocketService from "./socketService";
 
+// Purpose:
+// This middleware intercepts certain Redux actions to manage WebSocket connections and events globally from within your Redux store. It helps decouple WebSocket logic from UI components by handling it centrally.
+
 const websocketMiddleware = (store) => (next) => (action) => {
   const socket = SocketService.getSocket();
 

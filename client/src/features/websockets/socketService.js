@@ -1,3 +1,6 @@
+// Purpose:
+// Acts as a singleton that manages your single Socket.IO connection. It encapsulates the logic for connecting to, retrieving, and disconnecting from your WebSocket server.
+
 import io from "socket.io-client";
 
 class SocketService {
