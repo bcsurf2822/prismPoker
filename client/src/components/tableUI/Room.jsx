@@ -80,37 +80,53 @@ export default function Room() {
         {/* top */}
         <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
           <Seat
-            seatId={currentGame.seats[0]}
+            seat={currentGame.seats[0]}
             joinGame={handleJoinGame}
             user={user}
+            min={currentGame.min}
+            max={currentGame.max}
           />
-          <Seat seatId={currentGame.seats[1]} />
+          <Seat
+            seat={currentGame.seats[1]}
+            joinGame={handleJoinGame}
+            user={user}
+            min={currentGame.min}
+            max={currentGame.max}
+          />
         </div>
         {/* mid */}
         <div className="flex gap-5 w-full h-1/3  justify-center  text-center px-4">
           <Seat
-            seatId={currentGame.seats[5]}
+            seat={currentGame.seats[5]}
             joinGame={handleJoinGame}
             user={user}
+            min={currentGame.min}
+            max={currentGame.max}
           />
           <Table />
           <Seat
-            seatId={currentGame.seats[2]}
+            seat={currentGame.seats[2]}
             joinGame={handleJoinGame}
             user={user}
+            min={currentGame.min}
+            max={currentGame.max}
           />
         </div>
         {/* btm */}
         <div className="flex gap-10 h-1/3 w-1/2 items-center justify-center">
           <Seat
-            seatId={currentGame.seats[4]}
+            seat={currentGame.seats[4]}
             joinGame={handleJoinGame}
             user={user}
+            min={currentGame.min}
+            max={currentGame.max}
           />
           <Seat
             seat={currentGame.seats[3]}
             joinGame={handleJoinGame}
             user={user}
+            min={currentGame.min}
+            max={currentGame.max}
           />
         </div>
       </section>
