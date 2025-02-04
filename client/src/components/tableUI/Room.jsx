@@ -12,6 +12,7 @@ export default function Room() {
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const currentGame = useSelector((state) => state.games.currentGame);
+  const user = useSelector((state) => state.auth.user);
   console.log("C.Game: ", currentGame )
   const socket = useContext(SocketContext);
   const [joinError, setJoinError] = useState(null);
@@ -73,19 +74,19 @@ export default function Room() {
       <section className="flex flex-col justify-center  items-center gap-2 w-full h-[70vh] bg-blue-700">
         {/* top */}
         <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
-        <Seat seat={currentGame.seats[0]} />
+        <Seat seat={currentGame.seats[0]} joinGame={handleJoinGame} user={user} />
         <Seat seat={currentGame.seats[1]} />
         </div>
         {/* mid */}
         <div className="flex gap-5 w-full h-1/3  justify-center  text-center px-4">
-        <Seat seat={currentGame.seats[5]} />
+        <Seat seat={currentGame.seats[5]} joinGame={handleJoinGame}  user={user} />
           <Table />
-          <Seat seat={currentGame.seats[2]} />
+          <Seat seat={currentGame.seats[2]} joinGame={handleJoinGame}  user={user} />
         </div>
         {/* btm */}
         <div className="flex gap-10 h-1/3 w-1/2 items-center justify-center">
-        <Seat seat={currentGame.seats[4]} />
-        <Seat seat={currentGame.seats[3]} />
+        <Seat seat={currentGame.seats[4]} joinGame={handleJoinGame}  user={user} />
+        <Seat seat={currentGame.seats[3]} joinGame={handleJoinGame}  user={user} />
         </div>
       </section>
       <section>
