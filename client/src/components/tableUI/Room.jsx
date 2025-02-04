@@ -7,34 +7,36 @@ import Chat from "./Chat";
 import { useContext, useEffect, useState } from "react";
 import { fetchGameById, updateGame } from "../../features/games/gamesSlice";
 import { SocketContext } from "../../context/socketContext";
+import { rehydrateUser } from "../../features/auth/authenticationSlice";
 
 export default function Room() {
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const currentGame = useSelector((state) => state.games.currentGame);
   const user = useSelector((state) => state.auth.user);
-  console.log("C.Game: ", currentGame )
+  console.log("USER", user);
+  console.log("C.Game: ", currentGame);
   const socket = useContext(SocketContext);
   const [joinError, setJoinError] = useState(null);
 
   useEffect(() => {
-    // Fetch the game when entering the room
     dispatch(fetchGameById(roomId));
 
-    // Listen for game updates
+    if (!user) {
+      dispatch(rehydrateUser());
+    }
+
     if (socket) {
       socket.on("gameUpdated", (updatedGame) => {
         dispatch(updateGame(updatedGame));
       });
 
-      // Listen for join success
       socket.on("joinSuccess", (data) => {
         console.log("Join successful:", data);
         // Optionally, update Redux state if needed
         dispatch(updateGame(data.game));
       });
 
-      // Listen for join error
       socket.on("joinError", (data) => {
         console.error("Join error:", data.message);
         setJoinError(data.message);
@@ -43,7 +45,6 @@ export default function Room() {
       console.warn("Socket not available yet");
     }
 
-    // Cleanup listeners on unmount
     return () => {
       if (socket) {
         socket.off("gameUpdated");
@@ -51,13 +52,14 @@ export default function Room() {
         socket.off("joinError");
       }
     };
-  }, [dispatch, roomId, socket]);
+  }, [dispatch, roomId, socket, user]);
 
   const handleJoinGame = (seatId, buyIn) => {
-    // Ensure socket is connected and currentGame (or user info) is available
+    console.log(`attempting to join seat : ${seatId} with ${buyIn}`);
+
     if (!socket) return;
-    // Assuming you have user id from a higher-level auth state, e.g., using useSelector((state) => state.auth.user.id)
-    const userId = "someUserId"; // Replace with actual user id from your auth slice
+
+    const userId = user.id; 
     socket.emit("playerJoin", {
       gameId: roomId,
       userId,
@@ -74,19 +76,39 @@ export default function Room() {
       <section className="flex flex-col justify-center  items-center gap-2 w-full h-[70vh] bg-blue-700">
         {/* top */}
         <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
-        <Seat seat={currentGame.seats[0]} joinGame={handleJoinGame} user={user} />
-        <Seat seat={currentGame.seats[1]} />
+          <Seat
+            seatId={currentGame.seats[0]._id}
+            joinGame={handleJoinGame}
+            user={user}
+          />
+          <Seat seatId={currentGame.seats[1]._id} />
         </div>
         {/* mid */}
         <div className="flex gap-5 w-full h-1/3  justify-center  text-center px-4">
-        <Seat seat={currentGame.seats[5]} joinGame={handleJoinGame}  user={user} />
+          <Seat
+            seatId={currentGame.seats[2]._id}
+            joinGame={handleJoinGame}
+            user={user}
+          />
           <Table />
-          <Seat seat={currentGame.seats[2]} joinGame={handleJoinGame}  user={user} />
+          <Seat
+            seatId={currentGame.seats[5]._id}
+            joinGame={handleJoinGame}
+            user={user}
+          />
         </div>
         {/* btm */}
         <div className="flex gap-10 h-1/3 w-1/2 items-center justify-center">
-        <Seat seat={currentGame.seats[4]} joinGame={handleJoinGame}  user={user} />
-        <Seat seat={currentGame.seats[3]} joinGame={handleJoinGame}  user={user} />
+          <Seat
+            seatId={currentGame.seats[4]._id}
+            joinGame={handleJoinGame}
+            user={user}
+          />
+          <Seat
+            seatId={currentGame.seats[3]._id}
+            joinGame={handleJoinGame}
+            user={user}
+          />
         </div>
       </section>
       <section>
