@@ -6,8 +6,9 @@ import BetControl from "./BetControl";
 import Chat from "./Chat";
 import { useContext, useEffect, useState } from "react";
 import { fetchGameById, updateGame } from "../../features/games/gamesSlice";
-import { SocketContext } from "../../context/socketContext";
+
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
+import { SocketContext } from "../../context/SocketProvider";
 
 export default function Room() {
   let { roomId } = useParams();

@@ -15,7 +15,8 @@ import RoomLayout from "./layouts/RoomLayout.jsx";
 import Profile from "./components/generalUI/Profile.jsx";
 import Account from "./components/generalUI/Account.jsx";
 import Home from "./components/generalUI/Home.jsx";
-import { SocketProvider } from "./context/socketContext.jsx";
+import SocketProvider from "./context/SocketProvider.jsx";
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
