@@ -34,10 +34,21 @@ const handlePlayerJoin = (io, socket) => {
         action: "none",
       };
 
+      game.playerCount++;
+
       await game.save();
 
-      io.to(gameId).emit("gameUpdated", game);
-      socket.emit("joinSuccess", { message: "Joined successfully", game });
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user"
+      );
+
+      io.to(gameId).emit("gameUpdated", updatedGame); 
+
+  
+      socket.emit("joinSuccess", {
+        message: "Joined successfully",
+        game: updatedGame,
+      });
     } catch (error) {
       console.error("Error joining game:", error);
       socket.emit("joinError", { message: "Server error" });

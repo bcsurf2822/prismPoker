@@ -1,13 +1,12 @@
-const Game = require("../../models/games");
 const User = require("../../models/users");
+const Game = require("../../models/games");
 
-function leaveSocket(socket, io) {
+const leaveGameSocket = (io, socket) => {
   socket.on("leaveGame", async (data) => {
     try {
       const { gameId, userId } = data;
 
       const game = await Game.findById(gameId);
-
       if (!game) {
         return socket.emit("leaveGameError", { message: "Game not found!" });
       }
@@ -20,7 +19,6 @@ function leaveSocket(socket, io) {
       const playerSeat = game.seats.find(
         (seat) => seat.player && seat.player.user.toString() === userId
       );
-
       if (!playerSeat) {
         return socket.emit("leaveGameError", {
           message: "You are not sitting in this game!",
@@ -41,7 +39,6 @@ function leaveSocket(socket, io) {
         const lastPlayer = remainingPlayers[0].player;
         lastPlayer.chips += game.pot;
         game.pot = 0;
-
         game.currentDeck = [];
         game.communityCards = [];
         game.dealtCards = [];
@@ -53,20 +50,25 @@ function leaveSocket(socket, io) {
         game.bigBlindPosition = -1;
         game.currentPlayerTurn = -1;
 
-        socket.broadcast.emit("game_ended", game);
+        io.to(gameId).emit("game_ended", game);
       }
 
       await game.save();
-      console.log("Emitting playerLeave event...");
-      io.emit("playerLeft", game);
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user"
+      );
 
-      console.log("Emitting gameLeft event...");
-      socket.emit("gameLeft", { message: "Successfully left the game!", game });
+      io.to(gameId).emit("gameUpdated", updatedGame);
+
+      socket.emit("gameLeft", {
+        message: "Successfully left the game!",
+        game: updatedGame,
+      });
     } catch (err) {
-      console.error(err);
+      console.error("Error in leaveSocket:", err);
       socket.emit("leaveGameError", { message: err.message });
     }
   });
-}
+};
 
-module.exports = leaveSocket;
+module.exports = leaveGameSocket;

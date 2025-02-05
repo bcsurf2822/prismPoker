@@ -4,54 +4,31 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import { useContext, useEffect, useState } from "react";
-import { fetchGameById, updateGame } from "../../features/games/gamesSlice";
-import { SocketContext } from "../../context/socketContext";
+import { useContext, useEffect } from "react";
+import { fetchGameById } from "../../features/games/gamesSlice";
+
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
+import { SocketContext } from "../../context/SocketProvider";
+
+// need to set up error handleing from redux instead of local state
 
 export default function Room() {
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const currentGame = useSelector((state) => state.games.currentGame);
   const user = useSelector((state) => state.auth.user);
-  console.log("USER", user);
-  console.log("C.Game: ", currentGame);
   const socket = useContext(SocketContext);
-  const [joinError, setJoinError] = useState(null);
 
   useEffect(() => {
     dispatch(fetchGameById(roomId));
+    if (!user) dispatch(rehydrateUser());
 
-    if (!user) {
-      dispatch(rehydrateUser());
-    }
-
-    if (socket) {
-      socket.on("gameUpdated", (updatedGame) => {
-        dispatch(updateGame(updatedGame));
-      });
-
-      socket.on("joinSuccess", (data) => {
-        console.log("Join successful:", data);
-        dispatch(updateGame(data.game));
-      });
-
-      socket.on("joinError", (data) => {
-        console.error("Join error:", data.message);
-        setJoinError(data.message);
-      });
-    } else {
-      console.warn("Socket not available yet");
-    }
+    dispatch({ type: "websocket/listenToRoomEvents" });
 
     return () => {
-      if (socket) {
-        socket.off("gameUpdated");
-        socket.off("joinSuccess");
-        socket.off("joinError");
-      }
+      dispatch({ type: "websocket/stopListeningToRoomEvents" });
     };
-  }, [dispatch, roomId, socket, user]);
+  }, [dispatch, roomId, user]);
 
   const handleJoinGame = (seatId, buyIn) => {
     console.log(`attempting to join seat : ${seatId} with ${buyIn}`);
@@ -67,13 +44,27 @@ export default function Room() {
     });
   };
 
+  const handleLeaveGame = () => {
+    if (!socket) return;
+    const userId = user._id || user.id;
+    console.log(`User ${userId} is leaving game ${roomId}`);
+    socket.emit("leaveGame", { gameId: roomId, userId });
+  };
+
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
     <main className="w-full min-h-screen flex flex-col justify-center bg-slate-200  ">
+      {/* {joinError && <p className="text-red-500">{joinError}</p>}
+      {leaveError && <p className="text-red-500">{leaveError}</p>} */}
       <div className="flex justify-between mb-2">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button className="bg-red-300 rounded-md py-2 px-3">Leave</button>
+        <button
+          onClick={handleLeaveGame}
+          className="bg-red-300 rounded-md py-2 px-3"
+        >
+          Leave
+        </button>
       </div>
 
       <section className="flex flex-col justify-center  items-center gap-2 w-full h-[70vh] bg-blue-700">

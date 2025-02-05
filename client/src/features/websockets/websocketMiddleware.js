@@ -3,6 +3,9 @@ import SocketService from "./socketService";
 
 // Purpose:
 // This middleware intercepts certain Redux actions to manage WebSocket connections and events globally from within your Redux store. It helps decouple WebSocket logic from UI components by handling it centrally.
+// Role: Listens for Redux actions to manage WebSocket event subscriptions and dispatches Redux actions in response to socket events.
+
+let isSubscribedToRoom = false;
 
 const websocketMiddleware = (store) => (next) => (action) => {
   const socket = SocketService.getSocket();
@@ -12,19 +15,50 @@ const websocketMiddleware = (store) => (next) => (action) => {
   switch (action.type) {
     case "websocket/connect":
       SocketService.connect();
-      socket.on("gameUpdated", (data) => {
-        store.dispatch(updateGame(data));
-      });
       break;
 
-    case "websocket/listenToGames":
-      socket.on("gameUpdated", (updatedGame) => {
-        store.dispatch(updateGame(updatedGame));
-      });
+    case "websocket/listenToRoomEvents":
+      if (!isSubscribedToRoom) {
+        socket.on("gameUpdated", (updatedGame) => {
+          console.log("gameUpdated event received:", updatedGame);
+          store.dispatch(updateGame(updatedGame));
+        });
+
+        socket.on("joinSuccess", (data) => {
+          console.log("joinSuccess event received:", data);
+          store.dispatch(updateGame(data.game));
+          store.dispatch({ type: "room/joinSuccess" });
+        });
+
+        socket.on("gameLeft", (data) => {
+          console.log("gameLeft event received:", data);
+          store.dispatch(updateGame(data.game));
+          store.dispatch({ type: "room/gameLeft" });
+        });
+
+        socket.on("joinError", (data) => {
+          store.dispatch({ type: "room/joinError", payload: data.message });
+        });
+
+        socket.on("leaveGameError", (data) => {
+          store.dispatch({ type: "room/leaveError", payload: data.message });
+        });
+
+        isSubscribedToRoom = true;
+        console.log("Subscribed to room events");
+      }
       break;
 
-    case "websocket/stopListeningToGames":
-      socket.off("gameUpdated");
+    case "websocket/stopListeningToRoomEvents":
+      if (isSubscribedToRoom) {
+        socket.off("gameUpdated");
+        socket.off("joinSuccess");
+        socket.off("joinError");
+        socket.off("gameLeft");
+        socket.off("leaveGameError");
+        isSubscribedToRoom = false;
+        console.log("Unsubscribed from room events");
+      }
       break;
 
     case "websocket/disconnect":

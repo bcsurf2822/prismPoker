@@ -5,7 +5,6 @@ export default function Seat({ seat, joinGame, min, max }) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
 
-
   const openModal = () => {
     if (modalRef.current) {
       modalRef.current.showModal();
@@ -24,6 +23,8 @@ export default function Seat({ seat, joinGame, min, max }) {
     }
     closeModal();
   };
+
+  // seat.player.username === user._id
   return (
     <div className="bg-white rounded-full w-1/4 h-5/6 flex flex-col justify-center items-center">
       {!seat.player ? (
@@ -61,8 +62,10 @@ export default function Seat({ seat, joinGame, min, max }) {
           </dialog>
         </>
       ) : (
-        <div className="flex justify-center items-center">
-          <span className="text-lg font-bold">Occupied</span>
+        <div className="flex flex-col justify-center items-center">
+          {/* Currently i am just making sure i am able to return user info */}
+          <span className="text-md font-bold">Occupied</span>
+          <span className="text-md font-bold">$ {seat.player?.chips}</span>
         </div>
       )}
     </div>
@@ -89,4 +92,6 @@ Seat.propTypes = {
     }),
   }).isRequired,
   joinGame: PropTypes.func.isRequired,
+  min: PropTypes.number.isRequired,
+  max: PropTypes.number.isRequired,
 };
