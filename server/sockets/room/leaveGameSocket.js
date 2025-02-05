@@ -57,10 +57,16 @@ const leaveGameSocket = (io, socket) => {
       }
 
       await game.save();
-      console.log("Emitting playerLeave event...");
-      io.to(gameId).emit("playerLeft", game);
-      console.log("Emitting gameLeft event to leaving socket...");
-      socket.emit("gameLeft", { message: "Successfully left the game!", game });
+      const updatedGame = await Game.findById(gameId).populate("seats.player.user");
+
+      // Broadcast to ALL clients
+      io.to(gameId).emit("gameUpdated", updatedGame);  // ✅ Critical
+      
+      // Optional: Specific event for the leaving player
+      socket.emit("gameLeft", { 
+        message: "Successfully left the game!", 
+        game: updatedGame 
+      });
     } catch (err) {
       console.error("Error in leaveSocket:", err);
       socket.emit("leaveGameError", { message: err.message });

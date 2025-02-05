@@ -5,60 +5,63 @@ import SocketService from "./socketService";
 // This middleware intercepts certain Redux actions to manage WebSocket connections and events globally from within your Redux store. It helps decouple WebSocket logic from UI components by handling it centrally.
 // Role: Listens for Redux actions to manage WebSocket event subscriptions and dispatches Redux actions in response to socket events.
 
+let isSubscribedToRoom = false;
+
 const websocketMiddleware = (store) => (next) => (action) => {
   const socket = SocketService.getSocket();
-
   if (!socket) return next(action);
 
   switch (action.type) {
     case "websocket/connect":
       SocketService.connect();
-      socket.on("gameUpdated", (data) => {
-        store.dispatch(updateGame(data));
-      });
-      break;
+      break; 
 
     case "websocket/listenToRoomEvents":
-      // Game updates
-      socket.on("gameUpdated", (updatedGame) => {
-        store.dispatch(updateGame(updatedGame));
-      });
+      if (!isSubscribedToRoom) {
+        // Game state updates
+        socket.on("gameUpdated", (updatedGame) => {
+          console.log("gameUpdated event received:", updatedGame);
+          store.dispatch(updateGame(updatedGame));
+        });
 
-      // Room-specific events
-      socket.on("joinSuccess", (data) => {
-        store.dispatch({ type: "room/joinSuccess", payload: data.game });
-      });
+        // Join/leave events that should ALSO update game state
+        socket.on("joinSuccess", (data) => {
+          console.log("joinSuccess event received:", data);
+          store.dispatch(updateGame(data.game)); // Update Redux state
+          store.dispatch({ type: "room/joinSuccess" }); // For UI feedback
+        });
 
-      socket.on("joinError", (data) => {
-        store.dispatch({ type: "room/joinError", payload: data.message });
-      });
+        socket.on("gameLeft", (data) => {
+          console.log("gameLeft event received:", data);
+          store.dispatch(updateGame(data.game)); // Update Redux state
+          store.dispatch({ type: "room/gameLeft" }); // For UI feedback
+        });
 
-      socket.on("gameLeft", (data) => {
-        store.dispatch({ type: "room/gameLeft", payload: data.game });
-      });
+        // Error handling
+        socket.on("joinError", (data) => {
+          store.dispatch({ type: "room/joinError", payload: data.message });
+        });
 
-      socket.on("leaveGameError", (data) => {
-        store.dispatch({ type: "room/leaveError", payload: data.message });
-      });
+        socket.on("leaveGameError", (data) => {
+          store.dispatch({ type: "room/leaveError", payload: data.message });
+        });
+
+        isSubscribedToRoom = true;
+        console.log("Subscribed to room events");
+      }
       break;
 
     case "websocket/stopListeningToRoomEvents":
-      socket.off("gameUpdated");
-      socket.off("joinSuccess");
-      socket.off("joinError");
-      socket.off("gameLeft");
-      socket.off("leaveGameError");
+      if (isSubscribedToRoom) {
+        socket.off("gameUpdated");
+        socket.off("joinSuccess");
+        socket.off("joinError");
+        socket.off("gameLeft");
+        socket.off("leaveGameError");
+        isSubscribedToRoom = false;
+        console.log("Unsubscribed from room events");
+      }
       break;
-
-    // case "websocket/listenToGames":
-    //   socket.on("gameUpdated", (updatedGame) => {
-    //     store.dispatch(updateGame(updatedGame));
-    //   });
-    //   break;
-
-    // case "websocket/stopListeningToGames":
-    //   socket.off("gameUpdated");
-    //   break;
 
     case "websocket/disconnect":
       SocketService.disconnect();

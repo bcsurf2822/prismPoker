@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import io from "socket.io-client";
 import { fetchGames } from "../../features/games/gamesSlice";
 
 export default function Games() {
@@ -8,16 +7,8 @@ export default function Games() {
 
   const { games, loading, error } = useSelector((state) => state.games);
 
-  console.log("GAMES: ", games)
-
   useEffect(() => {
     dispatch(fetchGames());
-
-    dispatch({ type: "websocket/listenToGames" });
-
-    return () => {
-      dispatch({ type: "websocket/stopListeningToGames" });
-    };
   }, [dispatch]);
 
   // opens window without extra settings
