@@ -34,6 +34,8 @@ const handlePlayerJoin = (io, socket) => {
         action: "none",
       };
 
+      game.playerCount++
+
       await game.save();
 
       io.to(gameId).emit("gameUpdated", game);
