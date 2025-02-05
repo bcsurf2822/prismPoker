@@ -38,7 +38,7 @@ const gamesSlice = createSlice({
   reducers: {
     updateGame: (state, action) => {
       const updatedGame = action.payload;
-      const index = state.games.findIndex((game) => game.id === updatedGame.id);
+      const index = state.games.findIndex((game) => game._id === updatedGame._id);
       if (index !== -1) {
         state.games[index] = updatedGame;
       } else {

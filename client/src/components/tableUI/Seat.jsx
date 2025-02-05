@@ -62,8 +62,9 @@ export default function Seat({ seat, joinGame, min, max }) {
           </dialog>
         </>
       ) : (
-        <div className="flex justify-center items-center">
-          <span className="text-lg font-bold">Occupied</span>
+        <div className="flex flex-col justify-center items-center">
+                   <span className="text-md font-bold">{seat.player?.user}</span>
+          <span className="text-md font-bold">$ {seat.player?.chips}</span>
         </div>
       )}
     </div>
