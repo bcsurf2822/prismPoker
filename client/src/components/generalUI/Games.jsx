@@ -8,6 +8,8 @@ export default function Games() {
 
   const { games, loading, error } = useSelector((state) => state.games);
 
+  console.log("GAMES: ", games)
+
   useEffect(() => {
     dispatch(fetchGames());
 

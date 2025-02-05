@@ -16,58 +16,72 @@ export default function Room() {
   const currentGame = useSelector((state) => state.games.currentGame);
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
-  const [joinError, setJoinError] = useState(null);
-  const [leaveError, setLeaveError] = useState(null);
+  // const [joinError, setJoinError] = useState(null);
+  // const [leaveError, setLeaveError] = useState(null);
 
-  console.log("USER", user);
+  
+  useEffect(() => {
+    dispatch(fetchGameById(roomId));
+    if (!user) dispatch(rehydrateUser());
+
+    // Start listening to room events
+    dispatch({ type: "websocket/listenToRoomEvents" });
+
+    return () => {
+      // Cleanup listeners when unmounting
+      dispatch({ type: "websocket/stopListeningToRoomEvents" });
+    };
+  }, [dispatch, roomId, user]);
+
+  // console.log("USER", user);
   // console.log("C.Game: ", currentGame);
   // possible add toast for succefull join or leave
 
-  useEffect(() => {
-    dispatch(fetchGameById(roomId));
+  // useEffect(() => {
+  //   dispatch(fetchGameById(roomId));
 
-    if (!user) {
-      dispatch(rehydrateUser());
-    }
+  //   if (!user) {
+  //     dispatch(rehydrateUser());
+  //   }
 
-    if (socket) {
-      socket.on("gameUpdated", (updatedGame) => {
-        dispatch(updateGame(updatedGame));
-      });
+  //   if (socket) {
+  //     socket.on("gameUpdated", (updatedGame) => {
+  //       dispatch(updateGame(updatedGame));
+  //     });
 
-      socket.on("joinSuccess", (data) => {
-        console.log("Join successful:", data);
-        dispatch(updateGame(data.game));
-      });
+  //     socket.on("joinSuccess", (data) => {
+  //       console.log("Join successful:", data);
+  //       dispatch(updateGame(data.game));
+  //     });
 
-      socket.on("joinError", (data) => {
-        console.error("Join error:", data.message);
-        setJoinError(data.message);
-      });
+  //     socket.on("joinError", (data) => {
+  //       console.error("Join error:", data.message);
+  //       setJoinError(data.message);
+  //     });
 
-      socket.on("gameLeft", (data) => {
-        console.log("Leave successful:", data);
-        dispatch(updateGame(data.game));
-      });
+  //     socket.on("gameLeft", (data) => {
+  //       console.log("Leave successful:", data);
+  //       dispatch(updateGame(data.game));
+  //     });
 
-      socket.on("leaveGameError", (data) => {
-        console.error("Leave game error:", data.message);
-        setLeaveError(data.message);
-      });
-    } else {
-      console.warn("Socket not available yet");
-    }
+  //     socket.on("leaveGameError", (data) => {
+  //       console.error("Leave game error:", data.message);
+  //       setLeaveError(data.message);
+  //     });
+  //   } else {
+  //     console.warn("Socket not available yet");
+  //   }
 
-    return () => {
-      if (socket) {
-        socket.off("gameUpdated");
-        socket.off("joinSuccess");
-        socket.off("joinError");
-        socket.off("gameLeft");
-        socket.off("leaveGameError");
-      }
-    };
-  }, [dispatch, roomId, socket, user]);
+  //   return () => {
+  //     if (socket) {
+  //       socket.off("gameUpdated");
+  //       socket.off("joinSuccess");
+  //       socket.off("joinError");
+  //       socket.off("gameLeft");
+  //       socket.off("leaveGameError");
+  //     }
+  //   };
+  // }, [dispatch, roomId, socket, user]);
 
   const handleJoinGame = (seatId, buyIn) => {
     console.log(`attempting to join seat : ${seatId} with ${buyIn}`);
@@ -94,8 +108,8 @@ export default function Room() {
 
   return (
     <main className="w-full min-h-screen flex flex-col justify-center bg-slate-200  ">
-      {joinError && <p className="text-red-500">{joinError}</p>}
-      {leaveError && <p className="text-red-500">{leaveError}</p>}
+      {/* {joinError && <p className="text-red-500">{joinError}</p>}
+      {leaveError && <p className="text-red-500">{leaveError}</p>} */}
       <div className="flex justify-between mb-2">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
         <button
