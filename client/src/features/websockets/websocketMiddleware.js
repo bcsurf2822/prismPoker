@@ -9,35 +9,33 @@ let isSubscribedToRoom = false;
 
 const websocketMiddleware = (store) => (next) => (action) => {
   const socket = SocketService.getSocket();
+
   if (!socket) return next(action);
 
   switch (action.type) {
     case "websocket/connect":
       SocketService.connect();
-      break; 
+      break;
 
     case "websocket/listenToRoomEvents":
       if (!isSubscribedToRoom) {
-        // Game state updates
         socket.on("gameUpdated", (updatedGame) => {
           console.log("gameUpdated event received:", updatedGame);
           store.dispatch(updateGame(updatedGame));
         });
 
-        // Join/leave events that should ALSO update game state
         socket.on("joinSuccess", (data) => {
           console.log("joinSuccess event received:", data);
-          store.dispatch(updateGame(data.game)); // Update Redux state
-          store.dispatch({ type: "room/joinSuccess" }); // For UI feedback
+          store.dispatch(updateGame(data.game));
+          store.dispatch({ type: "room/joinSuccess" });
         });
 
         socket.on("gameLeft", (data) => {
           console.log("gameLeft event received:", data);
-          store.dispatch(updateGame(data.game)); // Update Redux state
-          store.dispatch({ type: "room/gameLeft" }); // For UI feedback
+          store.dispatch(updateGame(data.game));
+          store.dispatch({ type: "room/gameLeft" });
         });
 
-        // Error handling
         socket.on("joinError", (data) => {
           store.dispatch({ type: "room/joinError", payload: data.message });
         });

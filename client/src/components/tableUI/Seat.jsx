@@ -64,9 +64,7 @@ export default function Seat({ seat, joinGame, min, max }) {
       ) : (
         <div className="flex flex-col justify-center items-center">
           {/* Currently i am just making sure i am able to return user info */}
-          <span className="text-md font-bold">
-            UserName: {seat.player?.user.charAt(1)}
-          </span>
+          <span className="text-md font-bold">Occupied</span>
           <span className="text-md font-bold">$ {seat.player?.chips}</span>
         </div>
       )}

@@ -42,10 +42,9 @@ const handlePlayerJoin = (io, socket) => {
         "seats.player.user"
       );
 
-      // Broadcast to ALL clients in the room
-      io.to(gameId).emit("gameUpdated", updatedGame); // ✅ Critical for real-time sync
+      io.to(gameId).emit("gameUpdated", updatedGame); 
 
-      // Notify ONLY the joining player
+  
       socket.emit("joinSuccess", {
         message: "Joined successfully",
         game: updatedGame,

@@ -16,7 +16,6 @@ const leaveGameSocket = (io, socket) => {
         return socket.emit("leaveGameError", { message: "User not found!" });
       }
 
-
       const playerSeat = game.seats.find(
         (seat) => seat.player && seat.player.user.toString() === userId
       );
@@ -26,7 +25,6 @@ const leaveGameSocket = (io, socket) => {
         });
       }
 
-    
       user.accountBalance += playerSeat.player.chips;
       playerSeat.player = null;
       game.playerCount -= 1;
@@ -36,7 +34,6 @@ const leaveGameSocket = (io, socket) => {
       const remainingPlayers = game.seats.filter(
         (seat) => seat.player !== null
       );
-
 
       if (remainingPlayers.length === 1) {
         const lastPlayer = remainingPlayers[0].player;
@@ -57,15 +54,15 @@ const leaveGameSocket = (io, socket) => {
       }
 
       await game.save();
-      const updatedGame = await Game.findById(gameId).populate("seats.player.user");
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user"
+      );
 
-      // Broadcast to ALL clients
-      io.to(gameId).emit("gameUpdated", updatedGame);  // ✅ Critical
-      
-      // Optional: Specific event for the leaving player
-      socket.emit("gameLeft", { 
-        message: "Successfully left the game!", 
-        game: updatedGame 
+      io.to(gameId).emit("gameUpdated", updatedGame);
+
+      socket.emit("gameLeft", {
+        message: "Successfully left the game!",
+        game: updatedGame,
       });
     } catch (err) {
       console.error("Error in leaveSocket:", err);

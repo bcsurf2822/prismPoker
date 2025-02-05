@@ -4,11 +4,13 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import { useContext, useEffect, useState } from "react";
-import { fetchGameById, updateGame } from "../../features/games/gamesSlice";
+import { useContext, useEffect } from "react";
+import { fetchGameById } from "../../features/games/gamesSlice";
 
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
 import { SocketContext } from "../../context/SocketProvider";
+
+// need to set up error handleing from redux instead of local state
 
 export default function Room() {
   let { roomId } = useParams();
@@ -16,72 +18,17 @@ export default function Room() {
   const currentGame = useSelector((state) => state.games.currentGame);
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
-  // const [joinError, setJoinError] = useState(null);
-  // const [leaveError, setLeaveError] = useState(null);
 
-  
   useEffect(() => {
     dispatch(fetchGameById(roomId));
     if (!user) dispatch(rehydrateUser());
 
-    // Start listening to room events
     dispatch({ type: "websocket/listenToRoomEvents" });
 
     return () => {
-      // Cleanup listeners when unmounting
       dispatch({ type: "websocket/stopListeningToRoomEvents" });
     };
   }, [dispatch, roomId, user]);
-
-  // console.log("USER", user);
-  // console.log("C.Game: ", currentGame);
-  // possible add toast for succefull join or leave
-
-  // useEffect(() => {
-  //   dispatch(fetchGameById(roomId));
-
-  //   if (!user) {
-  //     dispatch(rehydrateUser());
-  //   }
-
-  //   if (socket) {
-  //     socket.on("gameUpdated", (updatedGame) => {
-  //       dispatch(updateGame(updatedGame));
-  //     });
-
-  //     socket.on("joinSuccess", (data) => {
-  //       console.log("Join successful:", data);
-  //       dispatch(updateGame(data.game));
-  //     });
-
-  //     socket.on("joinError", (data) => {
-  //       console.error("Join error:", data.message);
-  //       setJoinError(data.message);
-  //     });
-
-  //     socket.on("gameLeft", (data) => {
-  //       console.log("Leave successful:", data);
-  //       dispatch(updateGame(data.game));
-  //     });
-
-  //     socket.on("leaveGameError", (data) => {
-  //       console.error("Leave game error:", data.message);
-  //       setLeaveError(data.message);
-  //     });
-  //   } else {
-  //     console.warn("Socket not available yet");
-  //   }
-
-  //   return () => {
-  //     if (socket) {
-  //       socket.off("gameUpdated");
-  //       socket.off("joinSuccess");
-  //       socket.off("joinError");
-  //       socket.off("gameLeft");
-  //       socket.off("leaveGameError");
-  //     }
-  //   };
-  // }, [dispatch, roomId, socket, user]);
 
   const handleJoinGame = (seatId, buyIn) => {
     console.log(`attempting to join seat : ${seatId} with ${buyIn}`);

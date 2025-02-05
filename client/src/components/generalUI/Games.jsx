@@ -7,6 +7,8 @@ export default function Games() {
 
   const { games, loading, error } = useSelector((state) => state.games);
 
+  //Need to fix this so that the socket events update the games state here
+
   useEffect(() => {
     dispatch(fetchGames());
   }, [dispatch]);
