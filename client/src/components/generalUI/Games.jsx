@@ -3,32 +3,34 @@ import { useDispatch, useSelector } from "react-redux";
 // import io from "socket.io-client";
 import { fetchGames } from "../../features/games/gamesSlice";
 
-// const socket = io("http://localhost:4000");
-
 export default function Games() {
   const dispatch = useDispatch();
 
   const { games, loading, error } = useSelector((state) => state.games);
 
   useEffect(() => {
-    // Fetch initial games from API
     dispatch(fetchGames());
 
-    // Dispatch WebSocket connection event
     dispatch({ type: "websocket/listenToGames" });
 
     return () => {
-      // Dispatch action to stop listening when component unmounts
       dispatch({ type: "websocket/stopListeningToGames" });
     };
   }, [dispatch]);
 
+  // opens window without extra settings
+
+  // const handleNavigateToRoom = (gameId) => {
+  //   window.open(
+  //     `/room/${gameId}`,
+  //     "_blank",
+  //     "width=800,height=600,top=100,left=100,noopener,noreferrer"
+  //   );
+  // };
+
   const handleNavigateToRoom = (gameId) => {
-    window.open(
-      `/room/${gameId}`,
-      "_blank",
-      "width=800,height=600,top=100,left=100,noopener,noreferrer"
-    );
+    // opens usual browser easier to work with in dev
+    window.open(`/room/${gameId}`, "_blank");
   };
 
   if (loading) return <p>Loading games...</p>;
