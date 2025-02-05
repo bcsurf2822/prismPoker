@@ -19,11 +19,10 @@ export default function Room() {
   const [joinError, setJoinError] = useState(null);
   const [leaveError, setLeaveError] = useState(null);
 
-    console.log("USER", user);
+  console.log("USER", user);
   // console.log("C.Game: ", currentGame);
-  
-  
-  
+  // possible add toast for succefull join or leave
+
   useEffect(() => {
     dispatch(fetchGameById(roomId));
 
@@ -48,7 +47,7 @@ export default function Room() {
 
       socket.on("gameLeft", (data) => {
         console.log("Leave successful:", data);
-        // Optionally, you could navigate away or update state here.
+        dispatch(updateGame(data.game));
       });
 
       socket.on("leaveGameError", (data) => {
@@ -59,7 +58,7 @@ export default function Room() {
       console.warn("Socket not available yet");
     }
 
-   return () => {
+    return () => {
       if (socket) {
         socket.off("gameUpdated");
         socket.off("joinSuccess");
@@ -91,16 +90,20 @@ export default function Room() {
     socket.emit("leaveGame", { gameId: roomId, userId });
   };
 
-
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
     <main className="w-full min-h-screen flex flex-col justify-center bg-slate-200  ">
-          {joinError && <p className="text-red-500">{joinError}</p>}
-          {leaveError && <p className="text-red-500">{leaveError}</p>}
+      {joinError && <p className="text-red-500">{joinError}</p>}
+      {leaveError && <p className="text-red-500">{leaveError}</p>}
       <div className="flex justify-between mb-2">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button onClick={handleLeaveGame}  className="bg-red-300 rounded-md py-2 px-3">Leave</button>
+        <button
+          onClick={handleLeaveGame}
+          className="bg-red-300 rounded-md py-2 px-3"
+        >
+          Leave
+        </button>
       </div>
 
       <section className="flex flex-col justify-center  items-center gap-2 w-full h-[70vh] bg-blue-700">

@@ -5,7 +5,6 @@ export default function Seat({ seat, joinGame, min, max }) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
 
-
   const openModal = () => {
     if (modalRef.current) {
       modalRef.current.showModal();
@@ -91,4 +90,6 @@ Seat.propTypes = {
     }),
   }).isRequired,
   joinGame: PropTypes.func.isRequired,
+  min: PropTypes.number.isRequired,
+  max: PropTypes.number.isRequired,
 };

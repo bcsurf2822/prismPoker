@@ -1,7 +1,7 @@
 const User = require("../../models/users");
 const Game = require("../../models/games");
 
-const leaveGameSocket = (socket, io) => {
+const leaveGameSocket = (io, socket) => {
   socket.on("leaveGame", async (data) => {
     try {
       const { gameId, userId } = data;
