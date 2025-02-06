@@ -1,14 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGames } from "../../features/games/gamesSlice";
 
 export default function Games() {
   const dispatch = useDispatch();
+  const [openWindows, setOpenWindows] = useState({});
 
   const { games, loading, error } = useSelector((state) => state.games);
 
   //Need to fix this so that the socket events update the games state here
-
   //Make sure redux updates individual game and all games
 
   useEffect(() => {
@@ -21,8 +21,21 @@ export default function Games() {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("Games component re-rendered with games:", games);
-  }, [games]);
+    const interval = setInterval(() => {
+      Object.keys(openWindows).forEach((gameId) => {
+        const win = openWindows[gameId];
+        if (win && win.closed) {
+          setOpenWindows((prev) => {
+            const updated = { ...prev };
+            delete updated[gameId];
+            return updated;
+          });
+        }
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [openWindows]);
 
   // opens window without extra settings
 
@@ -35,8 +48,21 @@ export default function Games() {
   // };
 
   const handleNavigateToRoom = (gameId) => {
-    // opens usual browser easier to work with in dev
-    window.open(`/room/${gameId}`, "_blank");
+    const existingWindow = openWindows[gameId];
+    if (existingWindow && !existingWindow.closed) {
+      existingWindow.focus();
+      return;
+    }
+    const newWindow = window.open(`/room/${gameId}`, "_blank");
+
+    newWindow.onbeforeunload = () => {
+      setOpenWindows((prev) => {
+        const updated = { ...prev };
+        delete updated[gameId];
+        return updated;
+      });
+    };
+    setOpenWindows((prev) => ({ ...prev, [gameId]: newWindow }));
   };
 
   if (loading) return <p>Loading games...</p>;
@@ -56,25 +82,31 @@ export default function Games() {
           </tr>
         </thead>
         <tbody>
-          {games.map((game) => (
-            <tr key={game._id} className="hover">
-              <td></td>
-              <td>{game.name}</td>
-              <td>{game.blinds}</td>
-              <td>
-                {game.min} / ${game.max}
-              </td>
-              <td>{game.playerCount} / 6</td>
-              <td>
-                <button
-                  onClick={() => handleNavigateToRoom(game._id)}
-                  className="btn btn-primary"
-                >
-                  View
-                </button>
-              </td>
-            </tr>
-          ))}
+          {games.map((game) => {
+            // Determine if the current game window is open
+            const isOpen =
+              openWindows[game._id] && !openWindows[game._id].closed;
+            return (
+              <tr key={game._id} className="hover">
+                <td></td>
+                <td>{game.name}</td>
+                <td>{game.blinds}</td>
+                <td>
+                  {game.min} / ${game.max}
+                </td>
+                <td>{game.playerCount} / 6</td>
+                <td>
+                  <button
+                    onClick={() => handleNavigateToRoom(game._id)}
+                    className="btn btn-primary"
+                    disabled={isOpen} // disable if already open
+                  >
+                    {isOpen ? "Opened" : "View"}
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
