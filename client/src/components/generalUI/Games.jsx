@@ -8,9 +8,6 @@ export default function Games() {
 
   const { games, loading, error } = useSelector((state) => state.games);
 
-  //Need to fix this so that the socket events update the games state here
-  //Make sure redux updates individual game and all games
-
   useEffect(() => {
     dispatch(fetchGames());
     dispatch({ type: "websocket/listenToRoomEvents" });
