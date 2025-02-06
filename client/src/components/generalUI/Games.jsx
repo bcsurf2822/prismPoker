@@ -80,7 +80,6 @@ export default function Games() {
         </thead>
         <tbody>
           {games.map((game) => {
-            // Determine if the current game window is open
             const isOpen =
               openWindows[game._id] && !openWindows[game._id].closed;
             return (
@@ -96,7 +95,7 @@ export default function Games() {
                   <button
                     onClick={() => handleNavigateToRoom(game._id)}
                     className="btn btn-primary"
-                    disabled={isOpen} // disable if already open
+                    disabled={isOpen}
                   >
                     {isOpen ? "Opened" : "View"}
                   </button>
