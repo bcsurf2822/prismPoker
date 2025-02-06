@@ -13,7 +13,16 @@ export default function Games() {
 
   useEffect(() => {
     dispatch(fetchGames());
+    dispatch({ type: "websocket/listenToRoomEvents" });
+
+    return () => {
+      dispatch({ type: "websocket/stopListeningToRoomEvents" });
+    };
   }, [dispatch]);
+
+  useEffect(() => {
+    console.log("Games component re-rendered with games:", games);
+  }, [games]);
 
   // opens window without extra settings
 
