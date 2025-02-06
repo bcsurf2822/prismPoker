@@ -10,7 +10,7 @@ import { fetchGameById } from "../../features/games/gamesSlice";
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
 import { SocketContext } from "../../context/SocketProvider";
 
-// need to set up error handleing from redux instead of local state
+// need to set up error/Success handling from redux instead of local state
 
 export default function Room() {
   let { roomId } = useParams();
@@ -54,20 +54,18 @@ export default function Room() {
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
-    <main className="w-full min-h-screen flex flex-col justify-center bg-slate-200  ">
-      {/* {joinError && <p className="text-red-500">{joinError}</p>}
-      {leaveError && <p className="text-red-500">{leaveError}</p>} */}
-      <div className="flex justify-between mb-2">
-        <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button
-          onClick={handleLeaveGame}
-          className="bg-red-300 rounded-md py-2 px-3"
-        >
-          Leave
-        </button>
-      </div>
-
-      <section className="flex flex-col justify-center  items-center gap-2 w-full h-[70vh] bg-blue-700">
+<main className="w-full h-screen flex flex-col bg-slate-200">
+  {/* Top Section: 1/8 of the screen (12.5vh) */}
+  <section className="h-[12.5vh] flex justify-between items-center px-4">
+    <h1 className="text-2xl font-bold">{currentGame.name}</h1>
+    <button
+      onClick={handleLeaveGame}
+      className="bg-red-300 rounded-md py-2 px-3"
+    >
+      Leave
+    </button>
+  </section>
+  <section className="flex flex-col justify-center  items-center gap-2 w-full h-[80vh] bg-blue-700">
         {/* top */}
         <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
           <Seat
@@ -94,7 +92,7 @@ export default function Room() {
             min={currentGame.min}
             max={currentGame.max}
           />
-          <Table />
+          <Table pot={currentGame.pot} />
           <Seat
             seat={currentGame.seats[2]}
             joinGame={handleJoinGame}
@@ -121,12 +119,12 @@ export default function Room() {
           />
         </div>
       </section>
-      <section>
-        <div className="flex justify-between">
-          <BetControl />
-          <Chat />
-        </div>
-      </section>
-    </main>
+
+  {/* Bottom Section: 1/4 of the screen (25vh) */}
+  <section className="h-[25vh] flex justify-between items-center px-4 bg-gray-100">
+    <Chat />
+    <BetControl />
+  </section>
+</main>
   );
 }
