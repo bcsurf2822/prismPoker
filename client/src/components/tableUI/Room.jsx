@@ -54,18 +54,19 @@ export default function Room() {
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
-<main className="w-full h-screen flex flex-col bg-slate-200">
-  {/* Top Section: 1/8 of the screen (12.5vh) */}
-  <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
-    <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-    <button
-      onClick={handleLeaveGame}
-      className="bg-red-300 rounded-md py-2 px-3"
-    >
-      Leave
-    </button>
-  </section>
-  <section className="flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
+    <main className="w-full h-screen flex flex-col bg-slate-200">
+      <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
+        <h1 className="text-2xl font-bold">{currentGame.name}</h1>
+        <button className="bg-green-300 rounded-md py-2 px-3">Start</button>
+        <button className="bg-red-300 rounded-md py-2 px-3">End</button>
+        <button
+          onClick={handleLeaveGame}
+          className="bg-red-300 rounded-md py-2 px-3"
+        >
+          Leave
+        </button>
+      </section>
+      <section className="flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
         {/* top */}
         <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
           <Seat
@@ -119,12 +120,10 @@ export default function Room() {
           />
         </div>
       </section>
-
-  {/* Bottom Section: 1/4 of the screen (25vh) */}
-  <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
-    <Chat />
-    <BetControl />
-  </section>
-</main>
+      <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
+        <Chat />
+        <BetControl />
+      </section>
+    </main>
   );
 }

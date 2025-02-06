@@ -13,9 +13,7 @@ export default function Chat() {
           You know Im gonna win this one
         </div>
       </div>
-      <div className="chat chat-end">
-        {/* <div className="chat-bubble">You are so bad at this game!</div> */}
-      </div>
+      <div className="chat chat-end"></div>
     </div>
   );
 }
