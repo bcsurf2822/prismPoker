@@ -9,9 +9,20 @@ export default function Games() {
 
   //Need to fix this so that the socket events update the games state here
 
+  //Make sure redux updates individual game and all games
+
   useEffect(() => {
     dispatch(fetchGames());
+    dispatch({ type: "websocket/listenToRoomEvents" });
+
+    return () => {
+      dispatch({ type: "websocket/stopListeningToRoomEvents" });
+    };
   }, [dispatch]);
+
+  useEffect(() => {
+    console.log("Games component re-rendered with games:", games);
+  }, [games]);
 
   // opens window without extra settings
 

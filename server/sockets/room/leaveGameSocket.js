@@ -57,13 +57,16 @@ const leaveGameSocket = (io, socket) => {
       const updatedGame = await Game.findById(gameId).populate(
         "seats.player.user"
       );
+      // Comment out for trying to update the State for the game comp
+      // io.to(gameId).emit("gameUpdated", updatedGame);
 
-      io.to(gameId).emit("gameUpdated", updatedGame);
+      // socket.emit("gameLeft", {
+      //   message: "Successfully left the game!",
+      //   game: updatedGame,
+      // });
 
-      socket.emit("gameLeft", {
-        message: "Successfully left the game!",
-        game: updatedGame,
-      });
+      io.emit("gameUpdated", updatedGame); // Changed from io.to(gameId)
+      socket.emit("gameLeft", { game: updatedGame });
     } catch (err) {
       console.error("Error in leaveSocket:", err);
       socket.emit("leaveGameError", { message: err.message });
