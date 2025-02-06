@@ -56,7 +56,7 @@ export default function Room() {
   return (
 <main className="w-full h-screen flex flex-col bg-slate-200">
   {/* Top Section: 1/8 of the screen (12.5vh) */}
-  <section className="h-[12.5vh] flex justify-between items-center px-4">
+  <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
     <h1 className="text-2xl font-bold">{currentGame.name}</h1>
     <button
       onClick={handleLeaveGame}
@@ -65,7 +65,7 @@ export default function Room() {
       Leave
     </button>
   </section>
-  <section className="flex flex-col justify-center  items-center gap-2 w-full h-[80vh] bg-blue-700">
+  <section className="flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
         {/* top */}
         <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
           <Seat
@@ -121,7 +121,7 @@ export default function Room() {
       </section>
 
   {/* Bottom Section: 1/4 of the screen (25vh) */}
-  <section className="h-[25vh] flex justify-between items-center px-4 bg-gray-100">
+  <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
     <Chat />
     <BetControl />
   </section>

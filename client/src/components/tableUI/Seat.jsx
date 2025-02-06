@@ -23,8 +23,7 @@ export default function Seat({ seat, joinGame, min, max }) {
     }
     closeModal();
   };
-
-  // seat.player.username === user._id
+  
   return (
     <div className="bg-white rounded-full w-1/4 h-5/6 flex flex-col justify-center items-center">
       {!seat.player ? (

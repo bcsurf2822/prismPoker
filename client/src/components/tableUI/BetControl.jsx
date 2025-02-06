@@ -15,22 +15,20 @@ export default function BetControl() {
           id=""
         />
       </div>
-      <div className="flex flex-col items-start gap-1">
+      {/* <div className="flex flex-col items-start gap-1 text-xs">
         <div className="flex gap-2">
           <input type="radio" name="radio-1" className="radio" />
           <label>Sit Out</label>
         </div>
         <div className="flex gap-2">
-
           <input type="radio" name="radio-1" className="radio" />
           <label>Sit Out Next BB</label>
         </div>
         <div className="flex gap-2">
-
           <input type="radio" name="radio-1" className="radio" />
           <label>Fold to any bet</label>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
