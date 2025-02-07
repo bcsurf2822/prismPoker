@@ -5,19 +5,32 @@ import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
 import { useContext, useEffect } from "react";
-import { fetchGameById } from "../../features/games/gamesSlice";
+import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
 
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
 import { SocketContext } from "../../context/SocketProvider";
-
-// need to set up error/Success handling from redux instead of local state
+import toast from "react-hot-toast";
 
 export default function Room() {
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const currentGame = useSelector((state) => state.games.currentGame);
+  const successMessage = useSelector((state) => state.games.successMessage);
+  const errorMessage = useSelector((state) => state.games.errorMessage);
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(clearMessages())
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(clearMessages())
+    }
+  }, [dispatch, successMessage, errorMessage]);
+
 
   useEffect(() => {
     dispatch(fetchGameById(roomId));

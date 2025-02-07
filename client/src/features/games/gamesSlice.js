@@ -34,6 +34,8 @@ const gamesSlice = createSlice({
     currentGame: null,
     loading: false,
     error: null,
+    successMessage: null,
+    errorMessage: null,
   },
   reducers: {
     updateGame: (state, action) => {
@@ -51,7 +53,7 @@ const gamesSlice = createSlice({
     },
     joinSuccess: (state) => {
       state.successMessage = "Successfully joined the game!";
-      state.errorMessage = null;  // Clear previous errors
+      state.errorMessage = null; 
     },
     gameLeft: (state) => {
       state.successMessage = "Successfully left the game!";
@@ -59,7 +61,7 @@ const gamesSlice = createSlice({
     },
     joinError: (state, action) => {
       state.errorMessage = action.payload;
-      state.successMessage = null;  // Clear previous success message
+      state.successMessage = null;
     },
     leaveError: (state, action) => {
       state.errorMessage = action.payload;
@@ -99,5 +101,12 @@ const gamesSlice = createSlice({
   },
 });
 
-export const { updateGame, joinSuccess, gameLeft, joinError, leaveError, clearMessages } = gamesSlice.actions;
+export const {
+  updateGame,
+  joinSuccess,
+  gameLeft,
+  joinError,
+  leaveError,
+  clearMessages,
+} = gamesSlice.actions;
 export default gamesSlice.reducer;
