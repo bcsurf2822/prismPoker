@@ -1,4 +1,4 @@
-import {  updateGame } from "../games/gamesSlice";
+import { updateGame } from "../games/gamesSlice";
 import SocketService from "./socketService";
 
 // Purpose:
@@ -24,24 +24,20 @@ const websocketMiddleware = (store) => (next) => (action) => {
           store.dispatch(updateGame(updatedGame));
         });
         socket.on("joinSuccess", (data) => {
-          console.log("joinSuccess event received:", data);
           store.dispatch(updateGame(data.game));
           store.dispatch({ type: "games/joinSuccess" });
         });
-    
+
         socket.on("gameLeft", (data) => {
-          console.log("gameLeft event received:", data);
           store.dispatch(updateGame(data.game));
           store.dispatch({ type: "games/gameLeft" });
         });
-    
+
         socket.on("joinError", (data) => {
-          console.log("Join Error: ", data.message);
           store.dispatch({ type: "games/joinError", payload: data.message });
         });
-    
+
         socket.on("leaveGameError", (data) => {
-          console.log("Leave Error: ", data.message);
           store.dispatch({ type: "games/leaveError", payload: data.message });
         });
 
