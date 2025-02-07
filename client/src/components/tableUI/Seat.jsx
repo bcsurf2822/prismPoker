@@ -63,7 +63,9 @@ export default function Seat({ seat, joinGame, min, max }) {
       ) : (
         <div className="flex flex-col justify-center items-center">
           {/* Currently i am just making sure i am able to return user info */}
-          <span className="text-md font-bold">Occupied</span>
+          <span className="text-md font-bold">
+            {seat.player?.user?.username}
+          </span>
           <span className="text-md font-bold">$ {seat.player?.chips}</span>
         </div>
       )}
@@ -76,7 +78,16 @@ Seat.propTypes = {
     _id: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
     player: PropTypes.shape({
-      user: PropTypes.string,
+      user: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        accountBalance: PropTypes.number.isRequired,
+        avatar: PropTypes.string.isRequired,
+        bankBalance: PropTypes.number.isRequired,
+        email: PropTypes.string.isRequired,
+        lastLogin: PropTypes.string.isRequired,
+        username: PropTypes.string.isRequired,
+        __v: PropTypes.number.isRequired,
+      }).isRequired,
       chips: PropTypes.number,
       bet: PropTypes.number,
       action: PropTypes.oneOf([

@@ -1,4 +1,4 @@
-import {  updateGame } from "../games/gamesSlice";
+import { updateGame } from "../games/gamesSlice";
 import SocketService from "./socketService";
 
 // Purpose:
@@ -23,25 +23,22 @@ const websocketMiddleware = (store) => (next) => (action) => {
           console.log("gameUpdated event received:", updatedGame);
           store.dispatch(updateGame(updatedGame));
         });
-
         socket.on("joinSuccess", (data) => {
-          console.log("joinSuccess event received:", data);
           store.dispatch(updateGame(data.game));
-          store.dispatch({ type: "room/joinSuccess" });
+          store.dispatch({ type: "games/joinSuccess" });
         });
 
         socket.on("gameLeft", (data) => {
-          console.log("gameLeft event received:", data);
           store.dispatch(updateGame(data.game));
-          store.dispatch({ type: "room/gameLeft" });
+          store.dispatch({ type: "games/gameLeft" });
         });
 
         socket.on("joinError", (data) => {
-          store.dispatch({ type: "room/joinError", payload: data.message });
+          store.dispatch({ type: "games/joinError", payload: data.message });
         });
 
         socket.on("leaveGameError", (data) => {
-          store.dispatch({ type: "room/leaveError", payload: data.message });
+          store.dispatch({ type: "games/leaveError", payload: data.message });
         });
 
         isSubscribedToRoom = true;

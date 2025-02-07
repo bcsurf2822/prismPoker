@@ -5,19 +5,32 @@ import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
 import { useContext, useEffect } from "react";
-import { fetchGameById } from "../../features/games/gamesSlice";
+import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
 
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
 import { SocketContext } from "../../context/SocketProvider";
-
-// need to set up error/Success handling from redux instead of local state
+import toast from "react-hot-toast";
 
 export default function Room() {
   let { roomId } = useParams();
   const dispatch = useDispatch();
-  const currentGame = useSelector((state) => state.games.currentGame);
+  const { currentGame, successMessage, errorMessage } = useSelector(
+    (state) => state.games
+  );
+
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(clearMessages());
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(clearMessages());
+    }
+  }, [dispatch, successMessage, errorMessage]);
 
   useEffect(() => {
     dispatch(fetchGameById(roomId));
@@ -31,8 +44,6 @@ export default function Room() {
   }, [dispatch, roomId, user]);
 
   const handleJoinGame = (seatId, buyIn) => {
-    console.log(`attempting to join seat : ${seatId} with ${buyIn}`);
-
     if (!socket) return;
 
     const userId = user.id;
@@ -47,7 +58,6 @@ export default function Room() {
   const handleLeaveGame = () => {
     if (!socket) return;
     const userId = user._id || user.id;
-    console.log(`User ${userId} is leaving game ${roomId}`);
     socket.emit("leaveGame", { gameId: roomId, userId });
   };
 
