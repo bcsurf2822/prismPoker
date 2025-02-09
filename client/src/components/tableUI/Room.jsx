@@ -43,6 +43,21 @@ export default function Room() {
     };
   }, [dispatch, roomId, user]);
 
+  useEffect(() => {
+    if (currentGame && socket) {
+      // Count the seats that have a player
+      const playerCount = currentGame.seats.filter(
+        (seat) => seat.player
+      ).length;
+
+      // Check if there are at least 2 players and a round isn’t already running.
+      if (playerCount >= 2 && !currentGame.gameRunning) {
+        console.log("Sufficient players detected, emitting updatePositionsAndBlinds");
+        socket.emit("updatePositionsAndBlinds", { gameId: roomId });
+      }
+    }
+  }, [currentGame, socket, roomId]);
+
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
