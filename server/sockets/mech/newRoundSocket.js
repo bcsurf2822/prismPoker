@@ -1,6 +1,5 @@
-const User = require("../../models/users");
 const Game = require("../../models/games");
-const axios = require("axios")
+const axios = require("axios");
 
 const findNextPosition = (startPosition, seats) => {
   const seatCount = seats.length;
@@ -58,7 +57,7 @@ const updatePositionsAndBlinds = async (gameId) => {
     game.currentDeck = await fetchNewDeck();
   }
 
-  game.winnerData = {};
+  game.winnerData = [];
   game.communityCards = [];
   game.stage = "preflop";
 
@@ -131,19 +130,17 @@ const dealCardsToPlayers = async (gameId) => {
   return game;
 };
 
-const positionsAndBlindsSocket = (socket, io) => {
+const positionsAndBlindsSocket = (io, socket) => {
   socket.on("updatePositionsAndBlinds", async ({ gameId }) => {
     try {
       let game = await updatePositionsAndBlinds(gameId);
-      game = await dealCardsToPlayers(gameId);
-
-      console.log(`Updated positions, blinds, and dealt cards for game ${gameId}. 
-                   Dealer: ${game.dealerPosition}, 
-                   Small Blind: ${game.smallBlindPosition}, 
-                   Big Blind: ${game.bigBlindPosition}, 
-                   Current Turn: ${game.currentPlayerTurn}`);
-
-      // Emit "gameUpdated" so Redux (or any other client listener) can update the game state.
+      console.log("Positions and blinds updated");
+      // game = await dealCardsToPlayers(gameId);
+      // console.log(`Updated positions, blinds, and dealt cards for game ${gameId}.
+      //              Dealer: ${game.dealerPosition},
+      //              Small Blind: ${game.smallBlindPosition},
+      //              Big Blind: ${game.bigBlindPosition},
+      //              Current Turn: ${game.currentPlayerTurn}`);
       io.emit("gameUpdated", game);
     } catch (error) {
       console.error(`Error starting new round for game ${gameId}:`, error);

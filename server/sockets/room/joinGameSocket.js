@@ -3,6 +3,7 @@ const Game = require("../../models/games");
 
 const handlePlayerJoin = (io, socket) => {
   socket.on("playerJoin", async ({ gameId, userId, buyIn, seatId }) => {
+    console.log(`Received playerJoin gameId: ${gameId}`);
     try {
       const game = await Game.findById(gameId);
       const user = await User.findById(userId);

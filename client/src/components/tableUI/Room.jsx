@@ -4,7 +4,7 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
 
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
@@ -12,6 +12,7 @@ import { SocketContext } from "../../context/SocketProvider";
 import toast from "react-hot-toast";
 
 export default function Room() {
+  const [hasEmittedStart, setHasEmittedStart] = useState(false);
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const { currentGame, successMessage, errorMessage } = useSelector(
@@ -21,11 +22,29 @@ export default function Room() {
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
 
-  const deck = currentGame.currentDeck
+  const {
+    gameRunning,
+    gameEnd,
+    currentDeck,
+    currentPlayerTurn,
+    smallBlindPosition,
+    dealerPosition,
+    bigBlindPosition,
+  } = currentGame;
 
-  if (deck) {
-    console.log("Deck Arr: ", deck)
-  }
+  // console.log("Game Running ?: ", gameRunning)
+  // console.log("Game End ?: ", gameEnd)
+  console.log("Deck: ", currentDeck);
+
+  const positions = {
+    dealerPosition,
+    smallBlindPosition,
+    bigBlindPosition,
+  };
+
+  console.log("POSITIONS: ", positions);
+
+  console.log("Current Player: ", currentPlayerTurn);
 
   useEffect(() => {
     if (successMessage) {
@@ -51,20 +70,35 @@ export default function Room() {
 
   useEffect(() => {
     if (currentGame && socket) {
-      // Count the seats that have a player
+      // Count the seats that have a player.
       const playerCount = currentGame.seats.filter(
         (seat) => seat.player
       ).length;
+      console.log(
+        "Player count:",
+        playerCount,
+        "gameRunning:",
+        currentGame.gameRunning
+      );
 
-      // Check if there are at least 2 players and a round isn’t already running.
-      if (playerCount >= 2 && !currentGame.gameRunning) {
+      // Only emit if there are at least 2 players, the game hasn't started, and we haven't already emitted.
+      if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
         console.log(
           "Sufficient players detected, emitting updatePositionsAndBlinds"
         );
         socket.emit("updatePositionsAndBlinds", { gameId: roomId });
+        setHasEmittedStart(true);
       }
     }
-  }, [currentGame, socket, roomId]);
+  }, [currentGame, socket, roomId, hasEmittedStart]);
+
+  useEffect(() => {
+    if (currentGame && currentGame.gameRunning && hasEmittedStart) {
+      console.log(
+        "Game is running, reset emission flag for future rounds if needed"
+      );
+    }
+  }, [currentGame, hasEmittedStart]);
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
