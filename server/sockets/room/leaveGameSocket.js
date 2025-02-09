@@ -43,7 +43,8 @@ const leaveGameSocket = (io, socket) => {
         game.communityCards = [];
         game.dealtCards = [];
         game.winnerData = [];
-        game.stage = "preflop";
+        game.stage = "preflop"
+        game.gameRunning = false
         game.gameEnd = false;
         game.dealerPosition = -1;
         game.smallBlindPosition = -1;
