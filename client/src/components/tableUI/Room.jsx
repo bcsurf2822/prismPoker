@@ -21,6 +21,12 @@ export default function Room() {
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
 
+  const deck = currentGame.currentDeck
+
+  if (deck) {
+    console.log("Deck Arr: ", deck)
+  }
+
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
@@ -52,7 +58,9 @@ export default function Room() {
 
       // Check if there are at least 2 players and a round isn’t already running.
       if (playerCount >= 2 && !currentGame.gameRunning) {
-        console.log("Sufficient players detected, emitting updatePositionsAndBlinds");
+        console.log(
+          "Sufficient players detected, emitting updatePositionsAndBlinds"
+        );
         socket.emit("updatePositionsAndBlinds", { gameId: roomId });
       }
     }

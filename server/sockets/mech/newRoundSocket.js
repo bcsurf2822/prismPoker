@@ -1,5 +1,6 @@
 const User = require("../../models/users");
 const Game = require("../../models/games");
+const axios = require("axios")
 
 const findNextPosition = (startPosition, seats) => {
   const seatCount = seats.length;
