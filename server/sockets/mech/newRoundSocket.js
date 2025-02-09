@@ -1,20 +1,20 @@
+const User = require("../../models/users");
 const Game = require("../../models/games");
-const axios = require("axios");
 
 const findNextPosition = (startPosition, seats) => {
-  let seatCount = seats.length;
+  const seatCount = seats.length;
   let nextPosition = (startPosition + 1) % seatCount;
+  // Continue looping until a seat with a player is found.
+  // (Be cautious: if no seats have a player, this could loop indefinitely.)
   while (!seats[nextPosition].player) {
     nextPosition = (nextPosition + 1) % seatCount;
   }
   return nextPosition;
 };
 
-function cardCode(code) {
-  return code.replace("0", "10");
-}
+const cardCode = (code) => code.replace("0", "10");
 
-async function fetchNewDeck() {
+const fetchNewDeck = async () => {
   const response = await axios.get(
     "https://www.deckofcardsapi.com/api/deck/new/draw/?count=52"
   );
@@ -23,18 +23,17 @@ async function fetchNewDeck() {
     suit: card.suit,
     code: cardCode(card.code),
   }));
-}
+};
 
-function resetActionNone(game) {
+const resetActionNone = (game) => {
   game.seats.forEach((seat) => {
     if (seat.player) {
       seat.player.action = "none";
     }
   });
-}
+};
 
-
-async function updatePositionsAndBlinds(gameId) {
+const updatePositionsAndBlinds = async (gameId) => {
   const game = await Game.findById(gameId);
 
   resetActionNone(game);
@@ -57,7 +56,8 @@ async function updatePositionsAndBlinds(gameId) {
     console.log(`Fetching a new deck for game ${gameId}.`);
     game.currentDeck = await fetchNewDeck();
   }
-game.winnerData = {};
+
+  game.winnerData = {};
   game.communityCards = [];
   game.stage = "preflop";
 
@@ -68,11 +68,11 @@ game.winnerData = {};
 
   const [smallBlindAmount, bigBlindAmount] = game.blinds.split("/").map(Number);
 
-  for (let seat of game.seats) {
+  game.seats.forEach((seat) => {
     if (seat.player) {
       seat.player.checkBetFold = false;
     }
-  }
+  });
 
   if (game.seats[game.smallBlindPosition].player) {
     game.seats[game.smallBlindPosition].player.chips -= smallBlindAmount;
@@ -86,14 +86,13 @@ game.winnerData = {};
 
   game.gameRunning = true;
   game.gameEnd = false;
-  
 
   await game.save();
 
   return game;
-}
+};
 
-async function dealCardsToPlayers(gameId) {
+const dealCardsToPlayers = async (gameId) => {
   const game = await Game.findById(gameId);
 
   if (!game) {
@@ -107,6 +106,7 @@ async function dealCardsToPlayers(gameId) {
     throw new Error("Not enough cards to deal!");
   }
 
+  // Reset players' hand cards and status.
   game.seats.forEach((seat) => {
     if (seat.player) {
       seat.player.handCards = [];
@@ -114,8 +114,10 @@ async function dealCardsToPlayers(gameId) {
     }
   });
 
+  // Deal two cards to each player.
   for (let i = 0; i < 2; i++) {
     for (let j = 0; j < numberOfPlayers; j++) {
+      // Calculate the player index relative to the big blind.
       const playerIndex = (game.bigBlindPosition + 1 + j) % numberOfPlayers;
       const seat = seatsWithPlayers[playerIndex];
       const card = game.currentDeck.shift();
@@ -126,9 +128,9 @@ async function dealCardsToPlayers(gameId) {
   await game.save();
 
   return game;
-}
+};
 
-function positionsAndBlindsSocket(socket, io) {
+const positionsAndBlindsSocket = (socket, io) => {
   socket.on("updatePositionsAndBlinds", async ({ gameId }) => {
     try {
       let game = await updatePositionsAndBlinds(gameId);
@@ -140,12 +142,13 @@ function positionsAndBlindsSocket(socket, io) {
                    Big Blind: ${game.bigBlindPosition}, 
                    Current Turn: ${game.currentPlayerTurn}`);
 
-      io.emit("positions_and_blinds", game);
+      // Emit "gameUpdated" so Redux (or any other client listener) can update the game state.
+      io.emit("gameUpdated", game);
     } catch (error) {
       console.error(`Error starting new round for game ${gameId}:`, error);
       socket.emit("error", error.message);
     }
   });
-}
+};
 
 module.exports = positionsAndBlindsSocket;
