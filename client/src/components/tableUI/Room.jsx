@@ -22,6 +22,7 @@ export default function Room() {
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
 
+  // UseEffect to track Toast
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
@@ -33,6 +34,7 @@ export default function Room() {
     }
   }, [dispatch, successMessage, errorMessage]);
 
+  // useEffect to listen for socket room events
   useEffect(() => {
     dispatch(fetchGameById(roomId));
     if (!user) dispatch(rehydrateUser());
@@ -44,6 +46,7 @@ export default function Room() {
     };
   }, [dispatch, roomId, user]);
 
+  // Triggers New Game / updatesPosBlinds
   useEffect(() => {
     if (currentGame && socket) {
       const playerCount = currentGame.seats.filter(
