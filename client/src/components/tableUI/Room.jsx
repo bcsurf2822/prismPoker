@@ -46,7 +46,7 @@ export default function Room() {
     };
   }, [dispatch, roomId, user]);
 
-  // Triggers New Game / updatesPosBlinds
+  // Triggers New Game / updatesPosBlind
   useEffect(() => {
     if (currentGame && socket) {
       const playerCount = currentGame.seats.filter(
