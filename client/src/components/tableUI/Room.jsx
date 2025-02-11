@@ -4,7 +4,7 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
 
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
@@ -12,7 +12,7 @@ import { SocketContext } from "../../context/SocketProvider";
 import toast from "react-hot-toast";
 
 export default function Room() {
-  const [hasEmittedStart, setHasEmittedStart] = useState(false);
+
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const { currentGame, successMessage, errorMessage } = useSelector(
@@ -57,15 +57,15 @@ export default function Room() {
         currentGame?.gameRunning
       );
 
-      if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
+      if (playerCount >= 2 && !currentGame.gameRunning) {
         console.log(
           "Sufficient players detected, emitting updatePositionsAndBlinds"
         );
         socket.emit("updatePositionsAndBlinds", { gameId: roomId });
-        setHasEmittedStart(true);
+    
       }
     }
-  }, [currentGame, socket, roomId, hasEmittedStart]);
+  }, [currentGame, socket, roomId]);
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;

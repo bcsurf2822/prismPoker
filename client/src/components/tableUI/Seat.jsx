@@ -77,10 +77,7 @@ Seat.propTypes = {
     _id: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
     player: PropTypes.shape({
-      user: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.object, 
-      ]),
+      user: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
       chips: PropTypes.number,
       bet: PropTypes.number,
       action: PropTypes.oneOf([

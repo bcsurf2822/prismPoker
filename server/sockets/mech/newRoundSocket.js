@@ -47,11 +47,6 @@ const updatePositionsAndBlinds = async (gameId) => {
     return game;
   }
 
-  if (!game.gameEnd) {
-    console.log(`Game ${gameId} has not ended yet. Skipping logic.`);
-    return game;
-  }
-
   if (game.currentDeck.length === 0) {
     console.log(`Fetching a new deck for game ${gameId}.`);
     game.currentDeck = await fetchNewDeck();
@@ -86,44 +81,6 @@ const updatePositionsAndBlinds = async (gameId) => {
 
   game.gameRunning = true;
   game.gameEnd = false;
-
-  await game.save();
-
-  return game;
-};
-
-const dealCardsToPlayers = async (gameId) => {
-  const game = await Game.findById(gameId);
-
-  if (!game) {
-    throw new Error(`Game with ID: ${gameId} not found!`);
-  }
-
-  const seatsWithPlayers = game.seats.filter((seat) => seat.player !== null);
-  const numberOfPlayers = seatsWithPlayers.length;
-
-  if (numberOfPlayers * 2 > game.currentDeck.length) {
-    throw new Error("Not enough cards to deal!");
-  }
-
-  // Reset players' hand cards and status.
-  game.seats.forEach((seat) => {
-    if (seat.player) {
-      seat.player.handCards = [];
-      seat.player.checkBetFold = false;
-    }
-  });
-
-  // Deal two cards to each player.
-  for (let i = 0; i < 2; i++) {
-    for (let j = 0; j < numberOfPlayers; j++) {
-      // Calculate the player index relative to the big blind.
-      const playerIndex = (game.bigBlindPosition + 1 + j) % numberOfPlayers;
-      const seat = seatsWithPlayers[playerIndex];
-      const card = game.currentDeck.shift();
-      seat.player.handCards.push(card.code);
-    }
-  }
 
   await game.save();
 

@@ -68,6 +68,7 @@ const gamesSlice = createSlice({
       state.successMessage = null;
     },
     gameError: (state, action) => {
+      console.log("Game Error: ", action.payload)
       state.errorMessage = action.payload;
       state.successMessage = null;
     },
