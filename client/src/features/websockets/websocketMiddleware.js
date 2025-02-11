@@ -56,6 +56,7 @@ const websocketMiddleware = (store) => (next) => (action) => {
         socket.off("gameUpdated");
         socket.off("joinSuccess");
         socket.off("joinError");
+        socket.off("gameError");
         socket.off("gameLeft");
         socket.off("leaveGameError");
         isSubscribedToRoom = false;

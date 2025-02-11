@@ -4,7 +4,7 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
 
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
@@ -12,7 +12,6 @@ import { SocketContext } from "../../context/SocketProvider";
 import toast from "react-hot-toast";
 
 export default function Room() {
-
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const { currentGame, successMessage, errorMessage } = useSelector(
@@ -21,6 +20,8 @@ export default function Room() {
 
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
+
+  const [hasEmittedStart, setHasEmittedStart] = useState(false);
 
   // UseEffect to track Toast
   useEffect(() => {
@@ -46,6 +47,19 @@ export default function Room() {
     };
   }, [dispatch, roomId, user]);
 
+  // Sets emitStartted to false
+useEffect(() => {
+  if (currentGame) {
+
+    const playerCount = currentGame.seats.filter((seat) => seat.player).length;
+    
+    if (playerCount < 2 && hasEmittedStart) {
+      console.log("Player count dropped below 2. Resetting hasEmittedStart.");
+      setHasEmittedStart(false);
+    }
+  }
+}, [currentGame, hasEmittedStart]);
+
   // Triggers New Game / updatesPosBlind
   useEffect(() => {
     if (currentGame && socket) {
@@ -54,18 +68,19 @@ export default function Room() {
         "Player count:",
         playerCount,
         "gameRunning:",
-        currentGame?.gameRunning
+        currentGame?.gameRunning,
+        "Emit Started? :", hasEmittedStart
       );
-
-      if (playerCount >= 2 && !currentGame.gameRunning) {
+  
+      if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
         console.log(
           "Sufficient players detected, emitting updatePositionsAndBlinds"
         );
         socket.emit("updatePositionsAndBlinds", { gameId: roomId });
-    
+        setHasEmittedStart(true);
       }
     }
-  }, [currentGame, socket, roomId]);
+  }, [currentGame, socket, roomId, hasEmittedStart]);
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
