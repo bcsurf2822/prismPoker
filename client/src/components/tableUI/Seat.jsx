@@ -62,7 +62,7 @@ export default function Seat({ seat, joinGame, min, max }) {
         </>
       ) : (
         <div className="flex flex-col justify-center items-center">
-          {/* Currently i am just making sure i am able to return user info */}
+
           <span className="text-md font-bold">
             {seat.player?.user?.username}
           </span>

@@ -12,12 +12,13 @@ import { SocketContext } from "../../context/SocketProvider";
 import toast from "react-hot-toast";
 
 export default function Room() {
-  const [hasEmittedStart, setHasEmittedStart] = useState(false);
+  // const [hasEmittedStart, setHasEmittedStart] = useState(false);
   let { roomId } = useParams();
   const dispatch = useDispatch();
   const { currentGame, successMessage, errorMessage } = useSelector(
     (state) => state.games
   );
+  console.log("SEATS: ", currentGame?.seats)
 
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
@@ -47,25 +48,25 @@ export default function Room() {
   }, [dispatch, roomId, user]);
 
   // Triggers New Game / updatesPosBlind
-  useEffect(() => {
-    if (currentGame && socket) {
-      const playerCount = currentGame.playerCount
-      console.log(
-        "Player count:",
-        playerCount,
-        "gameRunning:",
-        currentGame?.gameRunning
-      );
+  // useEffect(() => {
+  //   if (currentGame && socket) {
+  //     const playerCount = currentGame.playerCount
+  //     console.log(
+  //       "Player count:",
+  //       playerCount,
+  //       "gameRunning:",
+  //       currentGame?.gameRunning
+  //     );
 
-      if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
-        console.log(
-          "Sufficient players detected, emitting updatePositionsAndBlinds"
-        );
-        socket.emit("updatePositionsAndBlinds", { gameId: roomId });
-        setHasEmittedStart(true);
-      }
-    }
-  }, [currentGame, socket, roomId, hasEmittedStart]);
+  //     if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
+  //       console.log(
+  //         "Sufficient players detected, emitting updatePositionsAndBlinds"
+  //       );
+  //       socket.emit("updatePositionsAndBlinds", { gameId: roomId });
+  //       setHasEmittedStart(true);
+  //     }
+  //   }
+  // }, [currentGame, socket, roomId, hasEmittedStart]);
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
