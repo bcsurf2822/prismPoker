@@ -144,7 +144,7 @@ const positionsAndBlindsSocket = (io, socket) => {
       io.emit("gameUpdated", game);
     } catch (error) {
       console.error(`Error starting new round for game ${gameId}:`, error);
-      socket.emit("error", error.message);
+      socket.emit("gameError", error.message);
     }
   });
 };

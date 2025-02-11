@@ -67,6 +67,10 @@ const gamesSlice = createSlice({
       state.errorMessage = action.payload;
       state.successMessage = null;
     },
+    gameError: (state, action) => {
+      state.errorMessage = action.payload;
+      state.successMessage = null;
+    },
     clearMessages: (state) => {
       state.successMessage = null;
       state.errorMessage = null;
@@ -107,6 +111,7 @@ export const {
   gameLeft,
   joinError,
   leaveError,
+  gameError,
   clearMessages,
 } = gamesSlice.actions;
 export default gamesSlice.reducer;

@@ -41,6 +41,11 @@ const websocketMiddleware = (store) => (next) => (action) => {
           store.dispatch({ type: "games/leaveError", payload: data.message });
         });
 
+        socket.on("gameError", (data) => {
+          store.dispatch({ type: "games/gameError", payload: data.message });
+        });
+
+
         isSubscribedToRoom = true;
         console.log("Subscribed to room events");
       }

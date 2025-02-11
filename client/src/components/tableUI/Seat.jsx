@@ -62,7 +62,6 @@ export default function Seat({ seat, joinGame, min, max }) {
         </>
       ) : (
         <div className="flex flex-col justify-center items-center">
-
           <span className="text-md font-bold">
             {seat.player?.user?.username}
           </span>
@@ -78,16 +77,10 @@ Seat.propTypes = {
     _id: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
     player: PropTypes.shape({
-      user: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        accountBalance: PropTypes.number.isRequired,
-        avatar: PropTypes.string.isRequired,
-        bankBalance: PropTypes.number.isRequired,
-        email: PropTypes.string.isRequired,
-        lastLogin: PropTypes.string.isRequired,
-        username: PropTypes.string.isRequired,
-        __v: PropTypes.number.isRequired,
-      }).isRequired,
+      user: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.object, 
+      ]),
       chips: PropTypes.number,
       bet: PropTypes.number,
       action: PropTypes.oneOf([
