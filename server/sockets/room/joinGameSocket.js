@@ -40,12 +40,12 @@ const handlePlayerJoin = (io, socket) => {
       await game.save();
 
       const updatedGame = await Game.findById(gameId).populate(
-        "seats.player.user"
+        "seats.player.user",
+        "username"
       );
 
-      io.emit("gameUpdated", updatedGame); 
+      io.emit("gameUpdated", updatedGame);
       socket.emit("joinSuccess", { game: updatedGame });
-      
     } catch (error) {
       console.error("Error joining game:", error);
       socket.emit("joinError", { message: "Server error" });

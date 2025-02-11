@@ -79,7 +79,7 @@ const updatePositionsAndBlinds = async (gameId) => {
     game.seats[game.bigBlindPosition].player.chips -= bigBlindAmount;
     game.pot += bigBlindAmount;
   }
-  
+
   game.gameEnd = false;
 
   await game.save();
@@ -87,10 +87,48 @@ const updatePositionsAndBlinds = async (gameId) => {
   return game;
 };
 
+const dealCardsToPlayers = async (gameId) => {
+  const game = await Game.findById(gameId);
+
+  if (!game) {
+    throw new Error(`Game with ID: ${gameId} not found!`);
+  }
+
+  const seatsWithPlayers = game.seats.filter((seat) => seat.player !== null);
+  const numberOfPlayers = seatsWithPlayers.length;
+
+  if (numberOfPlayers * 2 > game.currentDeck.length) {
+    throw new Error("Not enough cards to deal!");
+  }
+
+  game.seats.forEach((seat) => {
+    if (seat.player) {
+      seat.player.handCards = [];
+      seat.player.checkBetFold = false;
+    }
+  });
+
+  for (let i = 0; i < 2; i++) {
+    for (let j = 0; j < numberOfPlayers; j++) {
+      const playerIndex = (game.bigBlindPosition + 1 + j) % numberOfPlayers;
+      const seat = seatsWithPlayers[playerIndex];
+      const card = game.currentDeck.shift();
+      seat.player.handCards.push(card.code);
+    }
+  }
+
+  await game.save();
+  return game;
+};
+
 const positionsAndBlindsSocket = (io, socket) => {
   socket.on("updatePositionsAndBlinds", async ({ gameId }) => {
     try {
       let game = await updatePositionsAndBlinds(gameId);
+      game = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
+      );
       console.log("Positions and blinds updated");
       // game = await dealCardsToPlayers(gameId);
       // console.log(`Updated positions, blinds, and dealt cards for game ${gameId}.

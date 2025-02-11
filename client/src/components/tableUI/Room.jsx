@@ -48,17 +48,18 @@ export default function Room() {
   }, [dispatch, roomId, user]);
 
   // Sets emitStartted to false
-useEffect(() => {
-  if (currentGame) {
+  useEffect(() => {
+    if (currentGame) {
+      const playerCount = currentGame.seats.filter(
+        (seat) => seat.player
+      ).length;
 
-    const playerCount = currentGame.seats.filter((seat) => seat.player).length;
-    
-    if (playerCount < 2 && hasEmittedStart) {
-      console.log("Player count dropped below 2. Resetting hasEmittedStart.");
-      setHasEmittedStart(false);
+      if (playerCount < 2 && hasEmittedStart) {
+        console.log("Player count dropped below 2. Resetting hasEmittedStart.");
+        setHasEmittedStart(false);
+      }
     }
-  }
-}, [currentGame, hasEmittedStart]);
+  }, [currentGame, hasEmittedStart]);
 
   // Triggers New Game / updatesPosBlind
   useEffect(() => {
@@ -69,9 +70,10 @@ useEffect(() => {
         playerCount,
         "gameRunning:",
         currentGame?.gameRunning,
-        "Emit Started? :", hasEmittedStart
+        "Emit Started? :",
+        hasEmittedStart
       );
-  
+
       if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
         console.log(
           "Sufficient players detected, emitting updatePositionsAndBlinds"
@@ -85,7 +87,7 @@ useEffect(() => {
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
-    const userId = user.id;
+    const userId = user._id || user.id;
     socket.emit("playerJoin", {
       gameId: roomId,
       userId,

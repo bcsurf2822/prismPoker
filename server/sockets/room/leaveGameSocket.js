@@ -43,30 +43,19 @@ const leaveGameSocket = (io, socket) => {
         game.communityCards = [];
         game.dealtCards = [];
         game.winnerData = [];
-        game.stage = "preflop"
-        game.gameRunning = false
+        game.stage = "preflop";
+        game.gameRunning = false;
         game.gameEnd = false;
         game.dealerPosition = -1;
         game.smallBlindPosition = -1;
         game.bigBlindPosition = -1;
         game.currentPlayerTurn = -1;
-
-        io.to(gameId).emit("game_ended", game);
       }
 
       await game.save();
-      const updatedGame = await Game.findById(gameId).populate(
-        "seats.player.user"
-      );
-      // Comment out for trying to update the State for the game comp
-      // io.to(gameId).emit("gameUpdated", updatedGame);
+      const updatedGame = await Game.findById(gameId).populate("seats.player.user", "username");
 
-      // socket.emit("gameLeft", {
-      //   message: "Successfully left the game!",
-      //   game: updatedGame,
-      // });
-
-      io.emit("gameUpdated", updatedGame); // Changed from io.to(gameId)
+      io.emit("gameUpdated", updatedGame);
       socket.emit("gameLeft", { game: updatedGame });
     } catch (err) {
       console.error("Error in leaveSocket:", err);
