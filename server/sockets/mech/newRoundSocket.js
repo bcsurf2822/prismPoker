@@ -52,6 +52,7 @@ const updatePositionsAndBlinds = async (gameId) => {
     game.currentDeck = await fetchNewDeck();
   }
 
+  game.gameRunning = true;
   game.winnerData = [];
   game.communityCards = [];
   game.stage = "preflop";
@@ -78,8 +79,7 @@ const updatePositionsAndBlinds = async (gameId) => {
     game.seats[game.bigBlindPosition].player.chips -= bigBlindAmount;
     game.pot += bigBlindAmount;
   }
-
-  game.gameRunning = true;
+  
   game.gameEnd = false;
 
   await game.save();
