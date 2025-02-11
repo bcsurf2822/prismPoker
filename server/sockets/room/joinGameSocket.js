@@ -43,16 +43,9 @@ const handlePlayerJoin = (io, socket) => {
         "seats.player.user"
       );
 
-      // Comment out for trying to update the State for the game comp
-      // io.to(gameId).emit("gameUpdated", updatedGame);
-
-      io.emit("gameUpdated", updatedGame); // Changed from io.to(gameId)
+      io.emit("gameUpdated", updatedGame); 
       socket.emit("joinSuccess", { game: updatedGame });
-
-      // socket.emit("joinSuccess", {
-      //   message: "Joined successfully",
-      //   game: updatedGame,
-      // });
+      
     } catch (error) {
       console.error("Error joining game:", error);
       socket.emit("joinError", { message: "Server error" });

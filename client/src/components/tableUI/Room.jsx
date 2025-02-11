@@ -49,9 +49,7 @@ export default function Room() {
   // Triggers New Game / updatesPosBlind
   useEffect(() => {
     if (currentGame && socket) {
-      const playerCount = currentGame.seats.filter(
-        (seat) => seat.player
-      ).length;
+      const playerCount = currentGame.playerCount
       console.log(
         "Player count:",
         playerCount,
