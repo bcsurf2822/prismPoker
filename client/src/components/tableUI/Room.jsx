@@ -23,6 +23,10 @@ export default function Room() {
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
 
+  if(user){
+    console.log("User Room: ", user)
+  }
+
   // UseEffect to track Toast
   useEffect(() => {
     if (successMessage) {

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router";
-import { logout } from "../../features/auth/authenticationSlice";
+import {  logoutUser } from "../../features/auth/authenticationSlice";
 import { useNavigate } from "react-router";
 
 export default function Navbar() {
@@ -9,7 +9,7 @@ export default function Navbar() {
   let navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     localStorage.removeItem("authToken");
     navigate("/");
   };

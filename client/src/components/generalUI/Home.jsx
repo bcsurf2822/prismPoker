@@ -5,6 +5,9 @@ import { useNavigate } from "react-router";
 export default function Home() {
   const user = useSelector((state) => state.auth.user);
   let navigate = useNavigate();
+  if(user){
+    console.log("user home", user)
+  }
 
   if (!user) {
     navigate("/");

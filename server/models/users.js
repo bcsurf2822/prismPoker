@@ -34,6 +34,10 @@ const UserSchema = new Schema({
     type: String,
     default: "http://localhost:4000/defaultUser.png",
   },
+  activeGames: [{
+    type: Schema.Types.ObjectId,
+    ref: "Game",
+  }],
   lastLogin: {
     type: Date,
     default: Date.now,

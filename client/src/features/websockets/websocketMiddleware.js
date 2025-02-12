@@ -1,3 +1,4 @@
+import { rehydrateUser } from "../auth/authenticationSlice";
 import { updateGame } from "../games/gamesSlice";
 import SocketService from "./socketService";
 
@@ -26,11 +27,13 @@ const websocketMiddleware = (store) => (next) => (action) => {
         socket.on("joinSuccess", (data) => {
           store.dispatch(updateGame(data.game));
           store.dispatch({ type: "games/joinSuccess" });
+          store.dispatch(rehydrateUser());
         });
 
         socket.on("gameLeft", (data) => {
           store.dispatch(updateGame(data.game));
           store.dispatch({ type: "games/gameLeft" });
+          store.dispatch(rehydrateUser());
         });
 
         socket.on("joinError", (data) => {

@@ -29,6 +29,9 @@ const leaveGameSocket = (io, socket) => {
       playerSeat.player = null;
       game.playerCount -= 1;
 
+      user.activeGames = user.activeGames.filter(
+        (id) => id.toString() !== gameId.toString()
+      );
       await user.save();
 
       const remainingPlayers = game.seats.filter(
@@ -53,7 +56,10 @@ const leaveGameSocket = (io, socket) => {
       }
 
       await game.save();
-      const updatedGame = await Game.findById(gameId).populate("seats.player.user", "username");
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
+      );
 
       io.emit("gameUpdated", updatedGame);
       socket.emit("gameLeft", { game: updatedGame });
