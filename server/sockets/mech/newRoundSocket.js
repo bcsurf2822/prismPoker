@@ -7,8 +7,7 @@ const updateLocks = {};
 const findNextPosition = (startPosition, seats) => {
   const seatCount = seats.length;
   let nextPosition = (startPosition + 1) % seatCount;
-  // Continue looping until a seat with a player is found.
-  // (Be cautious: if no seats have a player, this could loop indefinitely.)
+
   while (!seats[nextPosition].player) {
     nextPosition = (nextPosition + 1) % seatCount;
   }
@@ -38,7 +37,9 @@ const resetActionNone = (game) => {
 
 const updatePositionsAndBlinds = async (gameId) => {
   if (updateLocks[gameId]) {
-    console.log(`Update for game ${gameId} is already in progress. Skipping logic.`);
+    console.log(
+      `Update for game ${gameId} is already in progress. Skipping logic.`
+    );
 
     return await Game.findById(gameId);
   }
@@ -70,10 +71,18 @@ const updatePositionsAndBlinds = async (gameId) => {
 
     game.dealerPosition = findNextPosition(game.dealerPosition, game.seats);
     game.smallBlindPosition = findNextPosition(game.dealerPosition, game.seats);
-    game.bigBlindPosition = findNextPosition(game.smallBlindPosition, game.seats);
-    game.currentPlayerTurn = findNextPosition(game.bigBlindPosition, game.seats);
+    game.bigBlindPosition = findNextPosition(
+      game.smallBlindPosition,
+      game.seats
+    );
+    game.currentPlayerTurn = findNextPosition(
+      game.bigBlindPosition,
+      game.seats
+    );
 
-    const [smallBlindAmount, bigBlindAmount] = game.blinds.split("/").map(Number);
+    const [smallBlindAmount, bigBlindAmount] = game.blinds
+      .split("/")
+      .map(Number);
 
     game.seats.forEach((seat) => {
       if (seat.player) {
@@ -97,7 +106,6 @@ const updatePositionsAndBlinds = async (gameId) => {
 
     return game;
   } finally {
-    // Release the lock.
     delete updateLocks[gameId];
   }
 };
@@ -111,10 +119,6 @@ const dealCardsToPlayers = async (gameId) => {
 
   const seatsWithPlayers = game.seats.filter((seat) => seat.player !== null);
   const numberOfPlayers = seatsWithPlayers.length;
-
-  if (numberOfPlayers * 2 > game.currentDeck.length) {
-    throw new Error("Not enough cards to deal!");
-  }
 
   game.seats.forEach((seat) => {
     if (seat.player) {
@@ -145,7 +149,7 @@ const positionsAndBlindsSocket = (io, socket) => {
         "username"
       );
       console.log("Positions and blinds updated");
-      // game = await dealCardsToPlayers(gameId);
+      game = await dealCardsToPlayers(gameId);
       // console.log(`Updated positions, blinds, and dealt cards for game ${gameId}.
       //              Dealer: ${game.dealerPosition},
       //              Small Blind: ${game.smallBlindPosition},

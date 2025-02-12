@@ -79,8 +79,8 @@ export default function Seat({
           <span className="text-md font-bold">
             {seat.player?.user?.username}
           </span>
-          {isSmallBlind && <p className="text-sm" >S. B.</p>}
-          {isBigBlind && <p className="text-sm" >B. B.</p>}
+          {isSmallBlind && <p className="text-sm">S. B.</p>}
+          {isBigBlind && <p className="text-sm">B. B.</p>}
           {isDealer && <div className="badge badge-primary badge-sm">D</div>}
         </div>
       )}
