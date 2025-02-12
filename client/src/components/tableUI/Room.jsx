@@ -126,6 +126,7 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 0}
           />
           <Seat
             seat={currentGame.seats[1]}
@@ -133,6 +134,7 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 1}
           />
         </div>
         {/* mid */}
@@ -143,6 +145,7 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 5}
           />
           <Table pot={currentGame.pot} />
           <Seat
@@ -151,6 +154,7 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 2}
           />
         </div>
         {/* btm */}
@@ -161,6 +165,7 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 4}
           />
           <Seat
             seat={currentGame.seats[3]}
@@ -168,6 +173,7 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 3}
           />
         </div>
       </section>

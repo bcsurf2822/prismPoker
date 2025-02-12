@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useRef, useState } from "react";
 
-export default function Seat({ seat, joinGame, min, max }) {
+export default function Seat({ seat, joinGame, min, max, isDealer }) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
 
@@ -66,6 +66,7 @@ export default function Seat({ seat, joinGame, min, max }) {
             {seat.player?.user?.username}
           </span>
           <span className="text-md font-bold">$ {seat.player?.chips}</span>
+          {isDealer && <div className="badge badge-primary badge-sm">D</div>}
         </div>
       )}
     </div>
@@ -94,4 +95,5 @@ Seat.propTypes = {
   joinGame: PropTypes.func.isRequired,
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
+  isDealer: PropTypes.bool.isRequired,
 };
