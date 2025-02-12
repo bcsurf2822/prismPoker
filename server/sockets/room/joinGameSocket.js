@@ -3,6 +3,7 @@ const Game = require("../../models/games");
 
 const handlePlayerJoin = (io, socket) => {
   socket.on("playerJoin", async ({ gameId, userId, buyIn, seatId }) => {
+    console.log(`Received playerJoin gameId: ${gameId}`);
     try {
       const game = await Game.findById(gameId);
       const user = await User.findById(userId);
@@ -39,19 +40,12 @@ const handlePlayerJoin = (io, socket) => {
       await game.save();
 
       const updatedGame = await Game.findById(gameId).populate(
-        "seats.player.user"
+        "seats.player.user",
+        "username"
       );
 
-      // Comment out for trying to update the State for the game comp
-      // io.to(gameId).emit("gameUpdated", updatedGame);
-
-      io.emit("gameUpdated", updatedGame); // Changed from io.to(gameId)
+      io.emit("gameUpdated", updatedGame);
       socket.emit("joinSuccess", { game: updatedGame });
-
-      // socket.emit("joinSuccess", {
-      //   message: "Joined successfully",
-      //   game: updatedGame,
-      // });
     } catch (error) {
       console.error("Error joining game:", error);
       socket.emit("joinError", { message: "Server error" });

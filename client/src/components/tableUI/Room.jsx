@@ -4,7 +4,7 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
 
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
@@ -21,6 +21,9 @@ export default function Room() {
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
 
+  const [hasEmittedStart, setHasEmittedStart] = useState(false);
+
+  // UseEffect to track Toast
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
@@ -32,6 +35,7 @@ export default function Room() {
     }
   }, [dispatch, successMessage, errorMessage]);
 
+  // useEffect to listen for socket room events
   useEffect(() => {
     dispatch(fetchGameById(roomId));
     if (!user) dispatch(rehydrateUser());
@@ -43,10 +47,52 @@ export default function Room() {
     };
   }, [dispatch, roomId, user]);
 
+  // Sets emitStartted to false
+  useEffect(() => {
+    if (currentGame) {
+      const playerCount = currentGame.seats.filter(
+        (seat) => seat.player
+      ).length;
+
+      if (playerCount < 2 && hasEmittedStart) {
+        console.log("Player count dropped below 2. Resetting hasEmittedStart.");
+        setHasEmittedStart(false);
+      }
+    }
+  }, [currentGame, hasEmittedStart]);
+
+  // Triggers New Game / updatesPosBlind
+  useEffect(() => {
+    if (currentGame && socket) {
+      const playerCount = currentGame.playerCount;
+      console.log(
+        "Player count:",
+        playerCount,
+        "gameRunning:",
+        currentGame?.gameRunning,
+        "Emit Started? :",
+        hasEmittedStart
+      );
+
+      if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
+        console.log(
+          "Sufficient players detected, emitting updatePositionsAndBlinds"
+        );
+        socket.emit("updatePositionsAndBlinds", { gameId: roomId });
+        setHasEmittedStart(true);
+
+        setTimeout(() => {
+          console.log("Emitting dealCardsToPlayers");
+          socket.emit("dealCardsToPlayers", { gameId: roomId });
+        }, 2000);
+      }
+    }
+  }, [currentGame, socket, roomId, hasEmittedStart]);
+
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
-    const userId = user.id;
+    const userId = user._id || user.id;
     socket.emit("playerJoin", {
       gameId: roomId,
       userId,
@@ -85,6 +131,10 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 0}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 0}
+            isSmallBlind={currentGame.smallBlindPosition === 0}
+            isBigBlind={currentGame.bigBlindPosition === 0}
           />
           <Seat
             seat={currentGame.seats[1]}
@@ -92,6 +142,10 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 1}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 1}
+            isSmallBlind={currentGame.smallBlindPosition === 1}
+            isBigBlind={currentGame.bigBlindPosition === 1}
           />
         </div>
         {/* mid */}
@@ -102,6 +156,10 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 5}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 5}
+            isSmallBlind={currentGame.smallBlindPosition === 5}
+            isBigBlind={currentGame.bigBlindPosition === 5}
           />
           <Table pot={currentGame.pot} />
           <Seat
@@ -110,6 +168,10 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 2}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 2}
+            isSmallBlind={currentGame.smallBlindPosition === 2}
+            isBigBlind={currentGame.bigBlindPosition === 2}
           />
         </div>
         {/* btm */}
@@ -120,6 +182,10 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 4}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 4}
+            isSmallBlind={currentGame.smallBlindPosition === 4}
+            isBigBlind={currentGame.bigBlindPosition === 4}
           />
           <Seat
             seat={currentGame.seats[3]}
@@ -127,6 +193,10 @@ export default function Room() {
             user={user}
             min={currentGame.min}
             max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 3}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 3}
+            isSmallBlind={currentGame.smallBlindPosition === 3}
+            isBigBlind={currentGame.bigBlindPosition === 3}
           />
         </div>
       </section>

@@ -41,6 +41,11 @@ const websocketMiddleware = (store) => (next) => (action) => {
           store.dispatch({ type: "games/leaveError", payload: data.message });
         });
 
+        socket.on("gameError", (data) => {
+          store.dispatch({ type: "games/gameError", payload: data.message });
+        });
+
+
         isSubscribedToRoom = true;
         console.log("Subscribed to room events");
       }
@@ -51,6 +56,7 @@ const websocketMiddleware = (store) => (next) => (action) => {
         socket.off("gameUpdated");
         socket.off("joinSuccess");
         socket.off("joinError");
+        socket.off("gameError");
         socket.off("gameLeft");
         socket.off("leaveGameError");
         isSubscribedToRoom = false;

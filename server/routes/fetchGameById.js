@@ -3,7 +3,11 @@ const Game = require("../models/games");
 
 router.get("/:gameId", async (req, res) => {
   try {
-    const game = await Game.findById(req.params.gameId);
+    const game = await Game.findById(req.params.gameId).populate(
+      "seats.player.user",
+      "username"
+    );
+
     if (!game) {
       return res.status(404).json({ message: "Game not found" });
     }

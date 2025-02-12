@@ -1,7 +1,16 @@
 import PropTypes from "prop-types";
 import { useRef, useState } from "react";
 
-export default function Seat({ seat, joinGame, min, max }) {
+export default function Seat({
+  seat,
+  joinGame,
+  min,
+  max,
+  isDealer,
+  isCurrentPlayer,
+  isSmallBlind,
+  isBigBlind,
+}) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
 
@@ -25,7 +34,11 @@ export default function Seat({ seat, joinGame, min, max }) {
   };
 
   return (
-    <div className="bg-white rounded-full w-1/4 h-5/6 flex flex-col justify-center items-center">
+    <div
+      className={`bg-white rounded-full w-1/4 h-5/6 flex flex-col justify-center items-center ${
+        isCurrentPlayer ? "border-4 border-green-500" : ""
+      }`}
+    >
       {!seat.player ? (
         <>
           <button
@@ -62,11 +75,13 @@ export default function Seat({ seat, joinGame, min, max }) {
         </>
       ) : (
         <div className="flex flex-col justify-center items-center">
-          {/* Currently i am just making sure i am able to return user info */}
+          <span className="text-md font-bold">$ {seat.player?.chips}</span>{" "}
           <span className="text-md font-bold">
             {seat.player?.user?.username}
           </span>
-          <span className="text-md font-bold">$ {seat.player?.chips}</span>
+          {isSmallBlind && <p className="text-sm">S. B.</p>}
+          {isBigBlind && <p className="text-sm">B. B.</p>}
+          {isDealer && <div className="badge badge-primary badge-sm">D</div>}
         </div>
       )}
     </div>
@@ -78,16 +93,7 @@ Seat.propTypes = {
     _id: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
     player: PropTypes.shape({
-      user: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        accountBalance: PropTypes.number.isRequired,
-        avatar: PropTypes.string.isRequired,
-        bankBalance: PropTypes.number.isRequired,
-        email: PropTypes.string.isRequired,
-        lastLogin: PropTypes.string.isRequired,
-        username: PropTypes.string.isRequired,
-        __v: PropTypes.number.isRequired,
-      }).isRequired,
+      user: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
       chips: PropTypes.number,
       bet: PropTypes.number,
       action: PropTypes.oneOf([
@@ -104,4 +110,8 @@ Seat.propTypes = {
   joinGame: PropTypes.func.isRequired,
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
+  isDealer: PropTypes.bool.isRequired,
+  isCurrentPlayer: PropTypes.bool.isRequired,
+  isSmallBlind: PropTypes.bool.isRequired,
+  isBigBlind: PropTypes.bool.isRequired,
 };
