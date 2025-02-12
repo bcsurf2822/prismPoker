@@ -37,13 +37,8 @@ const resetActionNone = (game) => {
 
 const updatePositionsAndBlinds = async (gameId) => {
   if (updateLocks[gameId]) {
-    console.log(
-      `Update for game ${gameId} is already in progress. Skipping logic.`
-    );
-
     return await Game.findById(gameId);
   }
-
   updateLocks[gameId] = true;
   try {
     const game = await Game.findById(gameId);
@@ -55,12 +50,10 @@ const updatePositionsAndBlinds = async (gameId) => {
     }
 
     if (game.gameRunning) {
-      console.log(`Game ${gameId} is already running. Skipping logic.`);
       return game;
     }
 
     if (game.currentDeck.length === 0) {
-      console.log(`Fetching a new deck for game ${gameId}.`);
       game.currentDeck = await fetchNewDeck();
     }
 
@@ -110,36 +103,6 @@ const updatePositionsAndBlinds = async (gameId) => {
   }
 };
 
-const dealCardsToPlayers = async (gameId) => {
-  const game = await Game.findById(gameId);
-
-  if (!game) {
-    throw new Error(`Game with ID: ${gameId} not found!`);
-  }
-
-  const seatsWithPlayers = game.seats.filter((seat) => seat.player !== null);
-  const numberOfPlayers = seatsWithPlayers.length;
-
-  game.seats.forEach((seat) => {
-    if (seat.player) {
-      seat.player.handCards = [];
-      seat.player.checkBetFold = false;
-    }
-  });
-
-  for (let i = 0; i < 2; i++) {
-    for (let j = 0; j < numberOfPlayers; j++) {
-      const playerIndex = (game.bigBlindPosition + 1 + j) % numberOfPlayers;
-      const seat = seatsWithPlayers[playerIndex];
-      const card = game.currentDeck.shift();
-      seat.player.handCards.push(card.code);
-    }
-  }
-
-  await game.save();
-  return game;
-};
-
 const positionsAndBlindsSocket = (io, socket) => {
   socket.on("updatePositionsAndBlinds", async ({ gameId }) => {
     try {
@@ -148,13 +111,7 @@ const positionsAndBlindsSocket = (io, socket) => {
         "seats.player.user",
         "username"
       );
-      console.log("Positions and blinds updated");
-      game = await dealCardsToPlayers(gameId);
-      // console.log(`Updated positions, blinds, and dealt cards for game ${gameId}.
-      //              Dealer: ${game.dealerPosition},
-      //              Small Blind: ${game.smallBlindPosition},
-      //              Big Blind: ${game.bigBlindPosition},
-      //              Current Turn: ${game.currentPlayerTurn}`);
+
       io.emit("gameUpdated", game);
     } catch (error) {
       console.error(`Error starting new round for game ${gameId}:`, error);

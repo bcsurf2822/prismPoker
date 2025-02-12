@@ -80,6 +80,11 @@ export default function Room() {
         );
         socket.emit("updatePositionsAndBlinds", { gameId: roomId });
         setHasEmittedStart(true);
+
+        setTimeout(() => {
+          console.log("Emitting dealCardsToPlayers");
+          socket.emit("dealCardsToPlayers", { gameId: roomId });
+        }, 2000);
       }
     }
   }, [currentGame, socket, roomId, hasEmittedStart]);
