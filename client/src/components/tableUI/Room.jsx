@@ -23,6 +23,8 @@ export default function Room() {
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
 
+  // need to make sure that activeGames is updating all of the redux State not just when in a room
+  
   if(user){
     console.log("User Room: ", user)
   }
