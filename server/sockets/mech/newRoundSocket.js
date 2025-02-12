@@ -37,14 +37,12 @@ const resetActionNone = (game) => {
 };
 
 const updatePositionsAndBlinds = async (gameId) => {
-  // Check if an update for this game is already in progress.
   if (updateLocks[gameId]) {
     console.log(`Update for game ${gameId} is already in progress. Skipping logic.`);
-    // Optionally, return the current game without updating.
+
     return await Game.findById(gameId);
   }
 
-  // Acquire the lock for this game.
   updateLocks[gameId] = true;
   try {
     const game = await Game.findById(gameId);
