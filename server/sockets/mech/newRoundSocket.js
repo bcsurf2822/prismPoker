@@ -1,6 +1,9 @@
 const Game = require("../../models/games");
 const axios = require("axios");
 
+// interesting topic about concurrent calls from seperarte browsers
+const updateLocks = {};
+
 const findNextPosition = (startPosition, seats) => {
   const seatCount = seats.length;
   let nextPosition = (startPosition + 1) % seatCount;
@@ -34,57 +37,71 @@ const resetActionNone = (game) => {
 };
 
 const updatePositionsAndBlinds = async (gameId) => {
-  const game = await Game.findById(gameId);
-
-  resetActionNone(game);
-
-  if (!game) {
-    throw new Error(`Game with ID: ${gameId} not found!`);
+  // Check if an update for this game is already in progress.
+  if (updateLocks[gameId]) {
+    console.log(`Update for game ${gameId} is already in progress. Skipping logic.`);
+    // Optionally, return the current game without updating.
+    return await Game.findById(gameId);
   }
 
-  if (game.gameRunning) {
-    console.log(`Game ${gameId} is already running. Skipping logic.`);
-    return game;
-  }
+  // Acquire the lock for this game.
+  updateLocks[gameId] = true;
+  try {
+    const game = await Game.findById(gameId);
 
-  if (game.currentDeck.length === 0) {
-    console.log(`Fetching a new deck for game ${gameId}.`);
-    game.currentDeck = await fetchNewDeck();
-  }
+    resetActionNone(game);
 
-  game.gameRunning = true;
-  game.winnerData = [];
-  game.communityCards = [];
-  game.stage = "preflop";
-
-  game.dealerPosition = findNextPosition(game.dealerPosition, game.seats);
-  game.smallBlindPosition = findNextPosition(game.dealerPosition, game.seats);
-  game.bigBlindPosition = findNextPosition(game.smallBlindPosition, game.seats);
-  game.currentPlayerTurn = findNextPosition(game.bigBlindPosition, game.seats);
-
-  const [smallBlindAmount, bigBlindAmount] = game.blinds.split("/").map(Number);
-
-  game.seats.forEach((seat) => {
-    if (seat.player) {
-      seat.player.checkBetFold = false;
+    if (!game) {
+      throw new Error(`Game with ID: ${gameId} not found!`);
     }
-  });
 
-  if (game.seats[game.smallBlindPosition].player) {
-    game.seats[game.smallBlindPosition].player.chips -= smallBlindAmount;
-    game.pot += smallBlindAmount;
+    if (game.gameRunning) {
+      console.log(`Game ${gameId} is already running. Skipping logic.`);
+      return game;
+    }
+
+    if (game.currentDeck.length === 0) {
+      console.log(`Fetching a new deck for game ${gameId}.`);
+      game.currentDeck = await fetchNewDeck();
+    }
+
+    game.gameRunning = true;
+    game.winnerData = [];
+    game.communityCards = [];
+    game.stage = "preflop";
+
+    game.dealerPosition = findNextPosition(game.dealerPosition, game.seats);
+    game.smallBlindPosition = findNextPosition(game.dealerPosition, game.seats);
+    game.bigBlindPosition = findNextPosition(game.smallBlindPosition, game.seats);
+    game.currentPlayerTurn = findNextPosition(game.bigBlindPosition, game.seats);
+
+    const [smallBlindAmount, bigBlindAmount] = game.blinds.split("/").map(Number);
+
+    game.seats.forEach((seat) => {
+      if (seat.player) {
+        seat.player.checkBetFold = false;
+      }
+    });
+
+    if (game.seats[game.smallBlindPosition].player) {
+      game.seats[game.smallBlindPosition].player.chips -= smallBlindAmount;
+      game.pot += smallBlindAmount;
+    }
+
+    if (game.seats[game.bigBlindPosition].player) {
+      game.seats[game.bigBlindPosition].player.chips -= bigBlindAmount;
+      game.pot += bigBlindAmount;
+    }
+
+    game.gameEnd = false;
+
+    await game.save();
+
+    return game;
+  } finally {
+    // Release the lock.
+    delete updateLocks[gameId];
   }
-
-  if (game.seats[game.bigBlindPosition].player) {
-    game.seats[game.bigBlindPosition].player.chips -= bigBlindAmount;
-    game.pot += bigBlindAmount;
-  }
-
-  game.gameEnd = false;
-
-  await game.save();
-
-  return game;
 };
 
 const dealCardsToPlayers = async (gameId) => {
