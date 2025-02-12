@@ -127,6 +127,9 @@ export default function Room() {
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 0}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 0}
+            isSmallBlind={currentGame.smallBlindPosition === 0}
+            isBigBlind={currentGame.bigBlindPosition === 0}
           />
           <Seat
             seat={currentGame.seats[1]}
@@ -135,6 +138,9 @@ export default function Room() {
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 1}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 1}
+            isSmallBlind={currentGame.smallBlindPosition === 1}
+            isBigBlind={currentGame.bigBlindPosition === 1}
           />
         </div>
         {/* mid */}
@@ -146,6 +152,9 @@ export default function Room() {
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 5}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 5}
+            isSmallBlind={currentGame.smallBlindPosition === 5}
+            isBigBlind={currentGame.bigBlindPosition === 5}
           />
           <Table pot={currentGame.pot} />
           <Seat
@@ -155,6 +164,9 @@ export default function Room() {
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 2}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 2}
+            isSmallBlind={currentGame.smallBlindPosition === 2}
+            isBigBlind={currentGame.bigBlindPosition === 2}
           />
         </div>
         {/* btm */}
@@ -166,6 +178,9 @@ export default function Room() {
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 4}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 4}
+            isSmallBlind={currentGame.smallBlindPosition === 4}
+            isBigBlind={currentGame.bigBlindPosition === 4}
           />
           <Seat
             seat={currentGame.seats[3]}
@@ -174,6 +189,9 @@ export default function Room() {
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 3}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 3}
+            isSmallBlind={currentGame.smallBlindPosition === 3}
+            isBigBlind={currentGame.bigBlindPosition === 3}
           />
         </div>
       </section>
