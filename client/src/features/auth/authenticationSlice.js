@@ -112,7 +112,9 @@ export const logoutUser = () => async (dispatch, getState) => {
     if (socket) {
       for (const gameId of user.activeGames) {
         console.log(
-          `logoutUser: Emitting leaveGame for game ${gameId} for user ${user._id || user.id}`
+          `logoutUser: Emitting leaveGame for game ${gameId} for user ${
+            user._id || user.id
+          }`
         );
         socket.emit("leaveGame", { gameId, userId: user._id || user.id });
       }
@@ -145,6 +147,9 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.error = null;
+    },
+    updateUser: (state, action) => {
+      state.user = normalizeUser(action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -204,6 +209,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, updateUser } = authSlice.actions;
 
 export default authSlice.reducer;

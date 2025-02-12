@@ -1,4 +1,4 @@
-import { rehydrateUser } from "../auth/authenticationSlice";
+import { rehydrateUser, updateUser } from "../auth/authenticationSlice";
 import { updateGame } from "../games/gamesSlice";
 import SocketService from "./socketService";
 
@@ -25,9 +25,10 @@ const websocketMiddleware = (store) => (next) => (action) => {
           store.dispatch(updateGame(updatedGame));
         });
         socket.on("joinSuccess", (data) => {
+          console.log("joinSuccess event received:", data);
+          store.dispatch(updateUser(data.user));
           store.dispatch(updateGame(data.game));
           store.dispatch({ type: "games/joinSuccess" });
-          store.dispatch(rehydrateUser());
         });
 
         socket.on("gameLeft", (data) => {
@@ -47,7 +48,6 @@ const websocketMiddleware = (store) => (next) => (action) => {
         socket.on("gameError", (data) => {
           store.dispatch({ type: "games/gameError", payload: data.message });
         });
-
 
         isSubscribedToRoom = true;
         console.log("Subscribed to room events");
