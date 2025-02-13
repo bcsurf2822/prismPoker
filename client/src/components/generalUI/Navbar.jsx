@@ -47,6 +47,7 @@ export default function Navbar() {
               </ul>
             </li>
             <li>
+            <p className="font-bold">{user.username}</p>
               <p className="font-bold">SC: ${user.accountBalance}</p>
             </li>
             <li>

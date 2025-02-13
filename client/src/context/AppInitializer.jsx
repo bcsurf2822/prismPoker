@@ -8,38 +8,24 @@ export default function AppInitializer({ children }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // Always connect and listen for room events
+    socketService.connect();
+    dispatch({ type: "websocket/listenToRoomEvents" });
+    
+    // Check if a token exists
     const token = localStorage.getItem("authToken");
     if (token) {
-      // If a token exists, rehydrate the user and connect the socket.
       dispatch(rehydrateUser());
-      socketService.connect();
+      dispatch({ type: "websocket/listenToUserEvents" });
     } else {
-      console.log("AppInitializer: No auth token found, skipping rehydration and socket connection.");
+      console.log("AppInitializer: No auth token found, skipping user events subscription.");
     }
 
-    const socket = socketService.getSocket();
-    if (socket) {
-      const handleUserUpdated = (userData) => {
-        // Before processing any update, check if the token is still present.
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          console.log("AppInitializer: No auth token found, ignoring userUpdated event.");
-          return;
-        }
-        console.log("AppInitializer: userUpdated event received:", userData);
-        dispatch(updateUser(userData));
-      };
-
-      // Subscribe to user events.
-      socket.on("userUpdated", handleUserUpdated);
-      console.log("AppInitializer: Subscribed to userUpdated events.");
-
-      // Cleanup: Unsubscribe when unmounting.
-      return () => {
-        socket.off("userUpdated", handleUserUpdated);
-        console.log("AppInitializer: Unsubscribed from userUpdated events.");
-      };
-    }
+    // Optional cleanup when AppInitializer unmounts
+    return () => {
+      dispatch({ type: "websocket/stopListeningToRoomEvents" });
+      dispatch({ type: "websocket/stopListeningToUserEvents" });
+    };
   }, [dispatch]);
 
   return children;

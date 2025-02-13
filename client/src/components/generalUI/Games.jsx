@@ -9,12 +9,9 @@ export default function Games() {
   const { games, loading, error } = useSelector((state) => state.games);
 
   useEffect(() => {
-    dispatch(fetchGames());
-    dispatch({ type: "websocket/listenToRoomEvents" });
 
-    return () => {
-      dispatch({ type: "websocket/stopListeningToRoomEvents" });
-    };
+    dispatch(fetchGames());
+
   }, [dispatch]);
 
   useEffect(() => {

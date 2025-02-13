@@ -47,7 +47,7 @@ const handlePlayerJoin = (io, socket) => {
       const updatedUser = await User.findById(userId);
 
       io.emit("gameUpdated", updatedGame);
-      io.emit("userUpdated", updatedUser);
+      socket.emit("userUpdated", updatedUser);
       socket.emit("joinSuccess", {
         game: updatedGame,
       });
