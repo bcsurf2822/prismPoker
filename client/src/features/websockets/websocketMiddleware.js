@@ -30,7 +30,6 @@ const websocketMiddleware = (store) => (next) => (action) => {
           store.dispatch(updateGame(updatedGame));
         });
         socket.on("joinSuccess", (data) => {
-          console.log("joinSuccess event received:", data);
           store.dispatch(updateGame(data.game));
           store.dispatch({ type: "games/joinSuccess" });
         });
@@ -49,7 +48,6 @@ const websocketMiddleware = (store) => (next) => (action) => {
           store.dispatch({ type: "games/gameError", payload: data.message });
         });
         isSubscribedToRoom = true;
-        console.log("Subscribed to room events");
       }
       break;
 
@@ -60,32 +58,17 @@ const websocketMiddleware = (store) => (next) => (action) => {
             ? userData
             : normalizeUser(userData);
           const currentUser = store.getState().auth.user;
-          console.log("Received userUpdated event:", normalizedUserData);
-          console.log("Current user in store:", currentUser);
 
           if (currentUser) {
             const incomingId = normalizedUserData.id || normalizedUserData._id;
             const currentId = currentUser.id || currentUser._id;
 
             if (incomingId === currentId) {
-              console.log(
-                "userUpdated event matches current user. Updating auth state with:",
-                normalizedUserData
-              );
               store.dispatch(updateUser(normalizedUserData));
-            } else {
-              console.log(
-                "userUpdated event received for another user. Ignoring update."
-              );
             }
-          } else {
-            console.log(
-              "No current user in store. Ignoring userUpdated event."
-            );
           }
         });
         isSubscribedToUser = true;
-        console.log("Subscribed to user events");
       }
       break;
 
@@ -98,7 +81,6 @@ const websocketMiddleware = (store) => (next) => (action) => {
         socket.off("gameLeft");
         socket.off("leaveGameError");
         isSubscribedToRoom = false;
-        console.log("Unsubscribed from room events");
       }
       break;
 
@@ -106,7 +88,6 @@ const websocketMiddleware = (store) => (next) => (action) => {
       if (isSubscribedToUser) {
         socket.off("userUpdated");
         isSubscribedToUser = false;
-        console.log("Unsubscribed from user events");
       }
       break;
 
