@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGames } from "../../features/games/gamesSlice";
+import { useOpenWindows } from "../../context/WindowContext";
 
 export default function Games() {
   const dispatch = useDispatch();
-  const [openWindows, setOpenWindows] = useState({});
-
+  const { openWindows, setOpenWindows } = useOpenWindows();
   const { games, loading, error } = useSelector((state) => state.games);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Games() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [openWindows]);
+  }, [openWindows, setOpenWindows]);
 
   // opens window without extra settings
 
