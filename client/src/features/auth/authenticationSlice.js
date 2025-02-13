@@ -1,6 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import apiClient from "../../utils/apiClient";
+import socketService from "../websockets/socketService";
+
+export const normalizeUser = (user) => {
+  const normalized = {
+    id: user._id ? user._id.toString() : user.id,
+    username: user.username,
+    email: user.email,
+    accountBalance: user.accountBalance,
+    bankBalance: user.bankBalance,
+    avatar: user.avatar,
+    lastLogin: user.lastLogin,
+    activeGames: user.activeGames || [],
+  };
+  return normalized;
+};
 
 export const registerUser = createAsyncThunk(
   "auth/register",
@@ -40,14 +55,13 @@ export const rehydrateUser = createAsyncThunk(
       if (!token) {
         return rejectWithValue("No token found");
       }
-
       const response = await apiClient.get("/user/user-info", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      return { token, user: response.data };
+      const normalizedUser = normalizeUser(response.data);
+      return { token, user: normalizedUser };
     } catch (e) {
       return rejectWithValue(e.message);
     }
@@ -78,9 +92,36 @@ export const addFunds = createAsyncThunk(
   }
 );
 
+export const logoutUser = () => async (dispatch, getState) => {
+  const state = getState();
+  const user = state.auth.user;
+
+  if (user && user.activeGames && user.activeGames.length > 0) {
+    const socket = socketService.getSocket();
+    if (socket) {
+      for (const gameId of user.activeGames) {
+        console.log(
+          `logoutUser: Emitting leaveGame for game ${gameId} for user ${
+            user._id || user.id
+          }`
+        );
+        socket.emit("leaveGame", { gameId, userId: user._id || user.id });
+      }
+    } else {
+      console.warn("logoutUser: No socket found during logoutUser");
+    }
+  } else {
+    console.log("logoutUser: No active games found for this user.");
+  }
+
+  localStorage.removeItem("authToken");
+
+  dispatch(logout());
+};
+const token = localStorage.getItem("authToken");
 const initialState = {
   user: null,
-  token: null,
+  token: token || null,
   loading: false,
   error: null,
 };
@@ -93,6 +134,13 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.error = null;
+    },
+    updateUser: (state, action) => {
+      const normalizedUser = normalizeUser(action.payload);
+      state.user = {
+        ...state.user,
+        ...normalizedUser,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -152,6 +200,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, updateUser } = authSlice.actions;
 
 export default authSlice.reducer;

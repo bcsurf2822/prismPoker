@@ -23,7 +23,7 @@ export default function Room() {
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
 
-  // UseEffect to track Toast
+  // toast
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
@@ -41,13 +41,15 @@ export default function Room() {
     if (!user) dispatch(rehydrateUser());
 
     dispatch({ type: "websocket/listenToRoomEvents" });
+    dispatch({ type: "websocket/listenToUserEvents" });
 
     return () => {
       dispatch({ type: "websocket/stopListeningToRoomEvents" });
+      dispatch({ type: "websocket/listenToUserEvents" });
     };
   }, [dispatch, roomId, user]);
 
-  // Sets emitStartted to false
+  // just tracking state of room we will remove (ITHINK)
   useEffect(() => {
     if (currentGame) {
       const playerCount = currentGame.seats.filter(

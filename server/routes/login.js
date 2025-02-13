@@ -34,6 +34,8 @@ router.post("/", async (req, res) => {
       { expiresIn: "2h" }
     );
 
+    console.log("USER: =====", user)
+
     res.status(200).json({
       message: "Login successful",
       token,

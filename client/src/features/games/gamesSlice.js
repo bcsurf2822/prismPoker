@@ -39,7 +39,7 @@ const gamesSlice = createSlice({
   },
   reducers: {
     updateGame: (state, action) => {
-      console.log("Updating game with payload:", action.payload);
+      // console.log("Updating game with payload:", action.payload);
       const updatedGame = action.payload;
       const gameId = updatedGame._id?.toString();
 

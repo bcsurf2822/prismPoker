@@ -10,11 +10,6 @@ export default function Games() {
 
   useEffect(() => {
     dispatch(fetchGames());
-    dispatch({ type: "websocket/listenToRoomEvents" });
-
-    return () => {
-      dispatch({ type: "websocket/stopListeningToRoomEvents" });
-    };
   }, [dispatch]);
 
   useEffect(() => {
