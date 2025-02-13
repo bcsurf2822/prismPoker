@@ -10,9 +10,13 @@ export default function Seat({
   isCurrentPlayer,
   isSmallBlind,
   isBigBlind,
+  user,
 }) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
+
+  const isUserSeat =
+    seat.player && seat.player.user && seat.player.user._id === user.id;
 
   const openModal = () => {
     if (modalRef.current) {
@@ -114,4 +118,5 @@ Seat.propTypes = {
   isCurrentPlayer: PropTypes.bool.isRequired,
   isSmallBlind: PropTypes.bool.isRequired,
   isBigBlind: PropTypes.bool.isRequired,
+  user: PropTypes.object.isRequired,
 };

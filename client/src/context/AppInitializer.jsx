@@ -5,20 +5,35 @@ import socketService from "../features/websockets/socketService";
 
 export default function AppInitializer({ children }) {
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token); // use Redux token
+  
+  const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
     socketService.connect();
+
     dispatch({ type: "websocket/listenToRoomEvents" });
 
     if (token) {
       dispatch(rehydrateUser());
       dispatch({ type: "websocket/listenToUserEvents" });
-    } else {
-      dispatch({ type: "websocket/stopListeningToUserEvents" });
-      console.log(
-        "AppInitializer: No auth token, stopping user events subscription."
-      );
+    }
+
+    const socket = socketService.getSocket();
+    if (socket) {
+      const handleConnect = () => {
+        dispatch({ type: "websocket/listenToRoomEvents" });
+        if (token) {
+          dispatch({ type: "websocket/listenToUserEvents" });
+        }
+      };
+
+      socket.on("connect", handleConnect);
+
+      return () => {
+        socket.off("connect", handleConnect);
+        dispatch({ type: "websocket/stopListeningToRoomEvents" });
+        dispatch({ type: "websocket/stopListeningToUserEvents" });
+      };
     }
   }, [dispatch, token]);
 

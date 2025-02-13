@@ -124,9 +124,9 @@ export default function Room() {
           Leave
         </button>
       </section>
-      <section className="flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
+      <section className="  flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
         {/* top */}
-        <div className="flex gap-10 h-1/3  w-1/2 items-center justify-center">
+        <div className="bg-red-400 flex gap-10 h-1/3  w-full items-center justify-center">
           <Seat
             seat={currentGame.seats[0]}
             joinGame={handleJoinGame}
@@ -151,7 +151,7 @@ export default function Room() {
           />
         </div>
         {/* mid */}
-        <div className="flex gap-5 w-full h-1/3  justify-center  text-center px-4">
+        <div className="flex gap-5 w-full h-1/3 justify-center  text-center px-4">
           <Seat
             seat={currentGame.seats[5]}
             joinGame={handleJoinGame}
@@ -163,7 +163,9 @@ export default function Room() {
             isSmallBlind={currentGame.smallBlindPosition === 5}
             isBigBlind={currentGame.bigBlindPosition === 5}
           />
+
           <Table pot={currentGame.pot} />
+
           <Seat
             seat={currentGame.seats[2]}
             joinGame={handleJoinGame}
@@ -177,7 +179,7 @@ export default function Room() {
           />
         </div>
         {/* btm */}
-        <div className="flex gap-10 h-1/3 w-1/2 items-center justify-center">
+        <div className="flex gap-10 h-1/3 w-full items-center justify-center">
           <Seat
             seat={currentGame.seats[4]}
             joinGame={handleJoinGame}
