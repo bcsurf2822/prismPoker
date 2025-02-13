@@ -8,36 +8,38 @@ export default function AppInitializer({ children }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Rehydrate the user immediately.
-    dispatch(rehydrateUser());
-
-    // Connect the socket.
-    socketService.connect();
-
-    // Wait for the socket to connect before subscribing.
-    const socket = socketService.getSocket();
-    if (socket) {
-      // Use the "connect" event to ensure that the socket is ready.
-      socket.on("connect", () => {
-        console.log("AppInitializer: Socket connected. Subscribing to userUpdated events.");
-        socket.on("userUpdated", handleUserUpdated);
-      });
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      // If a token exists, rehydrate the user and connect the socket.
+      dispatch(rehydrateUser());
+      socketService.connect();
+    } else {
+      console.log("AppInitializer: No auth token found, skipping rehydration and socket connection.");
     }
 
-    // Handler function.
-    const handleUserUpdated = (userData) => {
-      console.log("AppInitializer: userUpdated event received:", userData);
-      dispatch(updateUser(userData));
-    };
+    const socket = socketService.getSocket();
+    if (socket) {
+      const handleUserUpdated = (userData) => {
+        // Before processing any update, check if the token is still present.
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          console.log("AppInitializer: No auth token found, ignoring userUpdated event.");
+          return;
+        }
+        console.log("AppInitializer: userUpdated event received:", userData);
+        dispatch(updateUser(userData));
+      };
 
-    // Cleanup: Unsubscribe from events when AppInitializer unmounts.
-    return () => {
-      const socket = socketService.getSocket();
-      if (socket) {
+      // Subscribe to user events.
+      socket.on("userUpdated", handleUserUpdated);
+      console.log("AppInitializer: Subscribed to userUpdated events.");
+
+      // Cleanup: Unsubscribe when unmounting.
+      return () => {
         socket.off("userUpdated", handleUserUpdated);
         console.log("AppInitializer: Unsubscribed from userUpdated events.");
-      }
-    };
+      };
+    }
   }, [dispatch]);
 
   return children;
