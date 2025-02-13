@@ -1,4 +1,4 @@
-import { rehydrateUser, updateUser } from "../auth/authenticationSlice";
+import { normalizeUser, rehydrateUser, updateUser } from "../auth/authenticationSlice";
 import { updateGame } from "../games/gamesSlice";
 import SocketService from "./socketService";
 
@@ -49,27 +49,34 @@ const websocketMiddleware = (store) => (next) => (action) => {
       }
       break;
 
-    case "websocket/listenToUserEvents":
-      if (!isSubscribedToUser) {
-        socket.on("userUpdated", (userData) => {
-          // Get the current user from the store.
-          const currentUser = store.getState().auth.user;
-          // Check if the update is for the logged in user.
-          if (
-            currentUser &&
-            (userData.id === currentUser.id ||
-              userData._id === currentUser.id)
-          ) {
-            console.log("userUpdated event received for current user:", userData);
-            store.dispatch(updateUser(userData));
-          } else {
-            console.log("userUpdated event received for another user:", userData);
-          }
-        });
-        isSubscribedToUser = true;
-        console.log("Subscribed to user events");
+case "websocket/listenToUserEvents":
+  if (!isSubscribedToUser) {
+    socket.on("userUpdated", (userData) => {
+      // Normalize incoming userData if needed
+      const normalizedUserData = userData.id ? userData : normalizeUser(userData);
+      const currentUser = store.getState().auth.user;
+      
+      console.log("Received userUpdated event:", normalizedUserData);
+      console.log("Current user in store:", currentUser);
+      
+      if (currentUser) {
+        const incomingId = normalizedUserData.id || normalizedUserData._id;
+        const currentId = currentUser.id || currentUser._id;
+        
+        if (incomingId === currentId) {
+          console.log("userUpdated event matches current user. Updating auth state with:", normalizedUserData);
+          store.dispatch(updateUser(normalizedUserData));
+        } else {
+          console.log("userUpdated event received for a different user. Ignoring update.");
+        }
+      } else {
+        console.log("No current user in store. Ignoring userUpdated event.");
       }
-      break;
+    });
+    isSubscribedToUser = true;
+    console.log("Subscribed to user events");
+  }
+  break;
 
     case "websocket/stopListeningToRoomEvents":
       if (isSubscribedToRoom) {

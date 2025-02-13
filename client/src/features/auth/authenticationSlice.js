@@ -1,13 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import apiClient from "../../utils/apiClient";
-import { useContext } from "react";
-import { SocketContext } from "../../context/SocketProvider";
 import socketService from "../websockets/socketService";
 
 // need to see why this is not being registered globally after some time
 
-const normalizeUser = (user) => {
+export const normalizeUser = (user) => {
   // Ensure the object has a consistent id field and includes any other necessary fields.
   const normalized = {
     id: user._id ? user._id.toString() : user.id,
@@ -151,8 +149,8 @@ const authSlice = createSlice({
     updateUser: (state, action) => {
       const normalizedUser = normalizeUser(action.payload);
       state.user = {
-        ...state.user,       // keep existing fields
-        ...normalizedUser,   // merge with new data
+        ...state.user,   
+        ...normalizedUser, 
       };
     },
   },

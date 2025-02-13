@@ -9,9 +9,7 @@ export default function Games() {
   const { games, loading, error } = useSelector((state) => state.games);
 
   useEffect(() => {
-
     dispatch(fetchGames());
-
   }, [dispatch]);
 
   useEffect(() => {

@@ -23,13 +23,7 @@ export default function Room() {
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
 
-  // need to make sure that activeGames is updating all of the redux State not just when in a room
-  
-  if(user){
-    console.log("User Room: ", user?.activeGames)
-  }
-
-  // UseEffect to track Toast
+// toast
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
@@ -47,13 +41,15 @@ export default function Room() {
     if (!user) dispatch(rehydrateUser());
 
     dispatch({ type: "websocket/listenToRoomEvents" });
+    dispatch({ type: "websocket/listenToUserEvents" });
 
     return () => {
       dispatch({ type: "websocket/stopListeningToRoomEvents" });
+      dispatch({ type: "websocket/listenToUserEvents" });
     };
   }, [dispatch, roomId, user]);
 
-  // Sets emitStartted to false
+
   useEffect(() => {
     if (currentGame) {
       const playerCount = currentGame.seats.filter(
