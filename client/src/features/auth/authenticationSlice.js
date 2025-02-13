@@ -3,10 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import apiClient from "../../utils/apiClient";
 import socketService from "../websockets/socketService";
 
-// need to see why this is not being registered globally after some time
-
 export const normalizeUser = (user) => {
-  // Ensure the object has a consistent id field and includes any other necessary fields.
   const normalized = {
     id: user._id ? user._id.toString() : user.id,
     username: user.username,
@@ -16,7 +13,6 @@ export const normalizeUser = (user) => {
     avatar: user.avatar,
     lastLogin: user.lastLogin,
     activeGames: user.activeGames || [],
-    // Add other fields as needed.
   };
   return normalized;
 };
@@ -100,12 +96,7 @@ export const logoutUser = () => async (dispatch, getState) => {
   const state = getState();
   const user = state.auth.user;
 
-  console.log("logoutUser: Initiating logout for user:", user);
-
   if (user && user.activeGames && user.activeGames.length > 0) {
-    console.log("logoutUser: User is in active games:", user.activeGames);
-
-    // Get the socket instance from your socket service
     const socket = socketService.getSocket();
     if (socket) {
       for (const gameId of user.activeGames) {
@@ -123,11 +114,9 @@ export const logoutUser = () => async (dispatch, getState) => {
     console.log("logoutUser: No active games found for this user.");
   }
 
-  console.log("logoutUser: Removing authToken from localStorage.");
   localStorage.removeItem("authToken");
-  console.log("logoutUser: Dispatching logout action.");
+
   dispatch(logout());
-  console.log("logoutUser: Logout complete.");
 };
 const token = localStorage.getItem("authToken");
 const initialState = {
@@ -149,8 +138,8 @@ const authSlice = createSlice({
     updateUser: (state, action) => {
       const normalizedUser = normalizeUser(action.payload);
       state.user = {
-        ...state.user,   
-        ...normalizedUser, 
+        ...state.user,
+        ...normalizedUser,
       };
     },
   },

@@ -23,7 +23,7 @@ export default function Room() {
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
 
-// toast
+  // toast
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
@@ -49,7 +49,7 @@ export default function Room() {
     };
   }, [dispatch, roomId, user]);
 
-
+  // just tracking state of room we will remove (ITHINK)
   useEffect(() => {
     if (currentGame) {
       const playerCount = currentGame.seats.filter(
