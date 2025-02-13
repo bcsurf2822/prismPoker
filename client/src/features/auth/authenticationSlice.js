@@ -122,8 +122,9 @@ const token = localStorage.getItem("authToken");
 const initialState = {
   user: null,
   token: token || null,
-  loading: false,
+  loading: true,
   error: null,
+  rehydrated: false,
 };
 
 const authSlice = createSlice({
@@ -134,6 +135,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.error = null;
+      state.rehydrated = true;
     },
     updateUser: (state, action) => {
       const normalizedUser = normalizeUser(action.payload);
@@ -179,11 +181,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.rehydrated = true;
       })
       .addCase(rehydrateUser.rejected, (state) => {
         state.loading = false;
         state.user = null;
         state.token = null;
+        state.rehydrated = true;
       })
       .addCase(addFunds.pending, (state) => {
         state.loading = true;

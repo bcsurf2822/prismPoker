@@ -3,26 +3,16 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
 export default function Home() {
-  const user = useSelector((state) => state.auth.user);
+  const { user, loading, rehydrated } = useSelector((state) => state.auth);
   let navigate = useNavigate();
-  if(user){
-    console.log("user home", user)
-  }
-
-  if (!user) {
-    navigate("/");
-  }
 
   useEffect(() => {
-    if (!user) {
+    if (rehydrated && !user) {
       navigate("/");
     }
-  }, [user, navigate]);
+  }, [rehydrated, user, navigate]);
 
-  if (!user) {
-    return null;
-  }
-
+  if (loading || !rehydrated) return <p>Loading...</p>;
   return (
     <div>
       <h1 className="text-2xl font-bold">Welcome back, {user.username}!</h1>
