@@ -60,8 +60,10 @@ const leaveGameSocket = (io, socket) => {
         "seats.player.user",
         "username"
       );
+      const updatedUser = await User.findById(userId);
 
       io.emit("gameUpdated", updatedGame);
+      io.emit("userUpdated", updatedUser);
       socket.emit("gameLeft", { game: updatedGame });
     } catch (err) {
       console.error("Error in leaveSocket:", err);

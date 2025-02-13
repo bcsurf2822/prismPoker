@@ -26,7 +26,7 @@ export default function Room() {
   // need to make sure that activeGames is updating all of the redux State not just when in a room
   
   if(user){
-    console.log("User Room: ", user)
+    console.log("User Room: ", user?.activeGames)
   }
 
   // UseEffect to track Toast

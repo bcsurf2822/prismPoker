@@ -45,12 +45,11 @@ const handlePlayerJoin = (io, socket) => {
         "username"
       );
       const updatedUser = await User.findById(userId);
- 
 
       io.emit("gameUpdated", updatedGame);
-      socket.emit("joinSuccess", { 
+      io.emit("userUpdated", updatedUser);
+      socket.emit("joinSuccess", {
         game: updatedGame,
-        user: updatedUser 
       });
     } catch (error) {
       console.error("Error joining game:", error);

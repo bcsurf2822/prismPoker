@@ -149,7 +149,11 @@ const authSlice = createSlice({
       state.error = null;
     },
     updateUser: (state, action) => {
-      state.user = normalizeUser(action.payload);
+      const normalizedUser = normalizeUser(action.payload);
+      state.user = {
+        ...state.user,       // keep existing fields
+        ...normalizedUser,   // merge with new data
+      };
     },
   },
   extraReducers: (builder) => {

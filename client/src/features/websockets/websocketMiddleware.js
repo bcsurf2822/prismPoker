@@ -7,6 +7,7 @@ import SocketService from "./socketService";
 // Role: Listens for Redux actions to manage WebSocket event subscriptions and dispatches Redux actions in response to socket events.
 
 let isSubscribedToRoom = false;
+let isSubscribedToUser = false;
 
 const websocketMiddleware = (store) => (next) => (action) => {
   const socket = SocketService.getSocket();
@@ -26,31 +27,47 @@ const websocketMiddleware = (store) => (next) => (action) => {
         });
         socket.on("joinSuccess", (data) => {
           console.log("joinSuccess event received:", data);
-          store.dispatch(updateUser(data.user));
           store.dispatch(updateGame(data.game));
           store.dispatch({ type: "games/joinSuccess" });
         });
-
         socket.on("gameLeft", (data) => {
           store.dispatch(updateGame(data.game));
           store.dispatch({ type: "games/gameLeft" });
           store.dispatch(rehydrateUser());
         });
-
         socket.on("joinError", (data) => {
           store.dispatch({ type: "games/joinError", payload: data.message });
         });
-
         socket.on("leaveGameError", (data) => {
           store.dispatch({ type: "games/leaveError", payload: data.message });
         });
-
         socket.on("gameError", (data) => {
           store.dispatch({ type: "games/gameError", payload: data.message });
         });
-
         isSubscribedToRoom = true;
         console.log("Subscribed to room events");
+      }
+      break;
+
+    case "websocket/listenToUserEvents":
+      if (!isSubscribedToUser) {
+        socket.on("userUpdated", (userData) => {
+          // Get the current user from the store.
+          const currentUser = store.getState().auth.user;
+          // Check if the update is for the logged in user.
+          if (
+            currentUser &&
+            (userData.id === currentUser.id ||
+              userData._id === currentUser.id)
+          ) {
+            console.log("userUpdated event received for current user:", userData);
+            store.dispatch(updateUser(userData));
+          } else {
+            console.log("userUpdated event received for another user:", userData);
+          }
+        });
+        isSubscribedToUser = true;
+        console.log("Subscribed to user events");
       }
       break;
 
@@ -64,6 +81,14 @@ const websocketMiddleware = (store) => (next) => (action) => {
         socket.off("leaveGameError");
         isSubscribedToRoom = false;
         console.log("Unsubscribed from room events");
+      }
+      break;
+
+    case "websocket/stopListeningToUserEvents":
+      if (isSubscribedToUser) {
+        socket.off("userUpdated");
+        isSubscribedToUser = false;
+        console.log("Unsubscribed from user events");
       }
       break;
 

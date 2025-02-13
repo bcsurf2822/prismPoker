@@ -17,30 +17,31 @@ import Account from "./components/generalUI/Account.jsx";
 import Home from "./components/generalUI/Home.jsx";
 import SocketProvider from "./context/SocketProvider.jsx";
 import { Toaster } from "react-hot-toast";
+import AppInitializer from "./context/AppInitializer.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
       <SocketProvider>
         <Toaster />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<App />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="about" element={<About />} />
-              <Route path="games" element={<Games />} />
-              <Route path="register" element={<RegistrationForm />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="account" element={<Account />} />
-            </Route>
-
-            {/* Room Layout */}
-            <Route path="/room/:roomId" element={<RoomLayout />}>
-              <Route index element={<Room />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+        <AppInitializer>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<App />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="about" element={<About />} />
+                <Route path="games" element={<Games />} />
+                <Route path="register" element={<RegistrationForm />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="account" element={<Account />} />
+              </Route>
+              <Route path="/room/:roomId" element={<RoomLayout />}>
+                <Route index element={<Room />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </AppInitializer>
       </SocketProvider>
     </Provider>
   </StrictMode>
