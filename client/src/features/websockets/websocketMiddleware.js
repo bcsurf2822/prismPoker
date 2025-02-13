@@ -60,11 +60,18 @@ const websocketMiddleware = (store) => (next) => (action) => {
             ? userData
             : normalizeUser(userData);
           const currentUser = store.getState().auth.user;
+          console.log("Received userUpdated event:", normalizedUserData);
+          console.log("Current user in store:", currentUser);
+
           if (currentUser) {
             const incomingId = normalizedUserData.id || normalizedUserData._id;
             const currentId = currentUser.id || currentUser._id;
 
             if (incomingId === currentId) {
+              console.log(
+                "userUpdated event matches current user. Updating auth state with:",
+                normalizedUserData
+              );
               store.dispatch(updateUser(normalizedUserData));
             } else {
               console.log(

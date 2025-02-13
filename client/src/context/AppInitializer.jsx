@@ -1,26 +1,26 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { rehydrateUser } from "../features/auth/authenticationSlice";
 import socketService from "../features/websockets/socketService";
 
 export default function AppInitializer({ children }) {
   const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token); // use Redux token
 
   useEffect(() => {
     socketService.connect();
     dispatch({ type: "websocket/listenToRoomEvents" });
 
-    const token = localStorage.getItem("authToken");
     if (token) {
       dispatch(rehydrateUser());
       dispatch({ type: "websocket/listenToUserEvents" });
-    }
-
-    return () => {
-      dispatch({ type: "websocket/stopListeningToRoomEvents" });
+    } else {
       dispatch({ type: "websocket/stopListeningToUserEvents" });
-    };
-  }, [dispatch]);
+      console.log(
+        "AppInitializer: No auth token, stopping user events subscription."
+      );
+    }
+  }, [dispatch, token]);
 
   return children;
 }
