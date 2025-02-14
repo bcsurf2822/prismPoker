@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { useRef, useState } from "react";
+import blueCard from "../../assets/cardBack/blueCard.png";
 
 export default function Seat({
   seat,
@@ -14,6 +15,8 @@ export default function Seat({
 }) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
+
+
 
   const openModal = () => {
     if (modalRef.current) {
@@ -81,13 +84,13 @@ export default function Seat({
       ) : (
         <div className="flex flex-col justify-center items-center">
           {/* Cards */}
-          <div className="flex w-full gap-2 ">
+          <div className="flex w-5/6 gap-2 justify-center items-center">
             <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
-           
+            <img src={blueCard} alt="Blue Card Back" className="max-h-full" />
             </div>
 
             <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
-              
+            <img src={blueCard} alt="Card Back" className="max-h-full" />
             </div>
           </div>
           {/* Username / Pot */}
