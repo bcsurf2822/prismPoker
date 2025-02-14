@@ -10,14 +10,10 @@ export default function Seat({
   isCurrentPlayer,
   isSmallBlind,
   isBigBlind,
-  isInGame
+  isInGame,
 }) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
-
-
-
-
 
   const openModal = () => {
     if (modalRef.current) {
@@ -46,7 +42,7 @@ export default function Seat({
     >
       {!seat.player ? (
         <>
-        {/* Button that needs to be disable if isUserSeat is true */}
+          {/* Button that needs to be disable if isUserSeat is true */}
           <button
             onClick={openModal}
             disabled={isInGame}
@@ -84,10 +80,26 @@ export default function Seat({
         </>
       ) : (
         <div className="flex flex-col justify-center items-center">
-          <span className="text-md font-bold">$ {seat.player?.chips}</span>{" "}
-          <span className="text-md font-bold">
-            {seat.player?.user?.username}
-          </span>
+          {/* Cards */}
+          <div className="flex w-full gap-2 ">
+            <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
+           
+            </div>
+
+            <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
+              
+            </div>
+          </div>
+          {/* Username / Pot */}
+          <div>
+            <span className="text-md font-bold">
+              <div className="badge badge-neutral">
+                {seat.player?.user?.username}
+              </div>
+            </span>
+            <span className="text-md font-bold">${seat.player?.chips}</span>{" "}
+          </div>
+
           {isSmallBlind && <p className="text-sm">S. B.</p>}
           {isBigBlind && <p className="text-sm">B. B.</p>}
           {isDealer && <div className="badge badge-primary badge-sm">D</div>}
@@ -124,5 +136,4 @@ Seat.propTypes = {
   isSmallBlind: PropTypes.bool.isRequired,
   isBigBlind: PropTypes.bool.isRequired,
   isInGame: PropTypes.bool.isRequired,
-
 };
