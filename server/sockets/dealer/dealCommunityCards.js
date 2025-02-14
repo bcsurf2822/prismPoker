@@ -23,8 +23,8 @@ function findNextActivePlayer(game, startingPosition) {
 
 // FLOP
 
-const dealFlopSocket = (socket, io) => {
-  socket.on("deal_flop", async (data) => {
+const dealFlopSocket = (io, socket) => {
+  socket.on("dealFlop", async (data) => {
     const { gameId } = data;
     try {
       const game = await Game.findById(gameId);
@@ -77,7 +77,7 @@ const dealFlopSocket = (socket, io) => {
 
 // TURN
 
-const dealTurnSocket = (socket, io) => {
+const dealTurnSocket = (io, socket) => {
   socket.on("deal_turn", async (data) => {
     const { gameId } = data;
     try {
@@ -128,7 +128,7 @@ const dealTurnSocket = (socket, io) => {
 };
 
 // RIVER
-const dealRiverSocket = (socket, io) => {
+const dealRiverSocket = (io, socket) => {
   socket.on("deal_river", async (data) => {
     const { gameId } = data;
     try {

@@ -114,6 +114,11 @@ export default function Room() {
     });
   };
 
+  const handleDealFlop = (gameId) => {
+    if (!socket) return;
+    socket.emit("dealFlop", { gameId });
+  };
+
   const handleLeaveGame = () => {
     if (!socket) return;
     const userId = user._id || user.id;
@@ -126,7 +131,7 @@ export default function Room() {
     <main className="w-full h-screen flex flex-col bg-slate-200">
       <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button className="bg-green-300 rounded-md py-2 px-3">Start</button>
+        <button onClick={handleDealFlop} className="bg-green-300 rounded-md py-2 px-3">Start</button>
         <button className="bg-red-300 rounded-md py-2 px-3">End</button>
         <button
           onClick={handleLeaveGame}
