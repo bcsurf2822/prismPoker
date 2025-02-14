@@ -23,6 +23,19 @@ export default function Room() {
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
 
+  const isUserInGame = (user, roomId) =>
+    !!(
+      user &&
+      user.activeGames &&
+      user.activeGames.some(
+        (activeGameId) => activeGameId.toString() === roomId.toString()
+      )
+    );
+
+  // console.log("InGame ?", isUserInGame(user, roomId))
+
+  const isInGame = isUserInGame(user, roomId);
+
   // toast
   useEffect(() => {
     if (successMessage) {
@@ -137,6 +150,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 0}
             isSmallBlind={currentGame.smallBlindPosition === 0}
             isBigBlind={currentGame.bigBlindPosition === 0}
+            isInGame={isInGame}
           />
           <Seat
             seat={currentGame.seats[1]}
@@ -148,6 +162,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 1}
             isSmallBlind={currentGame.smallBlindPosition === 1}
             isBigBlind={currentGame.bigBlindPosition === 1}
+            isInGame={isInGame}
           />
         </div>
         {/* mid */}
@@ -162,6 +177,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 5}
             isSmallBlind={currentGame.smallBlindPosition === 5}
             isBigBlind={currentGame.bigBlindPosition === 5}
+            isInGame={isInGame}
           />
 
           <Table pot={currentGame.pot} />
@@ -176,6 +192,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 2}
             isSmallBlind={currentGame.smallBlindPosition === 2}
             isBigBlind={currentGame.bigBlindPosition === 2}
+            isInGame={isInGame}
           />
         </div>
         {/* btm */}
@@ -190,6 +207,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 4}
             isSmallBlind={currentGame.smallBlindPosition === 4}
             isBigBlind={currentGame.bigBlindPosition === 4}
+            isInGame={isInGame}
           />
           <Seat
             seat={currentGame.seats[3]}
@@ -201,6 +219,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 3}
             isSmallBlind={currentGame.smallBlindPosition === 3}
             isBigBlind={currentGame.bigBlindPosition === 3}
+            isInGame={isInGame}
           />
         </div>
       </section>

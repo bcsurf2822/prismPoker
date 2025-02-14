@@ -10,13 +10,14 @@ export default function Seat({
   isCurrentPlayer,
   isSmallBlind,
   isBigBlind,
-  user,
+  isInGame
 }) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
 
-  const isUserSeat =
-    seat.player && seat.player.user && seat.player.user._id === user.id;
+
+
+
 
   const openModal = () => {
     if (modalRef.current) {
@@ -45,9 +46,13 @@ export default function Seat({
     >
       {!seat.player ? (
         <>
+        {/* Button that needs to be disable if isUserSeat is true */}
           <button
             onClick={openModal}
-            className="bg-blue-300 rounded-md py-2 px-3"
+            disabled={isInGame}
+            className={`rounded-md py-2 px-3 ${
+              isInGame ? "bg-gray-300 cursor-not-allowed" : "bg-blue-300"
+            }`}
           >
             Join
           </button>
@@ -118,5 +123,6 @@ Seat.propTypes = {
   isCurrentPlayer: PropTypes.bool.isRequired,
   isSmallBlind: PropTypes.bool.isRequired,
   isBigBlind: PropTypes.bool.isRequired,
-  user: PropTypes.object.isRequired,
+  isInGame: PropTypes.bool.isRequired,
+
 };

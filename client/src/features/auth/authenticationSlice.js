@@ -122,7 +122,7 @@ const token = localStorage.getItem("authToken");
 const initialState = {
   user: null,
   token: token || null,
-  loading: true,
+  loading: false,
   error: null,
   rehydrated: false,
 };
