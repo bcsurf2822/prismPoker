@@ -85,8 +85,8 @@ export default function Seat({
           </dialog>
         </>
       ) : (
-        <div className="flex flex-col justify-center items-center">
-          {/* Cards */}
+        <div className="relative flex flex-col items-center">
+          {/* Cards Container */}
           <div className="flex w-7/12 gap-2 justify-center items-center">
             {/* First card container */}
             <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
@@ -102,19 +102,22 @@ export default function Seat({
               ) : null}
             </div>
           </div>
-          {/* Username / Pot */}
-          <div>
-            <span className="text-md font-bold">
-              <div className="badge badge-neutral">
-                {seat.player?.user?.username}
-              </div>
+          {/* Username / Pot container */}
+          <div className="absolute top-10 left-5 w-5/6 h-full flex flex-col items-center justify-center z-10 pointer-events-none bg-white border border-neutral-300">
+            <div className="badge badge-neutral mb-2">
+              {seat.player?.user?.username}
+            </div>
+            <span className="text-md font-bold bg-white/80 px-1 rounded">
+              ${seat.player?.chips}
             </span>
-            <span className="text-md font-bold">${seat.player?.chips}</span>{" "}
+            <div className="flex justify-center items-center">
+              {isDealer && (
+                <div className="badge badge-primary badge-sm">D</div>
+              )}
+              {isSmallBlind && <p className="text-sm font-bold">S. B.</p>}
+              {isBigBlind && <p className="text-sm font-bold">B. B.</p>}
+            </div>
           </div>
-
-          {isSmallBlind && <p className="text-sm">S. B.</p>}
-          {isBigBlind && <p className="text-sm">B. B.</p>}
-          {isDealer && <div className="badge badge-primary badge-sm">D</div>}
         </div>
       )}
     </div>

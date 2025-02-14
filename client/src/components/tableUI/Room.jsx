@@ -32,8 +32,6 @@ export default function Room() {
       )
     );
 
-  // console.log("InGame ?", isUserInGame(user, roomId))
-
   const isInGame = isUserInGame(user, roomId);
 
   // toast
@@ -139,7 +137,7 @@ export default function Room() {
       </section>
       <section className="  flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
         {/* top */}
-        <div className="bg-red-400 flex gap-10 h-1/3  w-full items-center justify-center">
+        <div className=" flex gap-10 h-1/3  w-full items-center justify-center">
           <Seat
             seat={currentGame.seats[0]}
             joinGame={handleJoinGame}
