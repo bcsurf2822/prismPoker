@@ -20,6 +20,9 @@ export default function Room() {
 
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
+  console.log("USER ROOM", user);
+  console.log("Current Game Room ", currentGame);
+  console.log("ID", roomId);
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
 
@@ -33,22 +36,36 @@ export default function Room() {
     );
 
   const isInGame = isUserInGame(user, roomId);
-
   const seatData = (game, userId) => {
     if (!game || !game.seats) return null;
     const seat = game.seats.find((s) => {
       if (!s.player) return false;
-      // Compare the user id from the seat using normalized id
+
       const seatUserId =
         typeof s.player.user === "object" ? s.player.user.id : s.player.user;
       return seatUserId === userId;
     });
-    return seat ? { seatId: seat.id, chips: seat.player.chips } : null;
+    return seat
+      ? {
+          seatId: seat._id,
+          chips: seat.player.chips,
+          // seatNumber: seat.seatNumber,
+        }
+      : null;
   };
 
-  // const currentSeatId = seatData(currentGame, user.id);
+  const userSeatData = seatData(currentGame, user.id);
 
-  // console.log("User Seat ID: ", seatData(currentGame, user.id))
+  // if (userSeatData) {
+  //   console.log("User Seat: ", userSeatData);
+  // }
+
+
+  // useEffect to updateGame/rehydrate user
+  useEffect(() => {
+    dispatch(fetchGameById(roomId));
+    // if (!user) dispatch(rehydrateUser());
+  }, [dispatch,  roomId]);
 
   // toast
   useEffect(() => {
@@ -61,12 +78,6 @@ export default function Room() {
       dispatch(clearMessages());
     }
   }, [dispatch, successMessage, errorMessage]);
-
-  // useEffect to updateGame/rehydrate user
-  useEffect(() => {
-    dispatch(fetchGameById(roomId));
-    if (!user) dispatch(rehydrateUser());
-  }, [dispatch, roomId, user]);
 
   // just tracking local state of room we will remove (ITHINK)
   useEffect(() => {
@@ -148,7 +159,7 @@ export default function Room() {
     }
     socket.emit("player_bet", {
       gameId: roomId, // Make sure roomId is available in your component
-      seatId: seatData.seatId, // Ensure currentSeatId is defined as the seat the player occupies
+      seatId: userSeatData.seatId, // Ensure currentSeatId is defined as the seat the player occupies
       bet: betAmount,
       action: action, // e.g., "bet" or "raise"
     });
@@ -162,12 +173,12 @@ export default function Room() {
     }
     socket.emit("check", {
       gameId: roomId,
-      seatId: seatData.seatId,
+      seatId: userSeatData.seatId,
       action: "check",
     });
     console.log("[handleCheck] Emitted check event with:", {
       gameId: roomId,
-      seatId: seatData.seatId,
+      seatId: userSeatData.seatId,
       action: "check",
     });
   };
@@ -180,12 +191,12 @@ export default function Room() {
 
     socket.emit("fold", {
       gameId: roomId,
-      seatId: seatData.seatId,
+      seatId: userSeatData.seatId,
       action: "fold",
     });
     console.log("[handleFold] Emitted fold event with:", {
       gameId: roomId,
-      seatId: seatData.seatId,
+      seatId: userSeatData.seatId,
       action: "fold",
     });
   };
@@ -299,6 +310,9 @@ export default function Room() {
       <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
         <BetControl
+          // isCurrentPlayer={
+          //   currentGame.currentPlayerTurn + 1 === userSeatData.seatNumber
+          // }
           handleBet={handleBet}
           handleCheck={handleCheck}
           handleFold={handleFold}

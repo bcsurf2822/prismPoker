@@ -6,6 +6,7 @@ export default function BetControl({
   chips,
   handleFold,
   handleCheck,
+  isCurrentPlayer,
 }) {
   const [betAmount, setBetAmount] = useState(0);
 
@@ -70,4 +71,5 @@ BetControl.propTypes = {
   chips: PropTypes.number.isRequired,
   handleCheck: PropTypes.func.isRequired,
   handleFold: PropTypes.func.isRequired,
+  isCurrentPlayer: PropTypes.bool.isRequired,
 };

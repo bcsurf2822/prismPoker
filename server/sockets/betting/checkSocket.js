@@ -1,24 +1,47 @@
 const Game = require("../../models/games");
 
 function playersHaveActed(game, currentSeatId, currentAction) {
+  console.log(
+    "[playersHaveActed] Called with currentSeatId:",
+    currentSeatId,
+    "currentAction:",
+    currentAction
+  );
+
   if (currentAction === "raise") {
-    return game.seats.every((seat) => {
-      return (
+    const result = game.seats.every((seat, index) => {
+      const seatId = seat._id ? seat._id.toString() : "undefined";
+      const condition =
         !seat.player ||
-        seat._id.toString() === currentSeatId ||
+        seatId === currentSeatId ||
         seat.player.action === "fold" ||
         seat.player.action === "all-in" ||
-        (seat.player.bet >= game.highestBet && seat.player.checkBetFold)
+        (seat.player.bet >= game.highestBet && seat.player.checkBetFold);
+      console.log(
+        `[playersHaveActed] Seat ${index} (ID: ${seatId}) condition:`,
+        condition,
+        "Player:",
+        seat.player
       );
+      return condition;
     });
+    console.log("[playersHaveActed] Returning result:", result);
+    return result;
   } else {
-    return game.seats.every((seat) => {
-      return (
-        !seat.player ||
-        seat._id.toString() === currentSeatId ||
-        seat.player.checkBetFold
+    const result = game.seats.every((seat, index) => {
+      const seatId = seat._id ? seat._id.toString() : "undefined";
+      const condition =
+        !seat.player || seatId === currentSeatId || seat.player.checkBetFold;
+      console.log(
+        `[playersHaveActed] Seat ${index} (ID: ${seatId}) condition:`,
+        condition,
+        "Player:",
+        seat.player
       );
+      return condition;
     });
+    console.log("[playersHaveActed] Returning result:", result);
+    return result;
   }
 }
 
@@ -35,13 +58,39 @@ function playersWithCards(game) {
     (seat) => seat.player && seat.player.handCards.length
   ).length;
 }
-
 const findNextPosition = (startPosition, seats) => {
-  let seatCount = seats.length;
+  const seatCount = seats.length;
+  console.log(
+    "[findNextPosition] startPosition:",
+    startPosition,
+    "seatCount:",
+    seatCount
+  );
+
   let nextPosition = (startPosition + 1) % seatCount;
+  let iterations = 0;
+
   while (!seats[nextPosition].player) {
+    console.log(
+      "[findNextPosition] Iteration",
+      iterations,
+      "at position",
+      nextPosition,
+      "seat:",
+      seats[nextPosition]
+    );
     nextPosition = (nextPosition + 1) % seatCount;
+    iterations++;
+    if (iterations > seatCount) {
+      console.error(
+        "[findNextPosition] Could not find a valid seat after",
+        iterations,
+        "iterations."
+      );
+      break;
+    }
   }
+  console.log("[findNextPosition] Returning nextPosition:", nextPosition);
   return nextPosition;
 };
 
@@ -73,8 +122,7 @@ function proceedToNextStage(game) {
   game.highestBet = 0;
 }
 
-
-const checkSocket = (socket, io) => {
+const checkSocket = (io, socket) => {
   socket.on("check", async (data) => {
     console.log("[checkSocket] Received check event with data:", data);
     const { gameId, seatId, action } = data;
@@ -101,23 +149,35 @@ const checkSocket = (socket, io) => {
       await game.save();
       console.log("[checkSocket] Updated seat action and saved game.");
 
-      // If all players have acted, proceed to the next stage (if applicable)
-      if (playersHaveActed(game)) {
-        console.log("[checkSocket] All players have acted. Proceeding to next stage.");
+      // If all players have acted, proceed to the next stage.
+      if (playersHaveActed(game, seatId, action)) {
+        console.log(
+          "[checkSocket] All players have acted. Proceeding to next stage."
+        );
         proceedToNextStage(game);
         await game.save();
       }
 
-      // Set the next player's turn. Loop until you find a valid seat.
-      game.currentPlayerTurn = findNextActivePlayer(game, game.currentPlayerTurn);
-      console.log("[checkSocket] Next active player position determined:", game.currentPlayerTurn);
+      // Set the next player's turn.
+      game.currentPlayerTurn = findNextPosition(
+        game.currentPlayerTurn,
+        game.seats
+      );
+      console.log(
+        "[checkSocket] Next active player position determined:",
+        game.currentPlayerTurn
+      );
 
       await game.save();
       console.log("[checkSocket] Game saved successfully after check.");
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
+      );
 
       // Emit one consolidated event to update all clients.
       console.log("[checkSocket] Emitting gameUpdated with game:", game);
-      io.emit("gameUpdated", game);
+      io.emit("gameUpdated", updatedGame);
     } catch (error) {
       console.error("[checkSocket] Error handling check:", error);
       socket.emit("checkError", { error: "Failed to handle the check" });

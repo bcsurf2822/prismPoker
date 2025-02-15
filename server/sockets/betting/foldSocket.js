@@ -74,7 +74,7 @@ function proceedToNextStage(game) {
 }
 
 
-const foldSocket = (socket, io) => {
+const foldSocket = (io, socket) => {
   socket.on("fold", async (data) => {
     console.log("[foldSocket] Received fold event with data:", data);
     const { gameId, seatId, action } = data;

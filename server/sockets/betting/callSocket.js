@@ -74,7 +74,7 @@ function proceedToNextStage(game) {
 }
 
 
-const callSocket = (socket, io) => {
+const callSocket = (io, socket) => {
   socket.on("player_call", async (data) => {
     console.log("[callSocket] Received player_call event with data:", data);
     const { gameId, seatId, action, bet } = data;
