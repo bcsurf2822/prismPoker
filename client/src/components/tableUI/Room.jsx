@@ -107,8 +107,10 @@ export default function Room() {
   };
 
   const handleDealFlop = () => {
+    console.log("Emitting Deal Flop")
     if (!socket) return;
     socket.emit("dealFlop", { gameId: roomId });
+    console.log("dealFlop emitted from client")
   };
 
   const handleLeaveGame = () => {
