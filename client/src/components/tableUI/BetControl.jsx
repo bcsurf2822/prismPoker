@@ -1,7 +1,12 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-export default function BetControl({ handleBet, chips }) {
+export default function BetControl({
+  handleBet,
+  chips,
+  handleFold,
+  handleCheck,
+}) {
   const [betAmount, setBetAmount] = useState(0);
 
   const handleRangeChange = (e) => {
@@ -18,9 +23,13 @@ export default function BetControl({ handleBet, chips }) {
         >
           Bet ${betAmount}
         </button>
-        <button className="btn btn-success">Check</button>
+        <button onClick={handleCheck} className="btn btn-success">
+          Check
+        </button>
         <button className="btn btn-success">Call</button>
-        <button className="btn btn-error">Fold</button>
+        <button onClick={handleFold} className="btn btn-error">
+          Fold
+        </button>
       </div>
       <div className="flex gap-1">
         <input
@@ -59,4 +68,6 @@ export default function BetControl({ handleBet, chips }) {
 BetControl.propTypes = {
   handleBet: PropTypes.func.isRequired,
   chips: PropTypes.number.isRequired,
+  handleCheck: PropTypes.func.isRequired,
+  handleFold: PropTypes.func.isRequired,
 };
