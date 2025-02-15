@@ -46,21 +46,13 @@ export default function Room() {
     }
   }, [dispatch, successMessage, errorMessage]);
 
-  // useEffect to listen for socket room events
+  // useEffect to updateGame/rehydrate user
   useEffect(() => {
     dispatch(fetchGameById(roomId));
     if (!user) dispatch(rehydrateUser());
-
-    dispatch({ type: "websocket/listenToRoomEvents" });
-    dispatch({ type: "websocket/listenToUserEvents" });
-
-    return () => {
-      dispatch({ type: "websocket/stopListeningToRoomEvents" });
-      dispatch({ type: "websocket/listenToUserEvents" });
-    };
   }, [dispatch, roomId, user]);
 
-  // just tracking state of room we will remove (ITHINK)
+  // just tracking local state of room we will remove (ITHINK)
   useEffect(() => {
     if (currentGame) {
       const playerCount = currentGame.seats.filter(
@@ -114,9 +106,9 @@ export default function Room() {
     });
   };
 
-  const handleDealFlop = (gameId) => {
+  const handleDealFlop = () => {
     if (!socket) return;
-    socket.emit("dealFlop", { gameId });
+    socket.emit("dealFlop", { gameId: roomId });
   };
 
   const handleLeaveGame = () => {
@@ -131,7 +123,12 @@ export default function Room() {
     <main className="w-full h-screen flex flex-col bg-slate-200">
       <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button onClick={handleDealFlop} className="bg-green-300 rounded-md py-2 px-3">Start</button>
+        <button
+          onClick={handleDealFlop}
+          className="bg-green-300 rounded-md py-2 px-3"
+        >
+          Start
+        </button>
         <button className="bg-red-300 rounded-md py-2 px-3">End</button>
         <button
           onClick={handleLeaveGame}

@@ -25,6 +25,7 @@ function findNextActivePlayer(game, startingPosition) {
 
 const dealFlopSocket = (io, socket) => {
   socket.on("dealFlop", async (data) => {
+    console.log("Flop Emit Recieved from the server")
     const { gameId } = data;
     try {
       const game = await Game.findById(gameId);
