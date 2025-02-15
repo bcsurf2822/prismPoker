@@ -36,6 +36,7 @@ export default function Room() {
     );
 
   const isInGame = isUserInGame(user, roomId);
+
   const seatData = (game, userId) => {
     if (!game || !game.seats) return null;
     const seat = game.seats.find((s) => {
@@ -54,18 +55,19 @@ export default function Room() {
       : null;
   };
 
-  const userSeatData = seatData(currentGame, user.id);
+  //******************************* */ this is causing problems currently uncommented this is causing the room to not show up probably a simple fix
+
+  // const userSeatData = seatData(currentGame, user.id);
 
   // if (userSeatData) {
   //   console.log("User Seat: ", userSeatData);
   // }
 
-
   // useEffect to updateGame/rehydrate user
   useEffect(() => {
     dispatch(fetchGameById(roomId));
     // if (!user) dispatch(rehydrateUser());
-  }, [dispatch,  roomId]);
+  }, [dispatch, roomId]);
 
   // toast
   useEffect(() => {
