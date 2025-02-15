@@ -38,12 +38,12 @@ export default function Room() {
     if (!game || !game.seats) return null;
     const seat = game.seats.find((s) => {
       if (!s.player) return false;
-      // Compare the user id from the seat.
+      // Compare the user id from the seat using normalized id
       const seatUserId =
-        typeof s.player.user === "object" ? s.player.user._id : s.player.user;
+        typeof s.player.user === "object" ? s.player.user.id : s.player.user;
       return seatUserId === userId;
     });
-    return seat ? { seatId: seat._id, chips: seat.player.chips } : null;
+    return seat ? { seatId: seat.id, chips: seat.player.chips } : null;
   };
 
   // const currentSeatId = seatData(currentGame, user.id);
@@ -113,7 +113,7 @@ export default function Room() {
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
-    const userId = user._id || user.id;
+    const userId = user.id;
     socket.emit("playerJoin", {
       gameId: roomId,
       userId,
@@ -131,7 +131,7 @@ export default function Room() {
 
   const handleLeaveGame = () => {
     if (!socket) return;
-    const userId = user._id || user.id;
+    const userId = user.id;
     socket.emit("leaveGame", { gameId: roomId, userId });
   };
 

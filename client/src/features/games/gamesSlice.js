@@ -97,7 +97,7 @@ const gamesSlice = createSlice({
       })
       .addCase(fetchGameById.fulfilled, (state, action) => {
         state.loading = false;
-        state.games = action.payload.map(normalizeGames);
+  state.currentGame = normalizeGames(action.payload);
       })
       .addCase(fetchGameById.rejected, (state, action) => {
         state.loading = false;

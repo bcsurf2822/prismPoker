@@ -75,10 +75,9 @@ export default function Games() {
         </thead>
         <tbody>
           {games.map((game) => {
-            const isOpen =
-              openWindows[game._id] && !openWindows[game._id].closed;
+            const isOpen = openWindows[game.id] && !openWindows[game.id].closed;
             return (
-              <tr key={game._id} className="hover">
+              <tr key={game.id} className="hover">
                 <td></td>
                 <td>{game.name}</td>
                 <td>{game.blinds}</td>
@@ -88,7 +87,7 @@ export default function Games() {
                 <td>{game.playerCount} / 6</td>
                 <td>
                   <button
-                    onClick={() => handleNavigateToRoom(game._id)}
+                    onClick={() => handleNavigateToRoom(game.id)}
                     className="btn btn-primary"
                     disabled={isOpen}
                   >
