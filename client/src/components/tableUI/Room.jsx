@@ -34,6 +34,24 @@ export default function Room() {
 
   const isInGame = isUserInGame(user, roomId);
 
+  const seatData = (game, userId) => {
+    if (!game || !game.seats) return null;
+    const seat = game.seats.find((s) => {
+      if (!s.player) return false;
+      // Compare the user id from the seat.
+      const seatUserId =
+        typeof s.player.user === "object" ? s.player.user._id : s.player.user;
+      return seatUserId === userId;
+    });
+    return seat
+      ? { seatId: seat._id, chips: seat.player.chips }
+      : null;
+  };
+
+  // const currentSeatId = seatData(currentGame, user.id);
+
+  // console.log("User Seat ID: ", seatData(currentGame, user.id))
+
   // toast
   useEffect(() => {
     if (successMessage) {
@@ -107,16 +125,36 @@ export default function Room() {
   };
 
   const handleDealFlop = () => {
-    console.log("Emitting Deal Flop")
+    console.log("Emitting Deal Flop");
     if (!socket) return;
     socket.emit("dealFlop", { gameId: roomId });
-    console.log("dealFlop emitted from client")
+    console.log("dealFlop emitted from client");
   };
 
   const handleLeaveGame = () => {
     if (!socket) return;
     const userId = user._id || user.id;
     socket.emit("leaveGame", { gameId: roomId, userId });
+  };
+
+  const handleBet = (betAmount, action) => {
+    console.log(
+      "[handleBet] Called with betAmount:",
+      betAmount,
+      "and action:",
+      action
+    );
+    if (!socket) {
+      console.error("[handleBet] Socket is not available.");
+      return;
+    }
+    socket.emit("player_bet", {
+      gameId: roomId, // Make sure roomId is available in your component
+      seatId: seatData.seatId, // Ensure currentSeatId is defined as the seat the player occupies
+      bet: betAmount,
+      action: action, // e.g., "bet" or "raise"
+    });
+    console.log("[handleBet] Emitted player_bet event.");
   };
 
   if (!currentGame) return <p>Loading game...</p>;
@@ -227,7 +265,7 @@ export default function Room() {
       </section>
       <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
-        <BetControl />
+        <BetControl handleBet={handleBet} chips ={seatData.chips}  />
       </section>
     </main>
   );
