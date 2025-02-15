@@ -40,7 +40,6 @@ const gamesSlice = createSlice({
   },
   reducers: {
     updateGame: (state, action) => {
-      // console.log("Updating game with payload:", action.payload);
       const updatedGame = normalizeGames(action.payload);
       const gameId = updatedGame._id?.toString();
 
@@ -97,7 +96,7 @@ const gamesSlice = createSlice({
       })
       .addCase(fetchGameById.fulfilled, (state, action) => {
         state.loading = false;
-  state.currentGame = normalizeGames(action.payload);
+        state.currentGame = normalizeGames(action.payload);
       })
       .addCase(fetchGameById.rejected, (state, action) => {
         state.loading = false;
