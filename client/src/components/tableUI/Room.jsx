@@ -43,9 +43,7 @@ export default function Room() {
         typeof s.player.user === "object" ? s.player.user._id : s.player.user;
       return seatUserId === userId;
     });
-    return seat
-      ? { seatId: seat._id, chips: seat.player.chips }
-      : null;
+    return seat ? { seatId: seat._id, chips: seat.player.chips } : null;
   };
 
   // const currentSeatId = seatData(currentGame, user.id);
@@ -157,6 +155,41 @@ export default function Room() {
     console.log("[handleBet] Emitted player_bet event.");
   };
 
+  const handleCheck = () => {
+    if (!socket) {
+      console.error("handleCheck: Socket is not available.");
+      return;
+    }
+    socket.emit("check", {
+      gameId: roomId,
+      seatId: seatData.seatId,
+      action: "check",
+    });
+    console.log("[handleCheck] Emitted check event with:", {
+      gameId: roomId,
+      seatId: seatData.seatId,
+      action: "check",
+    });
+  };
+
+  const handleFold = () => {
+    if (!socket) {
+      console.error("handleFold: Socket is not available.");
+      return;
+    }
+
+    socket.emit("fold", {
+      gameId: roomId,
+      seatId: seatData.seatId,
+      action: "fold",
+    });
+    console.log("[handleFold] Emitted fold event with:", {
+      gameId: roomId,
+      seatId: seatData.seatId,
+      action: "fold",
+    });
+  };
+
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
@@ -265,7 +298,12 @@ export default function Room() {
       </section>
       <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
-        <BetControl handleBet={handleBet} chips ={seatData.chips}  />
+        <BetControl
+          handleBet={handleBet}
+          handleCheck={handleCheck}
+          handleFold={handleFold}
+          chips={seatData.chips}
+        />
       </section>
     </main>
   );
