@@ -2,20 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import apiClient from "../../utils/apiClient";
 import socketService from "../websockets/socketService";
-
-export const normalizeUser = (user) => {
-  const normalized = {
-    id: user._id ? user._id.toString() : user.id,
-    username: user.username,
-    email: user.email,
-    accountBalance: user.accountBalance,
-    bankBalance: user.bankBalance,
-    avatar: user.avatar,
-    lastLogin: user.lastLogin,
-    activeGames: user.activeGames || [],
-  };
-  return normalized;
-};
+import { normalizeUser } from "../../utils/normailizeUser";
 
 export const registerUser = createAsyncThunk(
   "auth/register",
