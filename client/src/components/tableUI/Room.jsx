@@ -73,21 +73,18 @@ export default function Room() {
     console.log("Emitting Deal Flop");
     if (!socket) return;
     socket.emit("dealFlop", { gameId: roomId });
-    console.log("dealFlop emitted from client");
   }, [socket, roomId]);
 
   const handleDealTurn = useCallback(() => {
     console.log("Emitting Deal Turn");
     if (!socket) return;
     socket.emit("dealTurn", { gameId: roomId });
-    console.log("dealTurn emitted from client");
   }, [socket, roomId]);
 
   const handleDealRiver = useCallback(() => {
     console.log("Emitting Deal River");
     if (!socket) return;
     socket.emit("dealRiver", { gameId: roomId });
-    console.log("dealRiver emitted from client");
   }, [socket, roomId]);
 
   const handleLeaveGame = () => {
