@@ -99,10 +99,16 @@ const callSocket = (io, socket) => {
 
       await game.save();
       console.log("[callSocket] Final game state saved.");
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
+      );
 
-      // Consolidate and emit one event with the updated game.
-      console.log("[callSocket] Emitting gameUpdated event with game:", game);
-      io.emit("gameUpdated", game);
+      console.log(
+        "[callSocket] Emitting gameUpdated event with game:",
+        updatedGame
+      );
+      io.emit("gameUpdated", updatedGame);
     } catch (error) {
       console.error("[callSocket] Error handling player call:", error);
       socket.emit("playerCallError", { error: "Failed to call bet" });

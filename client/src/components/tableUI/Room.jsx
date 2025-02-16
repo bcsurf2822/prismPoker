@@ -106,7 +106,7 @@ export default function Room() {
       console.error("[handleBet] Socket is not available.");
       return;
     }
-    socket.emit("player_bet", {
+    socket.emit("bet", {
       gameId: roomId,
       seatId: userSeatData.seatId,
       bet: betAmount,

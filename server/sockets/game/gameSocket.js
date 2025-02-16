@@ -1,5 +1,5 @@
 const Game = require("../../models/games");
-
+// Can probably remove
 function allGamesSocket(socket) {
   socket.on("getGames", async () => {
 

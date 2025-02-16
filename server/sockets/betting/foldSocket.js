@@ -73,9 +73,16 @@ const foldSocket = (io, socket) => {
       await game.save();
       console.log("[foldSocket] Final game state saved.");
 
-      // Emit one consolidated event with the updated game state
-      console.log("[foldSocket] Emitting gameUpdated event with game:", game);
-      io.emit("gameUpdated", game);
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
+      );
+      console.log(
+        "[foldSocket] Emitting gameUpdated event with game:",
+        updatedGame
+      );
+
+      io.emit("gameUpdated", updatedGame);
     } catch (error) {
       console.error("[foldSocket] Error handling fold:", error);
       socket.emit("foldError", { error: "Failed to handle the fold" });
