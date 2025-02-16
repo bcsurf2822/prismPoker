@@ -8,7 +8,7 @@ const dealLocks = {};
 
 // RIVER
 const dealRiverSocket = (io, socket) => {
-  socket.on("deal_river", async (data) => {
+  socket.on("dealRiver", async (data) => {
     console.log(
       "[dealRiverSocket] Received 'deal_river' event with data:",
       data

@@ -7,7 +7,7 @@ const {
 const dealLocks = {};
 // TURN
 const dealTurnSocket = (io, socket) => {
-  socket.on("deal_turn", async (data) => {
+  socket.on("dealTurn", async (data) => {
     console.log("[dealTurnSocket] Received 'deal_turn' event with data:", data);
     const { gameId } = data;
 
