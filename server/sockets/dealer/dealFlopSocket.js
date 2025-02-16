@@ -20,12 +20,24 @@ function findNextActivePlayer(game, startingPosition) {
   return nextPosition;
 }
 
-// FLOP
+const dealLocks = {};
 
+// FLOP
 const dealFlopSocket = (io, socket) => {
   socket.on("dealFlop", async (data) => {
     console.log("[dealFlopSocket] Received 'dealFlop' event with data:", data);
     const { gameId } = data;
+
+    // Check if a deal is already in progress for this game
+    if (dealLocks[gameId]) {
+      console.log(
+        `[dealFlopSocket] Deal flop already in progress for game ${gameId}. Skipping.`
+      );
+      return;
+    }
+    // Set the lock for this gameId
+    dealLocks[gameId] = true;
+
     try {
       const game = await Game.findById(gameId);
       console.log("[dealFlopSocket] Fetched game:", game);
@@ -66,10 +78,15 @@ const dealFlopSocket = (io, socket) => {
         });
       }
 
-      // Deal three cards for the flop
-      const flopCards = game.currentDeck.splice(0, 3).map((card) => card.code);
+      // Deal three cards for the flop (instead of 2)
+      const flopCards = game.currentDeck.splice(0, 3).map((card) => ({
+        value: card.value,
+        suit: card.suit,
+        code: card.code,
+      }));
       console.log("[dealFlopSocket] Flop cards dealt:", flopCards);
-      game.dealtCards.push(...flopCards);
+
+      game.dealtCards.push(...flopCards.map((card) => card.code));
       game.communityCards.push(...flopCards);
 
       // Reset bets and set the next player's turn
@@ -81,15 +98,19 @@ const dealFlopSocket = (io, socket) => {
 
       await game.save();
       console.log("[dealFlopSocket] Game saved successfully");
-
-      // Emit updated game state to all clients
-      console.log(
-        "[dealFlopSocket] Emitting 'gameUpdated' event with updated game state"
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
       );
-      io.emit("gameUpdated", game);
+
+      io.emit("gameUpdated", updatedGame);
     } catch (error) {
       console.error("[dealFlopSocket] Error dealing flop:", error);
       socket.emit("dealFlopError", { error: "Failed to deal the flop" });
+    } finally {
+      // Release the lock so that subsequent calls can proceed
+      delete dealLocks[gameId];
+      console.log(`[dealFlopSocket] Released lock for game ${gameId}`);
     }
   });
 };

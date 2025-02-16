@@ -98,10 +98,10 @@ export default function Room() {
       return;
     }
     socket.emit("player_bet", {
-      gameId: roomId, 
-      seatId: userSeatData.seatId, 
+      gameId: roomId,
+      seatId: userSeatData.seatId,
       bet: betAmount,
-      action: action, 
+      action: action,
     });
     console.log("[handleBet] Emitted player_bet event.");
   };
@@ -192,13 +192,18 @@ export default function Room() {
 
   useEffect(() => {
     if (currentGame && currentGame.stage === "flop" && !hasDealtFlop) {
-      // Check if every seat with a player has checkBetFold === true.
-      const playerHaveActed = currentGame.seats.every((seat) => {
+      // Check that for every seat with a player, checkBetFold is false and action is "none"
+      const allPlayersNotActed = currentGame.seats.every((seat) => {
         if (!seat.player) return true;
-        return seat.player.checkBetFold;
+        return (
+          seat.player.checkBetFold === false && seat.player.action === "none"
+        );
       });
-      console.log("[Room useEffect] All players acted: ", playerHaveActed);
-      if (playerHaveActed) {
+      console.log(
+        "[Room useEffect] All players have not acted:",
+        allPlayersNotActed
+      );
+      if (allPlayersNotActed) {
         setHasDealtFlop(true);
         console.log("[Room useEffect] Conditions met: Emitting dealFlop");
         handleDealFlop();
@@ -269,7 +274,10 @@ export default function Room() {
             isInGame={isInGame}
           />
 
-          <Table pot={currentGame.pot} />
+          <Table
+            communityCards={currentGame.communityCards}
+            pot={currentGame.pot}
+          />
 
           <Seat
             seat={currentGame.seats[2]}
