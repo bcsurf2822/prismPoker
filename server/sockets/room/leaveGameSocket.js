@@ -40,6 +40,7 @@ const leaveGameSocket = (io, socket) => {
 
       if (remainingPlayers.length === 1) {
         const lastPlayer = remainingPlayers[0].player;
+        lastPlayer.action = "none"
         lastPlayer.handCards = [];
         lastPlayer.chips += game.pot;
         game.pot = 0;
