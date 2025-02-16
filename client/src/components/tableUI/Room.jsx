@@ -6,8 +6,6 @@ import BetControl from "./BetControl";
 import Chat from "./Chat";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
-
-import { rehydrateUser } from "../../features/auth/authenticationSlice";
 import { SocketContext } from "../../context/SocketProvider";
 import toast from "react-hot-toast";
 
@@ -61,7 +59,6 @@ export default function Room() {
   const isCurrentPlayer =
     userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
 
-  // console.log("USER SEAT DATA: ", userSeatData);
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
@@ -190,14 +187,10 @@ export default function Room() {
       const playerCount = currentGame.playerCount;
 
       if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
-        console.log(
-          "Sufficient players detected, emitting updatePositionsAndBlinds"
-        );
         socket.emit("updatePositionsAndBlinds", { gameId: roomId });
         setHasEmittedStart(true);
 
         setTimeout(() => {
-          console.log("Emitting dealCardsToPlayers");
           socket.emit("dealCardsToPlayers", { gameId: roomId });
         }, 2000);
       }
@@ -205,28 +198,23 @@ export default function Room() {
   }, [currentGame, socket, roomId, hasEmittedStart]);
 
   //UseEffect to Deal Flop
-
   useEffect(() => {
     if (currentGame && currentGame.stage === "flop" && !hasDealtFlop) {
-      // Check that for every seat with a player, checkBetFold is false and action is "none"
       const allPlayersNotActed = currentGame.seats.every((seat) => {
         if (!seat.player) return true;
         return (
           seat.player.checkBetFold === false && seat.player.action === "none"
         );
       });
-      console.log(
-        "[Room useEffect] All players have not acted:",
-        allPlayersNotActed
-      );
+
       if (allPlayersNotActed) {
         setHasDealtFlop(true);
-        console.log("[Room useEffect] Conditions met: Emitting dealFlop");
         handleDealFlop();
       }
     }
   }, [currentGame, hasDealtFlop, handleDealFlop]);
 
+  //Deal Turn
   useEffect(() => {
     if (currentGame && currentGame.stage === "turn" && !hasDealtTurn) {
       const allPlayersNotActed = currentGame.seats.every((seat) => {
@@ -235,18 +223,15 @@ export default function Room() {
           seat.player.checkBetFold === false && seat.player.action === "none"
         );
       });
-      console.log(
-        "[Room useEffect] All players have not acted:",
-        allPlayersNotActed
-      );
+
       if (allPlayersNotActed) {
         sethasDealtTurn(true);
-        console.log("[Room useEffect] Conditions met: Emitting dealTurn");
         handleDealTurn();
       }
     }
   }, [currentGame, hasDealtTurn, handleDealTurn]);
 
+  //DealRiver
   useEffect(() => {
     if (currentGame && currentGame.stage === "river" && !hasDealtRiver) {
       const allPlayersNotActed = currentGame.seats.every((seat) => {
@@ -255,13 +240,10 @@ export default function Room() {
           seat.player.checkBetFold === false && seat.player.action === "none"
         );
       });
-      console.log(
-        "[Room useEffect] All players have not acted:",
-        allPlayersNotActed
-      );
+
       if (allPlayersNotActed) {
         setHasDealtRiver(true);
-        console.log("[Room useEffect] Conditions met: Emitting dealRiver");
+
         handleDealRiver();
       }
     }

@@ -1,78 +1,9 @@
 const Game = require("../../models/games");
-
-function playersHaveActed(game, currentSeatId, currentAction) {
-  if (currentAction === "raise") {
-    return game.seats.every((seat) => {
-      return (
-        !seat.player ||
-        seat._id.toString() === currentSeatId ||
-        seat.player.action === "fold" ||
-        seat.player.action === "all-in" ||
-        (seat.player.bet >= game.highestBet && seat.player.checkBetFold)
-      );
-    });
-  } else {
-    return game.seats.every((seat) => {
-      return (
-        !seat.player ||
-        seat._id.toString() === currentSeatId ||
-        seat.player.checkBetFold
-      );
-    });
-  }
-}
-
-function resetCheckBetFold(game) {
-  game.seats.forEach((seat) => {
-    if (seat.player) {
-      seat.player.checkBetFold = false;
-    }
-  });
-}
-
-function playersWithCards(game) {
-  return game.seats.filter(
-    (seat) => seat.player && seat.player.handCards.length
-  ).length;
-}
-
-const findNextPosition = (startPosition, seats) => {
-  let seatCount = seats.length;
-  let nextPosition = (startPosition + 1) % seatCount;
-  while (!seats[nextPosition].player) {
-    nextPosition = (nextPosition + 1) % seatCount;
-  }
-  return nextPosition;
-};
-
-function proceedToNextStage(game) {
-  if (game.stage !== "showdown") {
-    if (playersWithCards(game) > 2) {
-      game.stage = "showdown";
-    } else {
-      switch (game.stage) {
-        case "preflop":
-          game.stage = "flop";
-          break;
-        case "flop":
-          game.stage = "turn";
-          break;
-        case "turn":
-          game.stage = "river";
-          break;
-        case "river":
-          game.stage = "showdown";
-          break;
-      }
-    }
-    if (game.stage !== "showdown") {
-      resetCheckBetFold(game);
-    }
-  }
-
-  game.highestBet = 0;
-}
-
+const {
+  playersHaveActed,
+  findNextPosition,
+  proceedToNextStage,
+} = require("../../utils/actionHelpers");
 
 const foldSocket = (io, socket) => {
   socket.on("fold", async (data) => {
@@ -108,21 +39,35 @@ const foldSocket = (io, socket) => {
 
       // Check if all players have acted; if so, proceed to next stage
       if (playersHaveActed(game)) {
-        console.log("[foldSocket] All players have acted; proceeding to next stage.");
+        console.log(
+          "[foldSocket] All players have acted; proceeding to next stage."
+        );
         proceedToNextStage(game);
         await game.save();
-        console.log("[foldSocket] Game saved after advancing stage:", game.stage);
+        console.log(
+          "[foldSocket] Game saved after advancing stage:",
+          game.stage
+        );
       }
 
       // Determine the next active player's turn
-      game.currentPlayerTurn = findNextPosition(game.currentPlayerTurn, game.seats);
-      console.log("[foldSocket] Next player's turn determined:", game.currentPlayerTurn);
+      game.currentPlayerTurn = findNextPosition(
+        game.currentPlayerTurn,
+        game.seats
+      );
+      console.log(
+        "[foldSocket] Next player's turn determined:",
+        game.currentPlayerTurn
+      );
       // Loop until a seat with a player and cards is found
       while (
         !game.seats[game.currentPlayerTurn].player ||
         game.seats[game.currentPlayerTurn].player.handCards.length === 0
       ) {
-        game.currentPlayerTurn = findNextPosition(game.currentPlayerTurn, game.seats);
+        game.currentPlayerTurn = findNextPosition(
+          game.currentPlayerTurn,
+          game.seats
+        );
       }
 
       await game.save();
