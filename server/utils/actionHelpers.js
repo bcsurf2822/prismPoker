@@ -46,7 +46,6 @@ const playersHaveActed = (game, currentSeatId, currentAction) => {
 const resetCheckBetFold = (game) => {
   game.seats.forEach((seat) => {
     if (seat.player) {
-      // Reset action as well as checkBetFold to false
       seat.player.action = "none";
       seat.player.checkBetFold = false;
     }
