@@ -1,18 +1,64 @@
-export default function BetControl() {
+import PropTypes from "prop-types";
+import { useState } from "react";
+
+export default function BetControl({
+  handleBet,
+  chips,
+  handleFold,
+  handleCheck,
+  isCurrentPlayer,
+}) {
+  const [betAmount, setBetAmount] = useState(0);
+
+  const handleRangeChange = (e) => {
+    const newBet = Number(e.target.value);
+    setBetAmount(newBet);
+  };
+
   return (
     <div className="w-1/2 h-full flex flex-col gap-1">
       <div className=" flex justify-evenly">
-        <button className="btn btn-info">Bet $</button>
-        <button className="btn btn-success">Check</button>
-        <button className="btn btn-error">Fold</button>
+        <button
+          disabled={!isCurrentPlayer}
+          className="btn btn-info"
+          onClick={() => handleBet(betAmount, "bet")}
+        >
+          Bet ${betAmount}
+        </button>
+        <button
+          disabled={!isCurrentPlayer}
+          onClick={handleCheck}
+          className="btn btn-success"
+        >
+          Check
+        </button>
+        <button disabled={!isCurrentPlayer} className="btn btn-success">
+          Call
+        </button>
+        <button
+          disabled={!isCurrentPlayer}
+          onClick={handleFold}
+          className="btn btn-error"
+        >
+          Fold
+        </button>
       </div>
       <div className="flex gap-1">
-        <input type="range" min={0} max="100" value="40" className="range" />
         <input
-          className="w-7 border border-green-600"
+          disabled={!isCurrentPlayer}
+          type="range"
+          min={0}
+          max={chips}
+          value={betAmount}
+          onChange={handleRangeChange}
+          className="range range-primary"
+        />
+        <input
+          disabled={!isCurrentPlayer}
           type="text"
-          name=""
-          id=""
+          value={betAmount}
+          readOnly
+          className="w-7 border border-green-600 text-center"
         />
       </div>
       {/* <div className="flex flex-col items-start gap-1 text-xs">
@@ -32,3 +78,11 @@ export default function BetControl() {
     </div>
   );
 }
+
+BetControl.propTypes = {
+  handleBet: PropTypes.func.isRequired,
+  chips: PropTypes.number.isRequired,
+  handleCheck: PropTypes.func.isRequired,
+  handleFold: PropTypes.func.isRequired,
+  isCurrentPlayer: PropTypes.bool.isRequired,
+};

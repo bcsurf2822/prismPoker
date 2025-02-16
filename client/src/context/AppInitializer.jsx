@@ -13,9 +13,13 @@ export default function AppInitializer({ children }) {
 
     dispatch({ type: "websocket/listenToRoomEvents" });
 
+    const token = localStorage.getItem("authToken");
     if (token) {
+      console.log("[AppInitializer] Auth token found, rehydrating user.");
       dispatch(rehydrateUser());
       dispatch({ type: "websocket/listenToUserEvents" });
+    } else {
+      console.log("[AppInitializer] No auth token found, skipping rehydration.");
     }
 
     const socket = socketService.getSocket();

@@ -4,10 +4,8 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
-
-import { rehydrateUser } from "../../features/auth/authenticationSlice";
 import { SocketContext } from "../../context/SocketProvider";
 import toast from "react-hot-toast";
 
@@ -22,6 +20,133 @@ export default function Room() {
   const socket = useContext(SocketContext);
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
+  const [dealtStage, setDealtStage] = useState("");
+
+  const isUserInGame = (user, roomId) =>
+    !!(
+      user &&
+      user.activeGames &&
+      user.activeGames.some(
+        (activeGameId) => activeGameId.toString() === roomId.toString()
+      )
+    );
+
+  const isInGame = isUserInGame(user, roomId);
+
+  const seatData = (game, userId) => {
+    if (!game || !game.seats) return null;
+    const seat = game.seats.find((s) => {
+      if (!s.player) return false;
+
+      const seatUserId =
+        typeof s.player.user === "object" ? s.player.user.id : s.player.user;
+      return seatUserId === userId;
+    });
+    return seat
+      ? {
+          seatId: seat._id,
+          chips: seat.player.chips,
+          seatNumber: seat.seatNumber,
+        }
+      : null;
+  };
+
+  const userSeatData =
+    currentGame && user ? seatData(currentGame, user.id) : null;
+
+  const isCurrentPlayer =
+    userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
+
+  const handleJoinGame = (seatId, buyIn) => {
+    if (!socket) return;
+
+    const userId = user.id;
+    socket.emit("playerJoin", {
+      gameId: roomId,
+      userId,
+      buyIn,
+      seatId,
+    });
+  };
+
+  const handleDealFlop = useCallback(() => {
+    console.log("Emitting Deal Flop");
+    if (!socket) return;
+    socket.emit("dealFlop", { gameId: roomId });
+  }, [socket, roomId]);
+
+  const handleDealTurn = useCallback(() => {
+    console.log("Emitting Deal Turn");
+    if (!socket) return;
+    socket.emit("dealTurn", { gameId: roomId });
+  }, [socket, roomId]);
+
+  const handleDealRiver = useCallback(() => {
+    console.log("Emitting Deal River");
+    if (!socket) return;
+    socket.emit("dealRiver", { gameId: roomId });
+  }, [socket, roomId]);
+
+  const handleLeaveGame = () => {
+    if (!socket) return;
+    const userId = user.id;
+    socket.emit("leaveGame", { gameId: roomId, userId });
+  };
+
+  const handleBet = (betAmount, action) => {
+    console.log(
+      "[handleBet] Called with betAmount:",
+      betAmount,
+      "and action:",
+      action
+    );
+    if (!socket) {
+      console.error("[handleBet] Socket is not available.");
+      return;
+    }
+    socket.emit("player_bet", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      bet: betAmount,
+      action: action,
+    });
+    console.log("[handleBet] Emitted player_bet event.");
+  };
+
+  const handleCheck = () => {
+    if (!socket) {
+      console.error("handleCheck: Socket is not available.");
+      return;
+    }
+    socket.emit("check", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      action: "check",
+    });
+  };
+
+  const handleFold = () => {
+    if (!socket) {
+      console.error("handleFold: Socket is not available.");
+      return;
+    }
+
+    socket.emit("fold", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      action: "fold",
+    });
+    console.log("[handleFold] Emitted fold event with:", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      action: "fold",
+    });
+  };
+
+  // useEffect to updateGame
+  useEffect(() => {
+    dispatch(fetchGameById(roomId));
+  }, [dispatch, roomId]);
 
   // toast
   useEffect(() => {
@@ -35,21 +160,7 @@ export default function Room() {
     }
   }, [dispatch, successMessage, errorMessage]);
 
-  // useEffect to listen for socket room events
-  useEffect(() => {
-    dispatch(fetchGameById(roomId));
-    if (!user) dispatch(rehydrateUser());
-
-    dispatch({ type: "websocket/listenToRoomEvents" });
-    dispatch({ type: "websocket/listenToUserEvents" });
-
-    return () => {
-      dispatch({ type: "websocket/stopListeningToRoomEvents" });
-      dispatch({ type: "websocket/listenToUserEvents" });
-    };
-  }, [dispatch, roomId, user]);
-
-  // just tracking state of room we will remove (ITHINK)
+  // just tracking local state of room we will remove (ITHINK)
   useEffect(() => {
     if (currentGame) {
       const playerCount = currentGame.seats.filter(
@@ -67,47 +178,52 @@ export default function Room() {
   useEffect(() => {
     if (currentGame && socket) {
       const playerCount = currentGame.playerCount;
-      console.log(
-        "Player count:",
-        playerCount,
-        "gameRunning:",
-        currentGame?.gameRunning,
-        "Emit Started? :",
-        hasEmittedStart
-      );
 
       if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
-        console.log(
-          "Sufficient players detected, emitting updatePositionsAndBlinds"
-        );
         socket.emit("updatePositionsAndBlinds", { gameId: roomId });
         setHasEmittedStart(true);
 
         setTimeout(() => {
-          console.log("Emitting dealCardsToPlayers");
           socket.emit("dealCardsToPlayers", { gameId: roomId });
         }, 2000);
       }
     }
   }, [currentGame, socket, roomId, hasEmittedStart]);
 
-  const handleJoinGame = (seatId, buyIn) => {
-    if (!socket) return;
+  // Deals Flop Turn River
+  useEffect(() => {
+    if (!currentGame) return;
+    const stage = currentGame.stage;
 
-    const userId = user._id || user.id;
-    socket.emit("playerJoin", {
-      gameId: roomId,
-      userId,
-      buyIn,
-      seatId,
-    });
-  };
+    if (
+      (stage === "flop" || stage === "turn" || stage === "river") &&
+      dealtStage !== stage
+    ) {
+      const allPlayersNotActed = currentGame.seats.every((seat) => {
+        if (!seat.player) return true;
+        return (
+          seat.player.checkBetFold === false && seat.player.action === "none"
+        );
+      });
 
-  const handleLeaveGame = () => {
-    if (!socket) return;
-    const userId = user._id || user.id;
-    socket.emit("leaveGame", { gameId: roomId, userId });
-  };
+      if (allPlayersNotActed) {
+        setDealtStage(stage);
+        if (stage === "flop") {
+          handleDealFlop();
+        } else if (stage === "turn") {
+          handleDealTurn();
+        } else if (stage === "river") {
+          handleDealRiver();
+        }
+      }
+    }
+  }, [
+    currentGame,
+    dealtStage,
+    handleDealFlop,
+    handleDealTurn,
+    handleDealRiver,
+  ]);
 
   if (!currentGame) return <p>Loading game...</p>;
 
@@ -115,7 +231,12 @@ export default function Room() {
     <main className="w-full h-screen flex flex-col bg-slate-200">
       <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button className="bg-green-300 rounded-md py-2 px-3">Start</button>
+        <button
+          onClick={handleDealFlop}
+          className="bg-green-300 rounded-md py-2 px-3"
+        >
+          Start
+        </button>
         <button className="bg-red-300 rounded-md py-2 px-3">End</button>
         <button
           onClick={handleLeaveGame}
@@ -126,7 +247,7 @@ export default function Room() {
       </section>
       <section className="  flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
         {/* top */}
-        <div className="bg-red-400 flex gap-10 h-1/3  w-full items-center justify-center">
+        <div className=" flex gap-10 h-1/3  w-full items-center justify-center">
           <Seat
             seat={currentGame.seats[0]}
             joinGame={handleJoinGame}
@@ -137,6 +258,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 0}
             isSmallBlind={currentGame.smallBlindPosition === 0}
             isBigBlind={currentGame.bigBlindPosition === 0}
+            isInGame={isInGame}
           />
           <Seat
             seat={currentGame.seats[1]}
@@ -148,6 +270,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 1}
             isSmallBlind={currentGame.smallBlindPosition === 1}
             isBigBlind={currentGame.bigBlindPosition === 1}
+            isInGame={isInGame}
           />
         </div>
         {/* mid */}
@@ -162,9 +285,13 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 5}
             isSmallBlind={currentGame.smallBlindPosition === 5}
             isBigBlind={currentGame.bigBlindPosition === 5}
+            isInGame={isInGame}
           />
 
-          <Table pot={currentGame.pot} />
+          <Table
+            communityCards={currentGame.communityCards}
+            pot={currentGame.pot}
+          />
 
           <Seat
             seat={currentGame.seats[2]}
@@ -176,6 +303,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 2}
             isSmallBlind={currentGame.smallBlindPosition === 2}
             isBigBlind={currentGame.bigBlindPosition === 2}
+            isInGame={isInGame}
           />
         </div>
         {/* btm */}
@@ -190,6 +318,7 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 4}
             isSmallBlind={currentGame.smallBlindPosition === 4}
             isBigBlind={currentGame.bigBlindPosition === 4}
+            isInGame={isInGame}
           />
           <Seat
             seat={currentGame.seats[3]}
@@ -201,12 +330,19 @@ export default function Room() {
             isCurrentPlayer={currentGame.currentPlayerTurn === 3}
             isSmallBlind={currentGame.smallBlindPosition === 3}
             isBigBlind={currentGame.bigBlindPosition === 3}
+            isInGame={isInGame}
           />
         </div>
       </section>
       <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
-        <BetControl />
+        <BetControl
+          isCurrentPlayer={isCurrentPlayer}
+          handleBet={handleBet}
+          handleCheck={handleCheck}
+          handleFold={handleFold}
+          chips={seatData.chips}
+        />
       </section>
     </main>
   );

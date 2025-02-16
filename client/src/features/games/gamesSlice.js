@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiClient from "../../utils/apiClient";
+import { normalizeGames } from "../../utils/normalizeGames";
 
 export const fetchGames = createAsyncThunk(
   "games/fetchGames",
@@ -39,21 +40,18 @@ const gamesSlice = createSlice({
   },
   reducers: {
     updateGame: (state, action) => {
-      // console.log("Updating game with payload:", action.payload);
-      const updatedGame = action.payload;
-      const gameId = updatedGame._id?.toString();
+      const updatedGame = normalizeGames(action.payload);
+      const gameId = updatedGame.id;
 
-      state.games = state.games.map((g) =>
-        g._id?.toString() === gameId ? updatedGame : g
-      );
+      state.games = state.games.map((g) => (g.id === gameId ? updatedGame : g));
 
-      if (state.currentGame?._id?.toString() === gameId) {
+      if (state.currentGame && state.currentGame.id === gameId) {
         state.currentGame = updatedGame;
       }
     },
     joinSuccess: (state) => {
       state.successMessage = "Successfully joined the game!";
-      state.errorMessage = null; 
+      state.errorMessage = null;
     },
     gameLeft: (state) => {
       state.successMessage = "Successfully left the game!";
@@ -84,7 +82,7 @@ const gamesSlice = createSlice({
       })
       .addCase(fetchGames.fulfilled, (state, action) => {
         state.loading = false;
-        state.games = action.payload;
+        state.games = action.payload.map(normalizeGames);
       })
       .addCase(fetchGames.rejected, (state, action) => {
         state.loading = false;
@@ -96,7 +94,7 @@ const gamesSlice = createSlice({
       })
       .addCase(fetchGameById.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentGame = action.payload;
+        state.currentGame = normalizeGames(action.payload);
       })
       .addCase(fetchGameById.rejected, (state, action) => {
         state.loading = false;
