@@ -46,7 +46,6 @@ export default function Seat({
     >
       {!seat.player ? (
         <>
-          {/* Button that needs to be disable if isUserSeat is true */}
           <button
             onClick={openModal}
             disabled={isInGame}
@@ -130,7 +129,6 @@ Seat.propTypes = {
   seat: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     seatNumber: PropTypes.number.isRequired,
-
     player: PropTypes.shape({
       user: PropTypes.oneOfType([
         PropTypes.string,
@@ -165,7 +163,6 @@ Seat.propTypes = {
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
   isDealer: PropTypes.bool.isRequired,
-  // isCurrentPlayer might be false when the player isn't seated
   isCurrentPlayer: PropTypes.bool,
   isSmallBlind: PropTypes.bool.isRequired,
   isBigBlind: PropTypes.bool.isRequired,

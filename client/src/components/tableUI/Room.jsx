@@ -57,6 +57,8 @@ export default function Room() {
   const isCurrentPlayer =
     userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
 
+  const playerChips = userSeatData && userSeatData.chips;
+
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
@@ -111,6 +113,19 @@ export default function Room() {
       action: action,
     });
     console.log("[handleBet] Emitted player_bet event.");
+  };
+
+  const handleCall = () => {
+    if (!socket) {
+      console.error("handleCheck: Socket is not available.");
+      return;
+    }
+    socket.emit("call", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      action: "call",
+      bet: currentGame.highestBet,
+    });
   };
 
   const handleCheck = () => {
@@ -341,7 +356,9 @@ export default function Room() {
           handleBet={handleBet}
           handleCheck={handleCheck}
           handleFold={handleFold}
-          chips={seatData.chips}
+          handleCall={handleCall}
+          chips={playerChips}
+          highestBet={currentGame.highestBet}
         />
       </section>
     </main>

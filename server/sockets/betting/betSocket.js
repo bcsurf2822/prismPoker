@@ -107,7 +107,12 @@ const playerBetSocket = (io, socket) => {
         "[playerBetSocket] Emitting gameUpdated event with game:",
         game
       );
-      io.emit("gameUpdated", game);
+
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
+      );
+      io.emit("gameUpdated", updatedGame);
     } catch (error) {
       console.error("[playerBetSocket] Error handling player bet:", error);
       socket.emit("playerBetError", { error: "Failed to place bet" });

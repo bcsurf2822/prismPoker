@@ -1,5 +1,6 @@
 const User = require("../../models/users");
 const Game = require("../../models/games");
+const resetGame = require("../../utils/gameHelpers")
 
 const leaveGameSocket = (io, socket) => {
   socket.on("leaveGame", async (data) => {
@@ -40,21 +41,10 @@ const leaveGameSocket = (io, socket) => {
 
       if (remainingPlayers.length === 1) {
         const lastPlayer = remainingPlayers[0].player;
-        lastPlayer.action = "none"
+        lastPlayer.action = "none";
         lastPlayer.handCards = [];
         lastPlayer.chips += game.pot;
-        game.pot = 0;
-        game.currentDeck = [];
-        game.communityCards = [];
-        game.dealtCards = [];
-        game.winnerData = [];
-        game.stage = "preflop";
-        game.gameRunning = false;
-        game.gameEnd = false;
-        game.dealerPosition = -1;
-        game.smallBlindPosition = -1;
-        game.bigBlindPosition = -1;
-        game.currentPlayerTurn = -1;
+        resetGame(game);
       }
 
       await game.save();

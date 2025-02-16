@@ -6,8 +6,8 @@ const {
 } = require("../../utils/actionHelpers");
 
 const callSocket = (io, socket) => {
-  socket.on("player_call", async (data) => {
-    console.log("[callSocket] Received player_call event with data:", data);
+  socket.on("call", async (data) => {
+    console.log("[callSocket] Received call event with data:", data);
     const { gameId, seatId, action, bet } = data;
     const callAmount = Number(bet);
     try {
