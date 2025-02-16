@@ -144,7 +144,7 @@ const GameSchema = new Schema({
   },
   seats: {
     type: [SeatSchema],
-    default: Array.from({ length: 6 }, (_, i) => ({ seatNumber: i + 1, player: null })),
+    default: Array.from({ length: 6 }, (_, i) => ({ seatNumber: i, player: null })),
   },
 });
 

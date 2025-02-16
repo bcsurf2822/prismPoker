@@ -50,14 +50,24 @@ export default function Room() {
       ? {
           seatId: seat._id,
           chips: seat.player.chips,
-          // seatNumber: seat.seatNumber,
+          seatNumber: seat.seatNumber,
         }
       : null;
   };
 
   //******************************* */ this is causing problems currently uncommented this is causing the room to not show up probably a simple fix
 
-  // const userSeatData = seatData(currentGame, user.id);
+  const userSeatData =
+    currentGame && user ? seatData(currentGame, user.id) : null;
+
+  const isCurrentPlayer =
+    userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
+
+  console.log("USER SEAT DATA: ", userSeatData);
+
+  // console.log("CurrentPlayerTurn: ", currentGame.currentPlayerTurn, "SeatNumber: ", userSeatData.seatNumber)
+
+  console.log("Current Player?: ", isCurrentPlayer);
 
   // if (userSeatData) {
   //   console.log("User Seat: ", userSeatData);
@@ -312,9 +322,7 @@ export default function Room() {
       <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
         <BetControl
-          // isCurrentPlayer={
-          //   currentGame.currentPlayerTurn + 1 === userSeatData.seatNumber
-          // }
+          isCurrentPlayer={isCurrentPlayer}
           handleBet={handleBet}
           handleCheck={handleCheck}
           handleFold={handleFold}

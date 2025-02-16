@@ -9,7 +9,7 @@ export default function BetControl({
   isCurrentPlayer,
 }) {
   const [betAmount, setBetAmount] = useState(0);
-
+  console.log("CurrentPlayer", isCurrentPlayer);
   const handleRangeChange = (e) => {
     const newBet = Number(e.target.value);
     setBetAmount(newBet);
@@ -19,21 +19,33 @@ export default function BetControl({
     <div className="w-1/2 h-full flex flex-col gap-1">
       <div className=" flex justify-evenly">
         <button
+          disabled={!isCurrentPlayer}
           className="btn btn-info"
           onClick={() => handleBet(betAmount, "bet")}
         >
           Bet ${betAmount}
         </button>
-        <button onClick={handleCheck} className="btn btn-success">
+        <button
+          disabled={!isCurrentPlayer}
+          onClick={handleCheck}
+          className="btn btn-success"
+        >
           Check
         </button>
-        <button className="btn btn-success">Call</button>
-        <button onClick={handleFold} className="btn btn-error">
+        <button disabled={!isCurrentPlayer} className="btn btn-success">
+          Call
+        </button>
+        <button
+          disabled={!isCurrentPlayer}
+          onClick={handleFold}
+          className="btn btn-error"
+        >
           Fold
         </button>
       </div>
       <div className="flex gap-1">
         <input
+          disabled={!isCurrentPlayer}
           type="range"
           min={0}
           max={chips}
@@ -42,6 +54,7 @@ export default function BetControl({
           className="range range-primary"
         />
         <input
+          disabled={!isCurrentPlayer}
           type="text"
           value={betAmount}
           readOnly
