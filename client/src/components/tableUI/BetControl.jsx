@@ -81,8 +81,8 @@ export default function BetControl({
 
 BetControl.propTypes = {
   handleBet: PropTypes.func.isRequired,
-  chips: PropTypes.number.isRequired,
+  chips: PropTypes.number,
   handleCheck: PropTypes.func.isRequired,
   handleFold: PropTypes.func.isRequired,
-  isCurrentPlayer: PropTypes.bool.isRequired,
+  isCurrentPlayer: PropTypes.bool,
 };
