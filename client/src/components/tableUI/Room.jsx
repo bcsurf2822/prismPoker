@@ -20,9 +20,7 @@ export default function Room() {
   const socket = useContext(SocketContext);
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
-  const [hasDealtFlop, setHasDealtFlop] = useState(false);
-  const [hasDealtTurn, sethasDealtTurn] = useState(false);
-  const [hasDealtRiver, setHasDealtRiver] = useState(false);
+  const [dealtStage, setDealtStage] = useState("");
 
   const isUserInGame = (user, roomId) =>
     !!(
@@ -58,7 +56,6 @@ export default function Room() {
 
   const isCurrentPlayer =
     userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
-
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
@@ -149,10 +146,9 @@ export default function Room() {
     });
   };
 
-  // useEffect to updateGame/rehydrate user
+  // useEffect to updateGame
   useEffect(() => {
     dispatch(fetchGameById(roomId));
-    // if (!user) dispatch(rehydrateUser());
   }, [dispatch, roomId]);
 
   // toast
@@ -197,9 +193,15 @@ export default function Room() {
     }
   }, [currentGame, socket, roomId, hasEmittedStart]);
 
-  //UseEffect to Deal Flop
+  // Deals Flop Turn River
   useEffect(() => {
-    if (currentGame && currentGame.stage === "flop" && !hasDealtFlop) {
+    if (!currentGame) return;
+    const stage = currentGame.stage;
+
+    if (
+      (stage === "flop" || stage === "turn" || stage === "river") &&
+      dealtStage !== stage
+    ) {
       const allPlayersNotActed = currentGame.seats.every((seat) => {
         if (!seat.player) return true;
         return (
@@ -208,46 +210,23 @@ export default function Room() {
       });
 
       if (allPlayersNotActed) {
-        setHasDealtFlop(true);
-        handleDealFlop();
+        setDealtStage(stage);
+        if (stage === "flop") {
+          handleDealFlop();
+        } else if (stage === "turn") {
+          handleDealTurn();
+        } else if (stage === "river") {
+          handleDealRiver();
+        }
       }
     }
-  }, [currentGame, hasDealtFlop, handleDealFlop]);
-
-  //Deal Turn
-  useEffect(() => {
-    if (currentGame && currentGame.stage === "turn" && !hasDealtTurn) {
-      const allPlayersNotActed = currentGame.seats.every((seat) => {
-        if (!seat.player) return true;
-        return (
-          seat.player.checkBetFold === false && seat.player.action === "none"
-        );
-      });
-
-      if (allPlayersNotActed) {
-        sethasDealtTurn(true);
-        handleDealTurn();
-      }
-    }
-  }, [currentGame, hasDealtTurn, handleDealTurn]);
-
-  //DealRiver
-  useEffect(() => {
-    if (currentGame && currentGame.stage === "river" && !hasDealtRiver) {
-      const allPlayersNotActed = currentGame.seats.every((seat) => {
-        if (!seat.player) return true;
-        return (
-          seat.player.checkBetFold === false && seat.player.action === "none"
-        );
-      });
-
-      if (allPlayersNotActed) {
-        setHasDealtRiver(true);
-
-        handleDealRiver();
-      }
-    }
-  }, [currentGame, hasDealtRiver, handleDealRiver]);
+  }, [
+    currentGame,
+    dealtStage,
+    handleDealFlop,
+    handleDealTurn,
+    handleDealRiver,
+  ]);
 
   if (!currentGame) return <p>Loading game...</p>;
 
