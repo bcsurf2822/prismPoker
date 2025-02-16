@@ -9,7 +9,7 @@ export default function BetControl({
   isCurrentPlayer,
 }) {
   const [betAmount, setBetAmount] = useState(0);
-  console.log("CurrentPlayer", isCurrentPlayer);
+
   const handleRangeChange = (e) => {
     const newBet = Number(e.target.value);
     setBetAmount(newBet);

@@ -4,7 +4,7 @@ import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
 import Chat from "./Chat";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
 
 import { rehydrateUser } from "../../features/auth/authenticationSlice";
@@ -20,11 +20,9 @@ export default function Room() {
 
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
-  console.log("USER ROOM", user);
-  console.log("Current Game Room ", currentGame);
-  console.log("ID", roomId);
 
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
+  const [hasDealtFlop, setHasDealtFlop] = useState(false);
 
   const isUserInGame = (user, roomId) =>
     !!(
@@ -55,23 +53,88 @@ export default function Room() {
       : null;
   };
 
-  //******************************* */ this is causing problems currently uncommented this is causing the room to not show up probably a simple fix
-
   const userSeatData =
     currentGame && user ? seatData(currentGame, user.id) : null;
 
   const isCurrentPlayer =
     userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
 
-  console.log("USER SEAT DATA: ", userSeatData);
+  // console.log("USER SEAT DATA: ", userSeatData);
 
-  // console.log("CurrentPlayerTurn: ", currentGame.currentPlayerTurn, "SeatNumber: ", userSeatData.seatNumber)
+  const handleJoinGame = (seatId, buyIn) => {
+    if (!socket) return;
 
-  console.log("Current Player?: ", isCurrentPlayer);
+    const userId = user.id;
+    socket.emit("playerJoin", {
+      gameId: roomId,
+      userId,
+      buyIn,
+      seatId,
+    });
+  };
 
-  // if (userSeatData) {
-  //   console.log("User Seat: ", userSeatData);
-  // }
+  const handleDealFlop = useCallback(() => {
+    console.log("Emitting Deal Flop");
+    if (!socket) return;
+    socket.emit("dealFlop", { gameId: roomId });
+    console.log("dealFlop emitted from client");
+  }, [socket, roomId]);
+
+  const handleLeaveGame = () => {
+    if (!socket) return;
+    const userId = user.id;
+    socket.emit("leaveGame", { gameId: roomId, userId });
+  };
+
+  const handleBet = (betAmount, action) => {
+    console.log(
+      "[handleBet] Called with betAmount:",
+      betAmount,
+      "and action:",
+      action
+    );
+    if (!socket) {
+      console.error("[handleBet] Socket is not available.");
+      return;
+    }
+    socket.emit("player_bet", {
+      gameId: roomId, 
+      seatId: userSeatData.seatId, 
+      bet: betAmount,
+      action: action, 
+    });
+    console.log("[handleBet] Emitted player_bet event.");
+  };
+
+  const handleCheck = () => {
+    if (!socket) {
+      console.error("handleCheck: Socket is not available.");
+      return;
+    }
+    socket.emit("check", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      action: "check",
+    });
+  };
+
+  const handleFold = () => {
+    if (!socket) {
+      console.error("handleFold: Socket is not available.");
+      return;
+    }
+
+    socket.emit("fold", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      action: "fold",
+    });
+    console.log("[handleFold] Emitted fold event with:", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      action: "fold",
+    });
+  };
 
   // useEffect to updateGame/rehydrate user
   useEffect(() => {
@@ -109,14 +172,6 @@ export default function Room() {
   useEffect(() => {
     if (currentGame && socket) {
       const playerCount = currentGame.playerCount;
-      console.log(
-        "Player count:",
-        playerCount,
-        "gameRunning:",
-        currentGame?.gameRunning,
-        "Emit Started? :",
-        hasEmittedStart
-      );
 
       if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
         console.log(
@@ -133,85 +188,23 @@ export default function Room() {
     }
   }, [currentGame, socket, roomId, hasEmittedStart]);
 
-  const handleJoinGame = (seatId, buyIn) => {
-    if (!socket) return;
+  //UseEffect to Deal Flop
 
-    const userId = user.id;
-    socket.emit("playerJoin", {
-      gameId: roomId,
-      userId,
-      buyIn,
-      seatId,
-    });
-  };
-
-  const handleDealFlop = () => {
-    console.log("Emitting Deal Flop");
-    if (!socket) return;
-    socket.emit("dealFlop", { gameId: roomId });
-    console.log("dealFlop emitted from client");
-  };
-
-  const handleLeaveGame = () => {
-    if (!socket) return;
-    const userId = user.id;
-    socket.emit("leaveGame", { gameId: roomId, userId });
-  };
-
-  const handleBet = (betAmount, action) => {
-    console.log(
-      "[handleBet] Called with betAmount:",
-      betAmount,
-      "and action:",
-      action
-    );
-    if (!socket) {
-      console.error("[handleBet] Socket is not available.");
-      return;
+  useEffect(() => {
+    if (currentGame && currentGame.stage === "flop" && !hasDealtFlop) {
+      // Check if every seat with a player has checkBetFold === true.
+      const playerHaveActed = currentGame.seats.every((seat) => {
+        if (!seat.player) return true;
+        return seat.player.checkBetFold;
+      });
+      console.log("[Room useEffect] All players acted: ", playerHaveActed);
+      if (playerHaveActed) {
+        setHasDealtFlop(true);
+        console.log("[Room useEffect] Conditions met: Emitting dealFlop");
+        handleDealFlop();
+      }
     }
-    socket.emit("player_bet", {
-      gameId: roomId, // Make sure roomId is available in your component
-      seatId: userSeatData.seatId, // Ensure currentSeatId is defined as the seat the player occupies
-      bet: betAmount,
-      action: action, // e.g., "bet" or "raise"
-    });
-    console.log("[handleBet] Emitted player_bet event.");
-  };
-
-  const handleCheck = () => {
-    if (!socket) {
-      console.error("handleCheck: Socket is not available.");
-      return;
-    }
-    socket.emit("check", {
-      gameId: roomId,
-      seatId: userSeatData.seatId,
-      action: "check",
-    });
-    console.log("[handleCheck] Emitted check event with:", {
-      gameId: roomId,
-      seatId: userSeatData.seatId,
-      action: "check",
-    });
-  };
-
-  const handleFold = () => {
-    if (!socket) {
-      console.error("handleFold: Socket is not available.");
-      return;
-    }
-
-    socket.emit("fold", {
-      gameId: roomId,
-      seatId: userSeatData.seatId,
-      action: "fold",
-    });
-    console.log("[handleFold] Emitted fold event with:", {
-      gameId: roomId,
-      seatId: userSeatData.seatId,
-      action: "fold",
-    });
-  };
+  }, [currentGame, hasDealtFlop, handleDealFlop]);
 
   if (!currentGame) return <p>Loading game...</p>;
 
