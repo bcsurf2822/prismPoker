@@ -41,13 +41,11 @@ const gamesSlice = createSlice({
   reducers: {
     updateGame: (state, action) => {
       const updatedGame = normalizeGames(action.payload);
-      const gameId = updatedGame._id?.toString();
+      const gameId = updatedGame.id;
 
-      state.games = state.games.map((g) =>
-        g._id?.toString() === gameId ? updatedGame : g
-      );
+      state.games = state.games.map((g) => (g.id === gameId ? updatedGame : g));
 
-      if (state.currentGame?._id?.toString() === gameId) {
+      if (state.currentGame && state.currentGame.id === gameId) {
         state.currentGame = updatedGame;
       }
     },
