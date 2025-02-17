@@ -1,5 +1,5 @@
 const Game = require("../../models/games");
-const {resetForNewRound} = require("../../utils/gameHelpers");
+const { resetForNewRound } = require("../../utils/gameHelpers");
 var Hand = require("pokersolver").Hand;
 
 function resetActionNone(game) {

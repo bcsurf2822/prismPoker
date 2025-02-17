@@ -235,6 +235,23 @@ export default function Room() {
     }
   }, [currentGame, roomId, socket]);
 
+  // Checks winner at showdown
+  useEffect(() => {
+    if (currentGame && currentGame.stage === "showdown") {
+      // Check that every seat with a player has acted (i.e. action !== "none")
+      const allPlayersActed = currentGame.seats.every((seat) => {
+        // If there's no player, we ignore the seat.
+        if (!seat.player) return true;
+        return seat.player.action !== "none";
+      });
+      console.log("[Room useEffect] Showdown stage: all players acted:", allPlayersActed);
+      if (allPlayersActed) {
+        socket.emit("getWinner", { gameId: roomId });
+        console.log("[Room useEffect] Emitted getWinner event for game", roomId);
+      }
+    }
+  }, [currentGame, roomId, socket]);
+
   // Deals Flop Turn River
   useEffect(() => {
     if (!currentGame) return;
