@@ -9,16 +9,69 @@ function resetActionNone(game) {
   });
 }
 
-function winningSocket(io, socket) {
+const winningSocket = (io, socket) => {
   socket.on("getWinner", async (data) => {
     const { gameId } = data;
-
     try {
       const game = await Game.findById(gameId);
       if (!game) {
         return socket.emit("error", { message: "Game not found!" });
       }
 
+      // Surrender logic: if game.stage === "surrender"
+      if (game.stage === "surrender") {
+        console.log(
+          "[winningSocket] Game stage is 'surrender'. Applying surrender logic."
+        );
+        const activeSeats = game.seats.filter(
+          (seat) => seat.player && seat.player.handCards.length > 0
+        );
+        if (activeSeats.length !== 1) {
+          return socket.emit("winnerError", {
+            message: "Unexpected number of active players for surrender",
+          });
+        }
+        const lastActive = activeSeats[0];
+        const potAmount = game.pot;
+        // Assuming the user is populated on the player object.
+        const username = lastActive.player.user.username;
+        const message = `${username} wins $${potAmount} by surrender`;
+
+        // Award the pot to the last active player.
+        lastActive.player.chips += potAmount;
+
+        // Populate winnerData with the surrender win.
+        game.winnerData = [
+          {
+            seatId: lastActive._id.toString(),
+            user: username,
+            handName: "Surrender",
+            potAmount: potAmount,
+            message: message,
+          },
+        ];
+
+        game.pot = 0;
+        game.gameEnd = true;
+        game.gameRunning = false;
+        game.currentDeck = [];
+        game.highestBet = 0;
+        game.betPlaced = false;
+        game.stage = "end";
+
+        await game.save();
+        const updatedGame = await Game.findById(gameId).populate(
+          "seats.player.user",
+          "username"
+        );
+        console.log(
+          "[winningSocket] Surrender logic complete. Emitting gameUpdated:",
+          updatedGame
+        );
+        return io.emit("gameUpdated", updatedGame);
+      }
+
+      // Normal showdown logic:
       if (
         game.pot <= 0 ||
         game.stage !== "showdown" ||
@@ -29,19 +82,10 @@ function winningSocket(io, socket) {
         });
       }
 
-      const playersActive = game.seats.filter(
-        (seat) => seat.player && seat.player.handCards.length > 0
-      );
-      if (playersActive.length < 1) {
-        return socket.emit("winnerError", {
-          message: "Not enough active players to determine a winner",
-        });
-      }
-
       const communityCards = game.communityCards.map(
-        (card) => card[0].toUpperCase() + card.slice(1).toLowerCase()
+        (card) => card.code[0].toUpperCase() + card.code.slice(1).toLowerCase()
       );
-      console.log("Community Cards:", communityCards);
+      console.log("[winningSocket] Community Cards:", communityCards);
 
       const playersData = game.seats
         .filter((seat) => seat.player && seat.player.handCards.length)
@@ -49,19 +93,18 @@ function winningSocket(io, socket) {
           return {
             seatId: seat._id.toString(),
             handCards: seat.player.handCards.map(
-              (card) => card[0].toUpperCase() + card.slice(1).toLowerCase()
+              (card) =>
+                card.code[0].toUpperCase() + card.code.slice(1).toLowerCase()
             ),
             playerData: seat.player,
           };
         });
 
-      console.log("Players Data:", playersData);
+      console.log("[winningSocket] Players Data:", playersData);
 
-      const hands = playersData.map((player, index) => {
+      const hands = playersData.map((player) => {
         const fullHand = [...communityCards, ...player.handCards];
-
         const handSolved = Hand.solve(fullHand);
-
         return {
           seatId: player.seatId,
           playerData: player.playerData,
@@ -70,7 +113,7 @@ function winningSocket(io, socket) {
       });
 
       const winningHands = Hand.winners(hands.map((h) => h.hand));
-      console.log("Winning Hands:", winningHands);
+      console.log("[winningSocket] Winning Hands:", winningHands);
 
       const winnerData = winningHands.map((winner) => {
         const matchingSeat = hands.find(
@@ -84,7 +127,10 @@ function winningSocket(io, socket) {
         };
       });
 
-      console.log("Final Winner Data before assignment:", winnerData);
+      console.log(
+        "[winningSocket] Final Winner Data before assignment:",
+        winnerData
+      );
 
       try {
         game.winnerData = winnerData;
@@ -113,8 +159,14 @@ function winningSocket(io, socket) {
         game.stage = "end";
 
         await game.save();
-
-        io.emit("gameUpdated", game);
+        console.log(
+          "[winningSocket] Game saved successfully after determining winner."
+        );
+        const updatedGame = await Game.findById(gameId).populate(
+          "seats.player.user",
+          "username"
+        );
+        io.emit("gameUpdated", updatedGame);
       } catch (saveError) {
         console.error("Error saving game document:", saveError);
         socket.emit("winnerError", { message: "Failed to save game state." });
@@ -129,6 +181,6 @@ function winningSocket(io, socket) {
       });
     }
   });
-}
+};
 
-module.exports = { winningSocket };
+module.exports = winningSocket;

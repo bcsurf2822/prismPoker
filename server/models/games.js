@@ -138,6 +138,7 @@ const GameSchema = new Schema({
         user: String,
         handName: String,
         potAmount: Number,
+        message: String,
       },
     ],
     default: [],
