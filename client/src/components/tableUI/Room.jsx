@@ -22,6 +22,7 @@ export default function Room() {
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
   const [dealtStage, setDealtStage] = useState("");
 
+  // Boolean telling if use is in game
   const isUserInGame = (user, roomId) =>
     !!(
       user &&
@@ -33,6 +34,7 @@ export default function Room() {
 
   const isInGame = isUserInGame(user, roomId);
 
+  // Provides Seat Data for user that is in game
   const seatData = (game, userId) => {
     if (!game || !game.seats) return null;
     const seat = game.seats.find((s) => {
@@ -47,6 +49,8 @@ export default function Room() {
           seatId: seat._id,
           chips: seat.player.chips,
           seatNumber: seat.seatNumber,
+          action: seat.player.action,
+          bet: seat.player.bet,
         }
       : null;
   };
@@ -58,6 +62,10 @@ export default function Room() {
     userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
 
   const playerChips = userSeatData && userSeatData.chips;
+
+  const playerAction = userSeatData && userSeatData.action
+
+  const playerBetAmount = userSeatData && userSeatData.bet
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;

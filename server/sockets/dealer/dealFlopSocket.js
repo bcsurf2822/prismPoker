@@ -1,6 +1,5 @@
 const Game = require("../../models/games");
 const {
-  resetActionNone,
   findNextActivePlayer,
 } = require("../../utils/dealHelpers");
 
@@ -20,7 +19,7 @@ const dealFlopSocket = (io, socket) => {
     try {
       const game = await Game.findById(gameId);
 
-      resetActionNone(game);
+
 
       if (game.stage !== "flop" || game.communityCards.length > 0) {
         return socket.emit("dealFlopError", {

@@ -34,8 +34,10 @@ export default function BetControl({
         >
           Check
         </button>
-        <button onClick={handleCall} disabled={!isCurrentPlayer} className="btn btn-success">
-          Call ${highestBet}
+        <button onClick={handleCall}   disabled={!isCurrentPlayer || highestBet <= 0}  className="btn btn-success">
+        {(!isCurrentPlayer || highestBet <= 0)
+    ? "Call"
+    : `Call $${highestBet}`}
         </button>
         <button
           disabled={!isCurrentPlayer}

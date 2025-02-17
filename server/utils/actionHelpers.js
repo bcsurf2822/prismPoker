@@ -43,9 +43,10 @@ const playersHaveActed = (game, currentSeatId, currentAction) => {
   }
 };
 
-const resetCheckBetFold = (game) => {
+const resetPlayerActions = (game) => {
   game.seats.forEach((seat) => {
     if (seat.player) {
+      seat.player.bet = 0;
       seat.player.action = "none";
       seat.player.checkBetFold = false;
     }
@@ -115,14 +116,14 @@ const proceedToNextStage = (game) => {
       }
     }
     // Reset checkBetFold for all seats after each stage transition.
-    resetCheckBetFold(game);
+    resetPlayerActions(game);
   }
   game.highestBet = 0;
 };
 
 module.exports = {
   playersHaveActed,
-  resetCheckBetFold,
+  resetPlayerActions,
   playersWithCards,
   findNextPosition,
   proceedToNextStage,

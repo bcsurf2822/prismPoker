@@ -9,8 +9,8 @@ function resetActionNone(game) {
   });
 }
 
-function winningSocket(socket, io) {
-  socket.on("get_winner", async (data) => {
+function winningSocket(io, socket) {
+  socket.on("getWinner", async (data) => {
     const { gameId } = data;
 
     try {
@@ -19,22 +19,29 @@ function winningSocket(socket, io) {
         return socket.emit("error", { message: "Game not found!" });
       }
 
-      if (game.pot <= 0 || game.stage !== "showdown" || game.communityCards.length !== 5) {
-        return socket.emit("winnerError", { message: "Not time to determine winner" });
+      if (
+        game.pot <= 0 ||
+        game.stage !== "showdown" ||
+        game.communityCards.length !== 5
+      ) {
+        return socket.emit("winnerError", {
+          message: "Not time to determine winner",
+        });
       }
 
       const playersActive = game.seats.filter(
         (seat) => seat.player && seat.player.handCards.length > 0
       );
-      if (playersActive.length <= 1) {
-        return socket.emit("winnerError", { message: "Not enough active players to determine a winner" });
+      if (playersActive.length < 1) {
+        return socket.emit("winnerError", {
+          message: "Not enough active players to determine a winner",
+        });
       }
 
       const communityCards = game.communityCards.map(
         (card) => card[0].toUpperCase() + card.slice(1).toLowerCase()
       );
       console.log("Community Cards:", communityCards);
-
 
       const playersData = game.seats
         .filter((seat) => seat.player && seat.player.handCards.length)
@@ -53,9 +60,7 @@ function winningSocket(socket, io) {
       const hands = playersData.map((player, index) => {
         const fullHand = [...communityCards, ...player.handCards];
 
-
         const handSolved = Hand.solve(fullHand);
-
 
         return {
           seatId: player.seatId,
@@ -63,7 +68,6 @@ function winningSocket(socket, io) {
           hand: handSolved,
         };
       });
-
 
       const winningHands = Hand.winners(hands.map((h) => h.hand));
       console.log("Winning Hands:", winningHands);
@@ -85,16 +89,16 @@ function winningSocket(socket, io) {
       try {
         game.winnerData = winnerData;
 
-
-        game.winnerData.forEach(winner => {
-          const winningSeat = game.seats.find(seat => seat._id.toString() === winner.seatId);
+        game.winnerData.forEach((winner) => {
+          const winningSeat = game.seats.find(
+            (seat) => seat._id.toString() === winner.seatId
+          );
           if (winningSeat && winningSeat.player) {
             winningSeat.player.chips += winner.potAmount;
           }
         });
 
- 
-        game.seats.forEach(seat => {
+        game.seats.forEach((seat) => {
           if (seat.player) {
             seat.player.handCards = [];
           }
@@ -110,19 +114,19 @@ function winningSocket(socket, io) {
 
         await game.save();
 
- 
-        io.emit("winner_received", game);
+        io.emit("gameUpdated", game);
       } catch (saveError) {
         console.error("Error saving game document:", saveError);
         socket.emit("winnerError", { message: "Failed to save game state." });
         return;
       }
 
-      
       resetActionNone(game);
     } catch (error) {
       console.error("Error determining winner:", error);
-      socket.emit("winnerError", { message: "An error occurred while determining the winner." });
+      socket.emit("winnerError", {
+        message: "An error occurred while determining the winner.",
+      });
     }
   });
 }
