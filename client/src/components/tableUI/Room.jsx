@@ -22,6 +22,7 @@ export default function Room() {
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
   const [dealtStage, setDealtStage] = useState("");
 
+  // Boolean telling if user is in game
   const isUserInGame = (user, roomId) =>
     !!(
       user &&
@@ -33,6 +34,7 @@ export default function Room() {
 
   const isInGame = isUserInGame(user, roomId);
 
+  // Provides Seat Data for user that is in game
   const seatData = (game, userId) => {
     if (!game || !game.seats) return null;
     const seat = game.seats.find((s) => {
@@ -47,6 +49,8 @@ export default function Room() {
           seatId: seat._id,
           chips: seat.player.chips,
           seatNumber: seat.seatNumber,
+          action: seat.player.action,
+          bet: seat.player.bet,
         }
       : null;
   };
@@ -56,6 +60,12 @@ export default function Room() {
 
   const isCurrentPlayer =
     userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
+
+  const playerChips = userSeatData && userSeatData.chips;
+
+  const playerAction = userSeatData && userSeatData.action;
+
+  const playerBetAmount = userSeatData && userSeatData.bet;
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
@@ -70,19 +80,16 @@ export default function Room() {
   };
 
   const handleDealFlop = useCallback(() => {
-    console.log("Emitting Deal Flop");
     if (!socket) return;
     socket.emit("dealFlop", { gameId: roomId });
   }, [socket, roomId]);
 
   const handleDealTurn = useCallback(() => {
-    console.log("Emitting Deal Turn");
     if (!socket) return;
     socket.emit("dealTurn", { gameId: roomId });
   }, [socket, roomId]);
 
   const handleDealRiver = useCallback(() => {
-    console.log("Emitting Deal River");
     if (!socket) return;
     socket.emit("dealRiver", { gameId: roomId });
   }, [socket, roomId]);
@@ -94,23 +101,35 @@ export default function Room() {
   };
 
   const handleBet = (betAmount, action) => {
+    const effectiveBet =
+      action === "raise" ? currentGame.highestBet + betAmount : betAmount;
     console.log(
-      "[handleBet] Called with betAmount:",
-      betAmount,
-      "and action:",
-      action
+      `[handleBet] Called with betAmount: ${betAmount} and action: ${action}`
     );
     if (!socket) {
       console.error("[handleBet] Socket is not available.");
       return;
     }
-    socket.emit("player_bet", {
+    socket.emit("bet", {
       gameId: roomId,
       seatId: userSeatData.seatId,
-      bet: betAmount,
+      bet: effectiveBet,
       action: action,
     });
     console.log("[handleBet] Emitted player_bet event.");
+  };
+
+  const handleCall = () => {
+    if (!socket) {
+      console.error("handleCheck: Socket is not available.");
+      return;
+    }
+    socket.emit("call", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      action: "call",
+      bet: currentGame.highestBet,
+    });
   };
 
   const handleCheck = () => {
@@ -158,7 +177,18 @@ export default function Room() {
       toast.error(errorMessage);
       dispatch(clearMessages());
     }
-  }, [dispatch, successMessage, errorMessage]);
+    if (
+      currentGame &&
+      currentGame.winnerData &&
+      currentGame.winnerData.length > 0
+    ) {
+      currentGame.winnerData.forEach((winner) => {
+        if (winner.message) {
+          toast.success(winner.message);
+        }
+      });
+    }
+  }, [dispatch, successMessage, errorMessage, currentGame]);
 
   // just tracking local state of room we will remove (ITHINK)
   useEffect(() => {
@@ -168,7 +198,6 @@ export default function Room() {
       ).length;
 
       if (playerCount < 2 && hasEmittedStart) {
-        console.log("Player count dropped below 2. Resetting hasEmittedStart.");
         setHasEmittedStart(false);
       }
     }
@@ -189,6 +218,52 @@ export default function Room() {
       }
     }
   }, [currentGame, socket, roomId, hasEmittedStart]);
+
+  //Checks winner in case of surrender or showdown
+  useEffect(() => {
+    if (currentGame && roomId && socket) {
+      if (currentGame.stage === "surrender") {
+        socket.emit("getWinner", { gameId: roomId });
+        setHasEmittedStart(false);
+      } else if (currentGame.stage === "showdown") {
+        const activeSeats = currentGame.seats.filter(
+          (seat) =>
+            seat.player &&
+            seat.player.handCards &&
+            seat.player.handCards.length > 0
+        );
+
+        if (activeSeats.length > 1) {
+          socket.emit("getWinner", { gameId: roomId });
+          setHasEmittedStart(false);
+        }
+      }
+    }
+  }, [currentGame, roomId, socket]);
+
+  //Starts new round after game ends
+  useEffect(() => {
+    if (currentGame && currentGame.stage === "end" && !hasEmittedStart) {
+      const activeSeats = currentGame.seats.filter(
+        (seat) =>
+          seat.player &&
+          seat.player.handCards &&
+          seat.player.handCards.length > 0
+      );
+
+      if (activeSeats.length >= 2) {
+        setHasEmittedStart(true);
+
+        setTimeout(() => {
+          socket.emit("updatePositionsAndBlinds", { gameId: roomId });
+
+          setTimeout(() => {
+            socket.emit("dealCardsToPlayers", { gameId: roomId });
+          }, 2000);
+        }, 2000);
+      }
+    }
+  }, [currentGame, roomId, socket, hasEmittedStart]);
 
   // Deals Flop Turn River
   useEffect(() => {
@@ -341,7 +416,9 @@ export default function Room() {
           handleBet={handleBet}
           handleCheck={handleCheck}
           handleFold={handleFold}
-          chips={seatData.chips}
+          handleCall={handleCall}
+          chips={playerChips}
+          highestBet={currentGame.highestBet}
         />
       </section>
     </main>

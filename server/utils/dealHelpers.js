@@ -1,11 +1,3 @@
-const resetActionNone = (game) => {
-  game.seats.forEach((seat) => {
-    if (seat.player) {
-      seat.player.action = "none";
-    }
-  });
-};
-
 const findNextActivePlayer = (game, startingPosition) => {
   let nextPosition = startingPosition % game.seats.length;
   while (
@@ -18,6 +10,5 @@ const findNextActivePlayer = (game, startingPosition) => {
 };
 
 module.exports = {
-  resetActionNone,
   findNextActivePlayer,
 };

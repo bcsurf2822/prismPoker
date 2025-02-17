@@ -1,8 +1,5 @@
 const Game = require("../../models/games");
-const {
-  resetActionNone,
-  findNextActivePlayer,
-} = require("../../utils/dealHelpers");
+const { findNextActivePlayer } = require("../../utils/dealHelpers");
 
 const dealLocks = {};
 
@@ -18,8 +15,6 @@ const dealRiverSocket = (io, socket) => {
 
     try {
       const game = await Game.findById(gameId);
-
-      resetActionNone(game);
 
       if (game.stage !== "river" || game.communityCards.length > 4) {
         return socket.emit("dealRiverError", {

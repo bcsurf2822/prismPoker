@@ -1,5 +1,6 @@
 const Game = require("../../models/games");
 const axios = require("axios");
+const resetActionNone = require("../../utils/dealHelpers")
 
 function cardCode(code) {
   return code.replace("0", "10");
@@ -14,13 +15,6 @@ const findNextPosition = (startPosition, seats) => {
   return nextPosition;
 };
 
-function resetActionNone(game) {
-  game.seats.forEach((seat) => {
-    if (seat.player) {
-      seat.player.action = "none";
-    }
-  });
-}
 
 
 function updateCurrentPlayerSocket(socket, io) {

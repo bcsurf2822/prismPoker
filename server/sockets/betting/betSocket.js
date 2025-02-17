@@ -5,9 +5,10 @@ const {
   proceedToNextStage,
 } = require("../../utils/actionHelpers");
 
+// Covers Bet/Raise/All IN
+
 const playerBetSocket = (io, socket) => {
-  socket.on("player_bet", async (data) => {
-    console.log("[playerBetSocket] Received player_bet event with data:", data);
+  socket.on("bet", async (data) => {
     const { gameId, seatId, bet, action } = data;
     let betAmount = Number(bet);
     try {
@@ -41,7 +42,7 @@ const playerBetSocket = (io, socket) => {
 
       // Handle bet, raise, and all-in actions.
       if (action === "all-in") {
-        betAmount = bet; // using the provided bet (might be a string)
+        betAmount = bet;
       }
       if (action === "bet" || action === "raise") {
         if (action === "raise" && betAmount <= game.highestBet) {
@@ -76,7 +77,6 @@ const playerBetSocket = (io, socket) => {
       console.log("[playerBetSocket] Updated bet for seat:", seat);
 
       await game.save();
-      console.log("[playerBetSocket] Game saved after bet update.");
 
       // Check if all players have acted.
       const allHaveActed = playersHaveActed(game, seatId, action);
@@ -86,16 +86,10 @@ const playerBetSocket = (io, socket) => {
         );
         proceedToNextStage(game);
         await game.save();
-        console.log("[playerBetSocket] Proceeded to next stage:", game.stage);
       } else {
-        // Set the next player's turn.
         game.currentPlayerTurn = findNextPosition(
           game.currentPlayerTurn,
           game.seats
-        );
-        console.log(
-          "[playerBetSocket] Next player's turn set to:",
-          game.currentPlayerTurn
         );
       }
 
@@ -107,7 +101,12 @@ const playerBetSocket = (io, socket) => {
         "[playerBetSocket] Emitting gameUpdated event with game:",
         game
       );
-      io.emit("gameUpdated", game);
+
+      const updatedGame = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
+      );
+      io.emit("gameUpdated", updatedGame);
     } catch (error) {
       console.error("[playerBetSocket] Error handling player bet:", error);
       socket.emit("playerBetError", { error: "Failed to place bet" });

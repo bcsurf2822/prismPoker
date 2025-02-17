@@ -46,7 +46,6 @@ export default function Seat({
     >
       {!seat.player ? (
         <>
-          {/* Button that needs to be disable if isUserSeat is true */}
           <button
             onClick={openModal}
             disabled={isInGame}
@@ -86,23 +85,23 @@ export default function Seat({
         <div className="relative flex flex-col items-center">
           {/* Cards Container */}
           <div className="flex w-7/12 gap-2 justify-center items-center">
-       {/* First card container */}
-  <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
-    {cardCodes && cardCodes.length > 0 && cardCodes[0] ? (
-      <Card cardCode={cardCodes[0]} />
-    ) : (
-      <CardBack />
-    )}
-  </div>
+            {/* First card container */}
+            <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
+              {cardCodes && cardCodes.length > 0 && cardCodes[0] ? (
+                <Card cardCode={cardCodes[0]} />
+              ) : (
+                <CardBack />
+              )}
+            </div>
 
-  {/* Second card container */}
-  <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
-    {cardCodes && cardCodes.length > 1 && cardCodes[1] ? (
-      <Card cardCode={cardCodes[1]} />
-    ) : (
-      <CardBack />
-    )}
-  </div>
+            {/* Second card container */}
+            <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
+              {cardCodes && cardCodes.length > 1 && cardCodes[1] ? (
+                <Card cardCode={cardCodes[1]} />
+              ) : (
+                <CardBack />
+              )}
+            </div>
           </div>
           {/* Username / Pot container */}
           <div className="absolute top-10 left-5 w-5/6 h-full flex flex-col items-center justify-center z-10 pointer-events-none bg-white border border-neutral-300">
@@ -129,7 +128,7 @@ export default function Seat({
 Seat.propTypes = {
   seat: PropTypes.shape({
     _id: PropTypes.string.isRequired,
-    id: PropTypes.number.isRequired,
+    seatNumber: PropTypes.number.isRequired,
     player: PropTypes.shape({
       user: PropTypes.oneOfType([
         PropTypes.string,
@@ -137,9 +136,9 @@ Seat.propTypes = {
           _id: PropTypes.string.isRequired,
           username: PropTypes.string.isRequired,
         }),
-      ]).isRequired,
-      chips: PropTypes.number.isRequired,
-      bet: PropTypes.number.isRequired,
+      ]),
+      chips: PropTypes.number,
+      bet: PropTypes.number,
       action: PropTypes.oneOf([
         "check",
         "call",
@@ -148,8 +147,8 @@ Seat.propTypes = {
         "fold",
         "raise",
         "none",
-      ]).isRequired,
-      checkBetFold: PropTypes.bool.isRequired,
+      ]),
+      checkBetFold: PropTypes.bool,
       handCards: PropTypes.arrayOf(
         PropTypes.shape({
           value: PropTypes.string.isRequired,
@@ -157,15 +156,14 @@ Seat.propTypes = {
           code: PropTypes.string.isRequired,
           _id: PropTypes.string.isRequired,
         })
-      ).isRequired,
+      ),
     }),
   }).isRequired,
-
   joinGame: PropTypes.func.isRequired,
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
   isDealer: PropTypes.bool.isRequired,
-  isCurrentPlayer: PropTypes.bool.isRequired,
+  isCurrentPlayer: PropTypes.bool,
   isSmallBlind: PropTypes.bool.isRequired,
   isBigBlind: PropTypes.bool.isRequired,
   isInGame: PropTypes.bool.isRequired,

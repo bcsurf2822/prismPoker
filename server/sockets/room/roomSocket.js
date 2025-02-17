@@ -1,5 +1,6 @@
 const Game = require("../../models/games");
 
+// Can probably remove
 function roomSocket(socket) {
 
   socket.on("getGameById", async (gameId) => {

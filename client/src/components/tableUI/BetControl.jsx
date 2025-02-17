@@ -7,6 +7,8 @@ export default function BetControl({
   handleFold,
   handleCheck,
   isCurrentPlayer,
+  highestBet,
+  handleCall,
 }) {
   const [betAmount, setBetAmount] = useState(0);
 
@@ -15,15 +17,21 @@ export default function BetControl({
     setBetAmount(newBet);
   };
 
+  const sliderMin = highestBet > 0 ? 1 : 0;
+  // When raising, ensure the maximum additional amount doesn't exceed available chips.
+  const sliderMax = highestBet > 0 ? Math.max(chips - highestBet, 1) : chips;
+
   return (
     <div className="w-1/2 h-full flex flex-col gap-1">
       <div className=" flex justify-evenly">
         <button
           disabled={!isCurrentPlayer}
           className="btn btn-info"
-          onClick={() => handleBet(betAmount, "bet")}
+          onClick={() => handleBet(betAmount, highestBet > 0 ? "raise" : "bet")}
         >
-          Bet ${betAmount}
+          {highestBet > 0
+            ? `Raise $${highestBet + betAmount}`
+            : `Bet $${betAmount}`}
         </button>
         <button
           disabled={!isCurrentPlayer}
@@ -32,8 +40,12 @@ export default function BetControl({
         >
           Check
         </button>
-        <button disabled={!isCurrentPlayer} className="btn btn-success">
-          Call
+        <button
+          onClick={handleCall}
+          disabled={!isCurrentPlayer || highestBet <= 0}
+          className="btn btn-success"
+        >
+          {!isCurrentPlayer || highestBet <= 0 ? "Call" : `Call $${highestBet}`}
         </button>
         <button
           disabled={!isCurrentPlayer}
@@ -47,8 +59,8 @@ export default function BetControl({
         <input
           disabled={!isCurrentPlayer}
           type="range"
-          min={0}
-          max={chips}
+          min={sliderMin}
+          max={sliderMax}
           value={betAmount}
           onChange={handleRangeChange}
           className="range range-primary"
@@ -81,8 +93,10 @@ export default function BetControl({
 
 BetControl.propTypes = {
   handleBet: PropTypes.func.isRequired,
-  chips: PropTypes.number.isRequired,
+  handleCall: PropTypes.func.isRequired,
+  chips: PropTypes.number,
+  highestBet: PropTypes.number,
   handleCheck: PropTypes.func.isRequired,
   handleFold: PropTypes.func.isRequired,
-  isCurrentPlayer: PropTypes.bool.isRequired,
+  isCurrentPlayer: PropTypes.bool,
 };
