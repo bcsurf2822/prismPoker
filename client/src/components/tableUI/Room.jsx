@@ -101,8 +101,11 @@ export default function Room() {
   };
 
   const handleBet = (betAmount, action) => {
-    const effectiveBet = action === "raise" ? currentGame.highestBet + betAmount : betAmount;
-    console.log(`[handleBet] Called with betAmount: ${betAmount} and action: ${action}`);
+    const effectiveBet =
+      action === "raise" ? currentGame.highestBet + betAmount : betAmount;
+    console.log(
+      `[handleBet] Called with betAmount: ${betAmount} and action: ${action}`
+    );
     if (!socket) {
       console.error("[handleBet] Socket is not available.");
       return;
@@ -216,27 +219,24 @@ export default function Room() {
     }
   }, [currentGame, socket, roomId, hasEmittedStart]);
 
-  //Checks winner in case of surrender
-
+  //Checks winner in case of surrender or showdown
   useEffect(() => {
-    if (currentGame && currentGame.stage === "surrender") {
-      socket.emit("getWinner", { gameId: roomId });
-      setHasEmittedStart(false);
-    }
-  }, [currentGame, roomId, socket]);
-
-  // Checks winner at showdown
-  useEffect(() => {
-    if (currentGame && currentGame.stage === "showdown") {
-      const activeSeats = currentGame.seats.filter(
-        (seat) =>
-          seat.player &&
-          seat.player.handCards &&
-          seat.player.handCards.length > 0
-      );
-      if (activeSeats.length > 1) {
+    if (currentGame && roomId && socket) {
+      if (currentGame.stage === "surrender") {
         socket.emit("getWinner", { gameId: roomId });
         setHasEmittedStart(false);
+      } else if (currentGame.stage === "showdown") {
+        const activeSeats = currentGame.seats.filter(
+          (seat) =>
+            seat.player &&
+            seat.player.handCards &&
+            seat.player.handCards.length > 0
+        );
+
+        if (activeSeats.length > 1) {
+          socket.emit("getWinner", { gameId: roomId });
+          setHasEmittedStart(false);
+        }
       }
     }
   }, [currentGame, roomId, socket]);

@@ -77,7 +77,6 @@ const playerBetSocket = (io, socket) => {
       console.log("[playerBetSocket] Updated bet for seat:", seat);
 
       await game.save();
- 
 
       // Check if all players have acted.
       const allHaveActed = playersHaveActed(game, seatId, action);
@@ -87,13 +86,11 @@ const playerBetSocket = (io, socket) => {
         );
         proceedToNextStage(game);
         await game.save();
-   
       } else {
         game.currentPlayerTurn = findNextPosition(
           game.currentPlayerTurn,
           game.seats
         );
-
       }
 
       await game.save();
