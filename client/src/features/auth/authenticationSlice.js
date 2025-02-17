@@ -105,6 +105,7 @@ export const logoutUser = () => async (dispatch, getState) => {
 
   dispatch(logout());
 };
+
 const token = localStorage.getItem("authToken");
 const initialState = {
   user: null,

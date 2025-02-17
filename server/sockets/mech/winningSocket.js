@@ -2,9 +2,17 @@ const Game = require("../../models/games");
 const { resetForNewRound } = require("../../utils/gameHelpers");
 var Hand = require("pokersolver").Hand;
 
+const winnerLocks = {};
+
 const winningSocket = (io, socket) => {
   socket.on("getWinner", async (data) => {
     const { gameId } = data;
+
+    if (winnerLocks[gameId]) {
+      return;
+    }
+    winnerLocks[gameId] = true;
+
     try {
       const game = await Game.findById(gameId);
       if (!game) {
@@ -44,10 +52,7 @@ const winningSocket = (io, socket) => {
         resetForNewRound(populatedGame);
 
         await populatedGame.save();
-        console.log(
-          "[winningSocket] Surrender logic complete. Emitting gameUpdated:",
-          populatedGame
-        );
+
         return io.emit("gameUpdated", populatedGame);
       }
 
@@ -62,7 +67,6 @@ const winningSocket = (io, socket) => {
         });
       }
 
-      // Populate the game to ensure that player.user is available.
       const populatedGame = await Game.findById(gameId).populate(
         "seats.player.user",
         "username"
@@ -71,7 +75,6 @@ const winningSocket = (io, socket) => {
       const communityCards = populatedGame.communityCards.map(
         (card) => card.code[0].toUpperCase() + card.code.slice(1).toLowerCase()
       );
-      console.log("[winningSocket] Community Cards:", communityCards);
 
       const playersData = populatedGame.seats
         .filter((seat) => seat.player && seat.player.handCards.length)
@@ -86,8 +89,6 @@ const winningSocket = (io, socket) => {
           };
         });
 
-      console.log("[winningSocket] Players Data:", playersData);
-
       const hands = playersData.map((player) => {
         const fullHand = [...communityCards, ...player.handCards];
         const handSolved = Hand.solve(fullHand);
@@ -99,7 +100,6 @@ const winningSocket = (io, socket) => {
       });
 
       const winningHands = Hand.winners(hands.map((h) => h.hand));
-      console.log("[winningSocket] Winning Hands:", winningHands);
 
       const winnerData = winningHands.map((winner) => {
         const matchingSeat = hands.find(
@@ -114,11 +114,6 @@ const winningSocket = (io, socket) => {
           message: `${matchingSeat?.playerData.user.username} wins $${potShare} with ${winner.name}`,
         };
       });
-
-      console.log(
-        "[winningSocket] Final Winner Data before assignment:",
-        winnerData
-      );
 
       try {
         populatedGame.winnerData = winnerData;
@@ -141,9 +136,7 @@ const winningSocket = (io, socket) => {
         resetForNewRound(populatedGame);
 
         await populatedGame.save();
-        console.log(
-          "[winningSocket] Game saved successfully after determining winner."
-        );
+
         io.emit("gameUpdated", populatedGame);
       } catch (saveError) {
         console.error("Error saving game document:", saveError);
@@ -155,6 +148,8 @@ const winningSocket = (io, socket) => {
       socket.emit("winnerError", {
         message: "An error occurred while determining the winner.",
       });
+    } finally {
+      delete winnerLocks[gameId];
     }
   });
 };

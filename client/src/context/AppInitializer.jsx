@@ -1,33 +1,38 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { rehydrateUser } from "../features/auth/authenticationSlice";
+import { logout, rehydrateUser } from "../features/auth/authenticationSlice";
 import socketService from "../features/websockets/socketService";
 
 export default function AppInitializer({ children }) {
   const dispatch = useDispatch();
-  
-  const token = useSelector((state) => state.auth.token);
 
+  // const token = useSelector((state) => state.auth.token);
   useEffect(() => {
     socketService.connect();
 
     dispatch({ type: "websocket/listenToRoomEvents" });
 
-    const token = localStorage.getItem("authToken");
-    if (token) {
+    const localToken = localStorage.getItem("authToken");
+    if (localToken) {
       console.log("[AppInitializer] Auth token found, rehydrating user.");
       dispatch(rehydrateUser());
       dispatch({ type: "websocket/listenToUserEvents" });
     } else {
-      console.log("[AppInitializer] No auth token found, skipping rehydration.");
+      console.log(
+        "[AppInitializer] No auth token found, skipping rehydration."
+      );
+      dispatch(logout());
     }
 
     const socket = socketService.getSocket();
     if (socket) {
       const handleConnect = () => {
         dispatch({ type: "websocket/listenToRoomEvents" });
-        if (token) {
+        const localToken = localStorage.getItem("authToken");
+        if (localToken) {
           dispatch({ type: "websocket/listenToUserEvents" });
+        } else {
+          dispatch(logout());
         }
       };
 
@@ -39,7 +44,7 @@ export default function AppInitializer({ children }) {
         dispatch({ type: "websocket/stopListeningToUserEvents" });
       };
     }
-  }, [dispatch, token]);
+  }, [dispatch]);
 
   return children;
 }

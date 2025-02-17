@@ -22,7 +22,7 @@ export default function Room() {
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
   const [dealtStage, setDealtStage] = useState("");
 
-  // Boolean telling if use is in game
+  // Boolean telling if user is in game
   const isUserInGame = (user, roomId) =>
     !!(
       user &&
@@ -80,19 +80,16 @@ export default function Room() {
   };
 
   const handleDealFlop = useCallback(() => {
-    console.log("Emitting Deal Flop");
     if (!socket) return;
     socket.emit("dealFlop", { gameId: roomId });
   }, [socket, roomId]);
 
   const handleDealTurn = useCallback(() => {
-    console.log("Emitting Deal Turn");
     if (!socket) return;
     socket.emit("dealTurn", { gameId: roomId });
   }, [socket, roomId]);
 
   const handleDealRiver = useCallback(() => {
-    console.log("Emitting Deal River");
     if (!socket) return;
     socket.emit("dealRiver", { gameId: roomId });
   }, [socket, roomId]);
@@ -202,7 +199,6 @@ export default function Room() {
       ).length;
 
       if (playerCount < 2 && hasEmittedStart) {
-        console.log("Player count dropped below 2. Resetting hasEmittedStart.");
         setHasEmittedStart(false);
       }
     }
@@ -228,9 +224,6 @@ export default function Room() {
 
   useEffect(() => {
     if (currentGame && currentGame.stage === "surrender") {
-      console.log(
-        "[Room useEffect] Game stage is 'surrender', emitting getWinner."
-      );
       socket.emit("getWinner", { gameId: roomId });
       setHasEmittedStart(false);
     }
@@ -245,14 +238,7 @@ export default function Room() {
           seat.player.handCards &&
           seat.player.handCards.length > 0
       );
-      console.log(
-        "[Room useEffect] Active seats in showdown:",
-        activeSeats.length
-      );
       if (activeSeats.length > 1) {
-        console.log(
-          "[Room useEffect] More than one active seat remains. Emitting getWinner event."
-        );
         socket.emit("getWinner", { gameId: roomId });
         setHasEmittedStart(false);
       }
@@ -260,7 +246,6 @@ export default function Room() {
   }, [currentGame, roomId, socket]);
 
   //Starts new round after game ends
-
   useEffect(() => {
     if (currentGame && currentGame.stage === "end" && !hasEmittedStart) {
       const activeSeats = currentGame.seats.filter(
@@ -269,26 +254,14 @@ export default function Room() {
           seat.player.handCards &&
           seat.player.handCards.length > 0
       );
-      console.log(
-        "[Room useEffect] Active seats at 'end' stage:",
-        activeSeats.length
-      );
+
       if (activeSeats.length >= 2) {
         setHasEmittedStart(true);
-        console.log(
-          "[Room useEffect] Game stage 'end' with >=2 active players; scheduling new round."
-        );
-        // Wait 2 seconds for the winner toast to show, then emit updatePositionsAndBlinds...
+
         setTimeout(() => {
-          console.log(
-            "[Room useEffect] Emitting updatePositionsAndBlinds for new round."
-          );
           socket.emit("updatePositionsAndBlinds", { gameId: roomId });
-          // Then, after an additional 2 seconds, emit dealCardsToPlayers.
+
           setTimeout(() => {
-            console.log(
-              "[Room useEffect] Emitting dealCardsToPlayers for new round."
-            );
             socket.emit("dealCardsToPlayers", { gameId: roomId });
           }, 2000);
         }, 2000);
