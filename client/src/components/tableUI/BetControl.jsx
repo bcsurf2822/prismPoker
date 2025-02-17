@@ -7,7 +7,8 @@ export default function BetControl({
   handleFold,
   handleCheck,
   isCurrentPlayer,
-  highestBet
+  highestBet,
+  handleCall
 }) {
   const [betAmount, setBetAmount] = useState(0);
 
@@ -33,7 +34,7 @@ export default function BetControl({
         >
           Check
         </button>
-        <button disabled={!isCurrentPlayer} className="btn btn-success">
+        <button onClick={handleCall} disabled={!isCurrentPlayer} className="btn btn-success">
           Call ${highestBet}
         </button>
         <button
@@ -82,7 +83,9 @@ export default function BetControl({
 
 BetControl.propTypes = {
   handleBet: PropTypes.func.isRequired,
+  handleCall: PropTypes.func.isRequired,
   chips: PropTypes.number,
+  highestBet: PropTypes.number,
   handleCheck: PropTypes.func.isRequired,
   handleFold: PropTypes.func.isRequired,
   isCurrentPlayer: PropTypes.bool,
