@@ -14,4 +14,14 @@ const resetGame = (game) => {
   game.currentPlayerTurn = -1;
 };
 
-module.exports = resetGame;
+const resetForNewRound = (game) => {
+  game.pot = 0;
+  game.gameEnd = true;
+  game.gameRunning = false;
+  game.currentDeck = [];
+  game.highestBet = 0;
+  game.betPlaced = false;
+  game.stage = "end";
+};
+
+module.exports = { resetGame, resetForNewRound };

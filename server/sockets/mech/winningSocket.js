@@ -1,4 +1,5 @@
 const Game = require("../../models/games");
+const {resetForNewRound} = require("../../utils/gameHelpers");
 var Hand = require("pokersolver").Hand;
 
 function resetActionNone(game) {
@@ -48,13 +49,7 @@ const winningSocket = (io, socket) => {
           },
         ];
 
-        populatedGame.pot = 0;
-        populatedGame.gameEnd = true;
-        populatedGame.gameRunning = false;
-        populatedGame.currentDeck = [];
-        populatedGame.highestBet = 0;
-        populatedGame.betPlaced = false;
-        populatedGame.stage = "end";
+        resetForNewRound(populatedGame);
 
         await populatedGame.save();
         console.log(
@@ -143,13 +138,7 @@ const winningSocket = (io, socket) => {
           }
         });
 
-        game.pot = 0;
-        game.gameEnd = true;
-        game.gameRunning = false;
-        game.currentDeck = [];
-        game.highestBet = 0;
-        game.betPlaced = false;
-        game.stage = "end";
+        resetForNewRound(game);
 
         await game.save();
         console.log(

@@ -36,7 +36,6 @@ const gamesSlice = createSlice({
     loading: false,
     error: null,
     gameMessage: null,
-    successMessage: null,
     errorMessage: null,
   },
   reducers: {

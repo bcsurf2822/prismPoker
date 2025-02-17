@@ -1,6 +1,6 @@
 const User = require("../../models/users");
 const Game = require("../../models/games");
-const resetGame = require("../../utils/gameHelpers")
+const {resetGame} = require("../../utils/gameHelpers")
 
 const leaveGameSocket = (io, socket) => {
   socket.on("leaveGame", async (data) => {

@@ -63,9 +63,9 @@ export default function Room() {
 
   const playerChips = userSeatData && userSeatData.chips;
 
-  const playerAction = userSeatData && userSeatData.action
+  const playerAction = userSeatData && userSeatData.action;
 
-  const playerBetAmount = userSeatData && userSeatData.bet
+  const playerBetAmount = userSeatData && userSeatData.bet;
 
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
@@ -181,7 +181,11 @@ export default function Room() {
       toast.error(errorMessage);
       dispatch(clearMessages());
     }
-    if (currentGame && currentGame.winnerData && currentGame.winnerData.length > 0) {
+    if (
+      currentGame &&
+      currentGame.winnerData &&
+      currentGame.winnerData.length > 0
+    ) {
       currentGame.winnerData.forEach((winner) => {
         if (winner.message) {
           toast.success(winner.message);
@@ -224,7 +228,9 @@ export default function Room() {
 
   useEffect(() => {
     if (currentGame && currentGame.stage === "surrender") {
-      console.log("[Room useEffect] Game stage is 'surrender', emitting getWinner.");
+      console.log(
+        "[Room useEffect] Game stage is 'surrender', emitting getWinner."
+      );
       socket.emit("getWinner", { gameId: roomId });
     }
   }, [currentGame, roomId, socket]);
