@@ -17,6 +17,10 @@ export default function BetControl({
     setBetAmount(newBet);
   };
 
+  const sliderMin = highestBet > 0 ? 1 : 0;
+  // When raising, ensure the maximum additional amount doesn't exceed available chips.
+  const sliderMax = highestBet > 0 ? Math.max(chips - highestBet, 1) : chips;
+
   return (
     <div className="w-1/2 h-full flex flex-col gap-1">
       <div className=" flex justify-evenly">
@@ -55,8 +59,8 @@ export default function BetControl({
         <input
           disabled={!isCurrentPlayer}
           type="range"
-          min={0}
-          max={chips}
+          min={sliderMin}
+          max={sliderMax}
           value={betAmount}
           onChange={handleRangeChange}
           className="range range-primary"

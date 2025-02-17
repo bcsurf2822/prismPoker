@@ -1,12 +1,11 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { logout, rehydrateUser } from "../features/auth/authenticationSlice";
 import socketService from "../features/websockets/socketService";
 
 export default function AppInitializer({ children }) {
   const dispatch = useDispatch();
 
-  // const token = useSelector((state) => state.auth.token);
   useEffect(() => {
     socketService.connect();
 

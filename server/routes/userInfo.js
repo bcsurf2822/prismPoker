@@ -1,8 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/users");
 
-const {authenticateToken} = require("../middleware/authMiddleware")
-
+const { authenticateToken } = require("../middleware/authMiddleware");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {

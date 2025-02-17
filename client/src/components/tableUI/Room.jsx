@@ -101,12 +101,8 @@ export default function Room() {
   };
 
   const handleBet = (betAmount, action) => {
-    console.log(
-      "[handleBet] Called with betAmount:",
-      betAmount,
-      "and action:",
-      action
-    );
+    const effectiveBet = action === "raise" ? currentGame.highestBet + betAmount : betAmount;
+    console.log(`[handleBet] Called with betAmount: ${betAmount} and action: ${action}`);
     if (!socket) {
       console.error("[handleBet] Socket is not available.");
       return;
@@ -114,7 +110,7 @@ export default function Room() {
     socket.emit("bet", {
       gameId: roomId,
       seatId: userSeatData.seatId,
-      bet: betAmount,
+      bet: effectiveBet,
       action: action,
     });
     console.log("[handleBet] Emitted player_bet event.");
