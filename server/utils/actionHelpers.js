@@ -115,7 +115,6 @@ const proceedToNextStage = (game) => {
           break;
       }
     }
-    // Reset checkBetFold for all seats after each stage transition.
     resetPlayerActions(game);
   }
   game.highestBet = 0;

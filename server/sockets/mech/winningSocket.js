@@ -2,14 +2,6 @@ const Game = require("../../models/games");
 const { resetForNewRound } = require("../../utils/gameHelpers");
 var Hand = require("pokersolver").Hand;
 
-function resetActionNone(game) {
-  game.seats.forEach((seat) => {
-    if (seat.player) {
-      seat.player.action = "none";
-    }
-  });
-}
-
 const winningSocket = (io, socket) => {
   socket.on("getWinner", async (data) => {
     const { gameId } = data;
@@ -19,7 +11,7 @@ const winningSocket = (io, socket) => {
         return socket.emit("error", { message: "Game not found!" });
       }
 
-      // Surrender logic: if game.stage === "surrender"
+      // Surrender logic
       if (game.stage === "surrender") {
         const populatedGame = await Game.findById(gameId).populate(
           "seats.player.user",
@@ -59,7 +51,7 @@ const winningSocket = (io, socket) => {
         return io.emit("gameUpdated", populatedGame);
       }
 
-      // Normal showdown logic:
+      // Showdown logic:
       if (
         game.pot <= 0 ||
         game.stage !== "showdown" ||
@@ -70,12 +62,18 @@ const winningSocket = (io, socket) => {
         });
       }
 
-      const communityCards = game.communityCards.map(
+      // Populate the game to ensure that player.user is available.
+      const populatedGame = await Game.findById(gameId).populate(
+        "seats.player.user",
+        "username"
+      );
+
+      const communityCards = populatedGame.communityCards.map(
         (card) => card.code[0].toUpperCase() + card.code.slice(1).toLowerCase()
       );
       console.log("[winningSocket] Community Cards:", communityCards);
 
-      const playersData = game.seats
+      const playersData = populatedGame.seats
         .filter((seat) => seat.player && seat.player.handCards.length)
         .map((seat) => {
           return {
@@ -107,11 +105,13 @@ const winningSocket = (io, socket) => {
         const matchingSeat = hands.find(
           (h) => h.hand.toString() === winner.toString()
         );
+        const potShare = populatedGame.pot / winningHands.length;
         return {
           seatId: matchingSeat?.seatId,
-          user: matchingSeat?.playerData.username,
+          user: matchingSeat?.playerData.user.username,
           handName: winner.name,
-          potAmount: game.pot / winningHands.length,
+          potAmount: potShare,
+          message: `${matchingSeat?.playerData.user.username} wins $${potShare} with ${winner.name}`,
         };
       });
 
@@ -121,10 +121,10 @@ const winningSocket = (io, socket) => {
       );
 
       try {
-        game.winnerData = winnerData;
+        populatedGame.winnerData = winnerData;
 
-        game.winnerData.forEach((winner) => {
-          const winningSeat = game.seats.find(
+        populatedGame.winnerData.forEach((winner) => {
+          const winningSeat = populatedGame.seats.find(
             (seat) => seat._id.toString() === winner.seatId
           );
           if (winningSeat && winningSeat.player) {
@@ -132,30 +132,24 @@ const winningSocket = (io, socket) => {
           }
         });
 
-        game.seats.forEach((seat) => {
+        populatedGame.seats.forEach((seat) => {
           if (seat.player) {
             seat.player.handCards = [];
           }
         });
 
-        resetForNewRound(game);
+        resetForNewRound(populatedGame);
 
-        await game.save();
+        await populatedGame.save();
         console.log(
           "[winningSocket] Game saved successfully after determining winner."
         );
-        const updatedGame = await Game.findById(gameId).populate(
-          "seats.player.user",
-          "username"
-        );
-        io.emit("gameUpdated", updatedGame);
+        io.emit("gameUpdated", populatedGame);
       } catch (saveError) {
         console.error("Error saving game document:", saveError);
         socket.emit("winnerError", { message: "Failed to save game state." });
         return;
       }
-
-      resetActionNone(game);
     } catch (error) {
       console.error("Error determining winner:", error);
       socket.emit("winnerError", {

@@ -232,25 +232,69 @@ export default function Room() {
         "[Room useEffect] Game stage is 'surrender', emitting getWinner."
       );
       socket.emit("getWinner", { gameId: roomId });
+      setHasEmittedStart(false);
     }
   }, [currentGame, roomId, socket]);
 
   // Checks winner at showdown
   useEffect(() => {
     if (currentGame && currentGame.stage === "showdown") {
-      // Check that every seat with a player has acted (i.e. action !== "none")
-      const allPlayersActed = currentGame.seats.every((seat) => {
-        // If there's no player, we ignore the seat.
-        if (!seat.player) return true;
-        return seat.player.action !== "none";
-      });
-      console.log("[Room useEffect] Showdown stage: all players acted:", allPlayersActed);
-      if (allPlayersActed) {
+      const activeSeats = currentGame.seats.filter(
+        (seat) =>
+          seat.player &&
+          seat.player.handCards &&
+          seat.player.handCards.length > 0
+      );
+      console.log(
+        "[Room useEffect] Active seats in showdown:",
+        activeSeats.length
+      );
+      if (activeSeats.length > 1) {
+        console.log(
+          "[Room useEffect] More than one active seat remains. Emitting getWinner event."
+        );
         socket.emit("getWinner", { gameId: roomId });
-        console.log("[Room useEffect] Emitted getWinner event for game", roomId);
+        setHasEmittedStart(false);
       }
     }
   }, [currentGame, roomId, socket]);
+
+  //Starts new round after game ends
+
+  useEffect(() => {
+    if (currentGame && currentGame.stage === "end" && !hasEmittedStart) {
+      const activeSeats = currentGame.seats.filter(
+        (seat) =>
+          seat.player &&
+          seat.player.handCards &&
+          seat.player.handCards.length > 0
+      );
+      console.log(
+        "[Room useEffect] Active seats at 'end' stage:",
+        activeSeats.length
+      );
+      if (activeSeats.length >= 2) {
+        setHasEmittedStart(true);
+        console.log(
+          "[Room useEffect] Game stage 'end' with >=2 active players; scheduling new round."
+        );
+        // Wait 2 seconds for the winner toast to show, then emit updatePositionsAndBlinds...
+        setTimeout(() => {
+          console.log(
+            "[Room useEffect] Emitting updatePositionsAndBlinds for new round."
+          );
+          socket.emit("updatePositionsAndBlinds", { gameId: roomId });
+          // Then, after an additional 2 seconds, emit dealCardsToPlayers.
+          setTimeout(() => {
+            console.log(
+              "[Room useEffect] Emitting dealCardsToPlayers for new round."
+            );
+            socket.emit("dealCardsToPlayers", { gameId: roomId });
+          }, 2000);
+        }, 2000);
+      }
+    }
+  }, [currentGame, roomId, socket, hasEmittedStart]);
 
   // Deals Flop Turn River
   useEffect(() => {
