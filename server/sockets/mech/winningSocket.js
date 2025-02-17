@@ -20,10 +20,12 @@ const winningSocket = (io, socket) => {
 
       // Surrender logic: if game.stage === "surrender"
       if (game.stage === "surrender") {
-        console.log(
-          "[winningSocket] Game stage is 'surrender'. Applying surrender logic."
+
+        const populatedGame = await Game.findById(gameId).populate(
+          "seats.player.user",
+          "username"
         );
-        const activeSeats = game.seats.filter(
+        const activeSeats = populatedGame.seats.filter(
           (seat) => seat.player && seat.player.handCards.length > 0
         );
         if (activeSeats.length !== 1) {
@@ -32,16 +34,13 @@ const winningSocket = (io, socket) => {
           });
         }
         const lastActive = activeSeats[0];
-        const potAmount = game.pot;
-        // Assuming the user is populated on the player object.
+        const potAmount = populatedGame.pot;
         const username = lastActive.player.user.username;
         const message = `${username} wins $${potAmount} by surrender`;
-
-        // Award the pot to the last active player.
         lastActive.player.chips += potAmount;
 
-        // Populate winnerData with the surrender win.
-        game.winnerData = [
+     
+        populatedGame.winnerData = [
           {
             seatId: lastActive._id.toString(),
             user: username,
@@ -51,24 +50,20 @@ const winningSocket = (io, socket) => {
           },
         ];
 
-        game.pot = 0;
-        game.gameEnd = true;
-        game.gameRunning = false;
-        game.currentDeck = [];
-        game.highestBet = 0;
-        game.betPlaced = false;
-        game.stage = "end";
+        populatedGame.pot = 0;
+        populatedGame.gameEnd = true;
+        populatedGame.gameRunning = false;
+        populatedGame.currentDeck = [];
+        populatedGame.highestBet = 0;
+        populatedGame.betPlaced = false;
+        populatedGame.stage = "end";
 
-        await game.save();
-        const updatedGame = await Game.findById(gameId).populate(
-          "seats.player.user",
-          "username"
-        );
+        await populatedGame.save();
         console.log(
           "[winningSocket] Surrender logic complete. Emitting gameUpdated:",
-          updatedGame
+          populatedGame
         );
-        return io.emit("gameUpdated", updatedGame);
+        return io.emit("gameUpdated", populatedGame);
       }
 
       // Normal showdown logic:

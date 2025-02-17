@@ -213,6 +213,15 @@ export default function Room() {
     }
   }, [currentGame, socket, roomId, hasEmittedStart]);
 
+  //Checks winner in case of surrender
+
+  useEffect(() => {
+    if (currentGame && currentGame.stage === "surrender") {
+      console.log("[Room useEffect] Game stage is 'surrender', emitting getWinner.");
+      socket.emit("getWinner", { gameId: roomId });
+    }
+  }, [currentGame, roomId, socket]);
+
   // Deals Flop Turn River
   useEffect(() => {
     if (!currentGame) return;
