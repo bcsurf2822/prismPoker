@@ -20,7 +20,6 @@ const winningSocket = (io, socket) => {
 
       // Surrender logic: if game.stage === "surrender"
       if (game.stage === "surrender") {
-
         const populatedGame = await Game.findById(gameId).populate(
           "seats.player.user",
           "username"
@@ -39,7 +38,6 @@ const winningSocket = (io, socket) => {
         const message = `${username} wins $${potAmount} by surrender`;
         lastActive.player.chips += potAmount;
 
-     
         populatedGame.winnerData = [
           {
             seatId: lastActive._id.toString(),

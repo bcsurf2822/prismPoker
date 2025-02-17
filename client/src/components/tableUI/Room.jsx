@@ -181,7 +181,14 @@ export default function Room() {
       toast.error(errorMessage);
       dispatch(clearMessages());
     }
-  }, [dispatch, successMessage, errorMessage]);
+    if (currentGame && currentGame.winnerData && currentGame.winnerData.length > 0) {
+      currentGame.winnerData.forEach((winner) => {
+        if (winner.message) {
+          toast.success(winner.message);
+        }
+      });
+    }
+  }, [dispatch, successMessage, errorMessage, currentGame]);
 
   // just tracking local state of room we will remove (ITHINK)
   useEffect(() => {

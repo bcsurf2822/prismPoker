@@ -35,6 +35,7 @@ const gamesSlice = createSlice({
     currentGame: null,
     loading: false,
     error: null,
+    gameMessage: null,
     successMessage: null,
     errorMessage: null,
   },
