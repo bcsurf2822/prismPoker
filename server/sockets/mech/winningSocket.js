@@ -33,6 +33,7 @@ const winningSocket = (io, socket) => {
             message: "Unexpected number of active players for surrender",
           });
         }
+
         const lastActive = activeSeats[0];
         const potAmount = populatedGame.pot;
         const username = lastActive.player.user.username;
@@ -49,10 +50,20 @@ const winningSocket = (io, socket) => {
           },
         ];
 
+        // Remove handCards from all seats to clear out any remaining cards
+        populatedGame.seats.forEach((seat) => {
+          if (seat.player) {
+            seat.player.handCards = [];
+          }
+        });
+
         resetForNewRound(populatedGame);
 
         await populatedGame.save();
-
+        console.log(
+          "[winningSocket] Surrender logic complete. Emitting gameUpdated:",
+          populatedGame
+        );
         return io.emit("gameUpdated", populatedGame);
       }
 

@@ -66,7 +66,6 @@ const findNextPosition = (startPosition, seats) => {
   let iterations = 0;
 
   while (!seats[nextPosition].player) {
-
     nextPosition = (nextPosition + 1) % seatCount;
     iterations++;
     if (iterations > seatCount) {
@@ -106,10 +105,23 @@ const proceedToNextStage = (game) => {
   game.highestBet = 0;
 };
 
+
+const findNextActivePlayer = (game, startingPosition) => {
+  let nextPosition = startingPosition % game.seats.length;
+  while (
+    game.seats[nextPosition].player == null ||
+    game.seats[nextPosition].player.handCards.length === 0
+  ) {
+    nextPosition = (nextPosition + 1) % game.seats.length;
+  }
+  return nextPosition;
+};
+
 module.exports = {
   playersHaveActed,
   resetPlayerActions,
   playersWithCards,
   findNextPosition,
   proceedToNextStage,
+  findNextActivePlayer,
 };
