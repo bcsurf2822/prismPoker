@@ -31,19 +31,29 @@ const playerBetSocket = (io, socket) => {
         isNaN(betAmount) ||
         (seat.player.chips < betAmount && action !== "all-in")
       ) {
-        console.error("[playerBetSocket] Invalid bet or not enough chips:", betAmount);
-        return socket.emit("playerBetError", { message: "Invalid Bet or Not Enough Chips" });
+        console.error(
+          "[playerBetSocket] Invalid bet or not enough chips:",
+          betAmount
+        );
+        return socket.emit("playerBetError", {
+          message: "Invalid Bet or Not Enough Chips",
+        });
       }
 
       // For all-in, override betAmount to player's total chips
       if (action === "all-in" || betAmount === seat.player.chips) {
         betAmount = seat.player.chips;
+        game.highestBet = betAmount;
       }
 
       // Standard bet or raise handling
       if (action === "bet" || action === "raise") {
         if (action === "raise" && betAmount <= game.highestBet) {
-          console.error("[playerBetSocket] Raise must be higher than the current highest bet:", betAmount, game.highestBet);
+          console.error(
+            "[playerBetSocket] Raise must be higher than the current highest bet:",
+            betAmount,
+            game.highestBet
+          );
           return socket.emit("playerBetError", {
             message: "Raise must be higher than the current highest bet",
           });
@@ -68,10 +78,12 @@ const playerBetSocket = (io, socket) => {
       // Special all-in case: if the action is "all-in" and only one player remains with chips > 0, force showdown.
       if (action === "all-in") {
         const activePlayers = game.seats.filter(
-          (s) => s.player && s.player.chips > 0
+          (s) => s.player && s.player.chips > 0 && s.player.action === "call"
         );
         if (activePlayers.length === 1) {
-          console.log("[playerBetSocket] Only one player has chips left. Forcing showdown.");
+          console.log(
+            "[playerBetSocket] Only one player has chips left. Forcing showdown."
+          );
           game.stage = "defaultShowdown";
         }
       }
