@@ -115,10 +115,6 @@ const GameSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  gameEnd: {
-    type: Boolean,
-    default: true,
-  },
   currentDeck: {
     type: [CardSchema],
     default: [],

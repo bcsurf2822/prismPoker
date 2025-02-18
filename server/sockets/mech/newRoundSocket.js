@@ -25,17 +25,14 @@ const positionsAndBlindsSocket = (io, socket) => {
         return game;
       }
 
-      // Ensure there is a deck; if not, fetch a new one
       if (game.currentDeck.length === 0) {
         game.currentDeck = await fetchNewDeck();
       }
 
-      // Set up the game for a new round
       game.gameRunning = true;
       game.winnerData = [];
       game.stage = "preflop";
 
-      // Determine positions using our helper function
       game.dealerPosition = findNextPosition(game.dealerPosition, game.seats);
       game.smallBlindPosition = findNextPosition(
         game.dealerPosition,
@@ -50,7 +47,6 @@ const positionsAndBlindsSocket = (io, socket) => {
         game.seats
       );
 
-      // Deduct blinds and update the pot
       const [smallBlindAmount, bigBlindAmount] = game.blinds
         .split("/")
         .map(Number);
@@ -65,10 +61,8 @@ const positionsAndBlindsSocket = (io, socket) => {
 
       game.gameEnd = false;
 
-      // Save updated game state
       await game.save();
 
-      // Re-fetch the game with populated user data
       const updatedGame = await Game.findById(gameId).populate(
         "seats.player.user",
         "username"
@@ -78,11 +72,7 @@ const positionsAndBlindsSocket = (io, socket) => {
       console.error(`Error starting new round for game ${gameId}:`, error);
       socket.emit("gameError", error.message);
     } finally {
-      // Release the lock so subsequent calls can proceed
       delete updateLocks[gameId];
-      console.log(
-        `[updatePositionsAndBlinds] Released lock for game ${gameId}`
-      );
     }
   });
 };

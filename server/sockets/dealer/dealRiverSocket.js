@@ -1,5 +1,5 @@
 const Game = require("../../models/games");
-const { findNextActivePlayer } = require("../../utils/dealHelpers");
+const { findNextActivePlayer } = require("../../utils/actionHelpers");
 
 const dealLocks = {};
 

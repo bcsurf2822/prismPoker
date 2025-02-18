@@ -50,20 +50,10 @@ const winningSocket = (io, socket) => {
           },
         ];
 
-        // Remove handCards from all seats to clear out any remaining cards
-        populatedGame.seats.forEach((seat) => {
-          if (seat.player) {
-            seat.player.handCards = [];
-          }
-        });
-
         resetForNewRound(populatedGame);
 
         await populatedGame.save();
-        console.log(
-          "[winningSocket] Surrender logic complete. Emitting gameUpdated:",
-          populatedGame
-        );
+
         return io.emit("gameUpdated", populatedGame);
       }
 
