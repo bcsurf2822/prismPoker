@@ -75,21 +75,6 @@ const playerBetSocket = (io, socket) => {
       seat.player.action = action;
       seat.player.checkBetFold = true;
 
-      // Special all-in case: if the action is "all-in" and only one player remains with chips > 0, force showdown.
-      if (action === "all-in") {
-        const activePlayers = game.seats.filter(
-          (s) => s.player && s.player.chips > 0 && s.player.action === "call"
-        );
-        if (activePlayers.length === 1) {
-          console.log(
-            "[playerBetSocket] Only one player has chips left. Forcing showdown."
-          );
-          game.stage = "defaultShowdown";
-        }
-      }
-
-      console.log("[playerBetSocket] Updated bet for seat:", seat);
-
       await game.save();
 
       // Check if all players have acted.
