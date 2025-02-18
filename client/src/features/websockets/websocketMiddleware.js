@@ -1,8 +1,4 @@
-import {
-
-  rehydrateUser,
-  updateUser,
-} from "../auth/authenticationSlice";
+import { rehydrateUser, updateUser } from "../auth/authenticationSlice";
 import { updateGame } from "../games/gamesSlice";
 import SocketService from "./socketService";
 import { normalizeUser } from "../../utils/normailizeUser";

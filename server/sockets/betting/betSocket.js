@@ -31,48 +31,50 @@ const playerBetSocket = (io, socket) => {
         isNaN(betAmount) ||
         (seat.player.chips < betAmount && action !== "all-in")
       ) {
-        console.error(
-          "[playerBetSocket] Invalid bet or not enough chips:",
-          betAmount
-        );
-        return socket.emit("playerBetError", {
-          message: "Invalid Bet or Not Enough Chips",
-        });
+        console.error("[playerBetSocket] Invalid bet or not enough chips:", betAmount);
+        return socket.emit("playerBetError", { message: "Invalid Bet or Not Enough Chips" });
       }
 
-      // Handle bet, raise, and all-in actions.
-      if (action === "all-in") {
-        betAmount = bet;
+      // For all-in, override betAmount to player's total chips
+      if (action === "all-in" || betAmount === seat.player.chips) {
+        betAmount = seat.player.chips;
       }
+
+      // Standard bet or raise handling
       if (action === "bet" || action === "raise") {
         if (action === "raise" && betAmount <= game.highestBet) {
-          console.error(
-            "[playerBetSocket] Raise must be higher than the current highest bet:",
-            betAmount,
-            game.highestBet
-          );
+          console.error("[playerBetSocket] Raise must be higher than the current highest bet:", betAmount, game.highestBet);
           return socket.emit("playerBetError", {
             message: "Raise must be higher than the current highest bet",
           });
         }
-        console.log(
-          `[playerBetSocket] Handling ${action} action, betAmount: ${betAmount}`
-        );
         game.highestBet = betAmount;
-        // Reset checkBetFold for all other players.
+        // Reset checkBetFold and action for all other players.
         game.seats.forEach((s) => {
           if (s.player && s._id.toString() !== seatId) {
             s.player.checkBetFold = false;
+            s.player.action = "none";
           }
         });
       }
 
-      // Update the player and game state with the bet.
+      // Update player's state with the bet.
       seat.player.chips -= betAmount;
       game.pot += betAmount;
       seat.player.bet += betAmount;
       seat.player.action = action;
       seat.player.checkBetFold = true;
+
+      // Special all-in case: if the action is "all-in" and only one player remains with chips > 0, force showdown.
+      if (action === "all-in") {
+        const activePlayers = game.seats.filter(
+          (s) => s.player && s.player.chips > 0
+        );
+        if (activePlayers.length === 1) {
+          console.log("[playerBetSocket] Only one player has chips left. Forcing showdown.");
+          game.stage = "defaultShowdown";
+        }
+      }
 
       console.log("[playerBetSocket] Updated bet for seat:", seat);
 

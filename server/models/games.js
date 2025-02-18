@@ -108,7 +108,16 @@ const GameSchema = new Schema({
   },
   stage: {
     type: String,
-    enum: ["preflop", "flop", "turn", "river", "surrender", "showdown", "end"],
+    enum: [
+      "preflop",
+      "flop",
+      "turn",
+      "river",
+      "surrender",
+      "defaultShowdown",
+      "showdown",
+      "end",
+    ],
     default: "preflop",
   },
   gameRunning: {
@@ -141,7 +150,10 @@ const GameSchema = new Schema({
   },
   seats: {
     type: [SeatSchema],
-    default: Array.from({ length: 6 }, (_, i) => ({ seatNumber: i, player: null })),
+    default: Array.from({ length: 6 }, (_, i) => ({
+      seatNumber: i,
+      player: null,
+    })),
   },
 });
 

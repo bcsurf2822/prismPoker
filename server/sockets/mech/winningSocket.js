@@ -128,12 +128,6 @@ const winningSocket = (io, socket) => {
           }
         });
 
-        populatedGame.seats.forEach((seat) => {
-          if (seat.player) {
-            seat.player.handCards = [];
-          }
-        });
-
         resetForNewRound(populatedGame);
 
         await populatedGame.save();

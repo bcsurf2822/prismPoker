@@ -17,9 +17,9 @@ export default function BetControl({
     setBetAmount(newBet);
   };
 
-  const sliderMin = highestBet > 0 ? 1 : 0;
+  const sliderMin = 1;
   // When raising, ensure the maximum additional amount doesn't exceed available chips.
-  const sliderMax = highestBet > 0 ? Math.max(chips - highestBet, 1) : chips;
+  const sliderMax = chips;
 
   return (
     <div className="w-1/2 h-full flex flex-col gap-1">
@@ -32,6 +32,13 @@ export default function BetControl({
           {highestBet > 0
             ? `Raise $${highestBet + betAmount}`
             : `Bet $${betAmount}`}
+        </button>
+        <button
+          disabled={!isCurrentPlayer}
+          className="btn btn-info"
+          onClick={() => handleBet(chips, "all-in")}
+        >
+  All in $ {chips}
         </button>
         <button
           disabled={!isCurrentPlayer}
@@ -69,7 +76,7 @@ export default function BetControl({
           disabled={!isCurrentPlayer}
           type="text"
           value={betAmount}
-          readOnly
+          onChange={handleRangeChange}
           className="w-7 border border-green-600 text-center"
         />
       </div>
