@@ -18,8 +18,7 @@ const dealFlopSocket = (io, socket) => {
       const game = await Game.findById(gameId);
 
       if (
-        game.stage !== "flop" ||
-        game.stage !== "defaultShowdown" ||
+        (game.stage !== "flop" && game.stage !== "defaultShowdown") ||
         game.communityCards.length > 0
       ) {
         return socket.emit("dealFlopError", {

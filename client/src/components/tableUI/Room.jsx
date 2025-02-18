@@ -300,6 +300,37 @@ export default function Room() {
     handleDealRiver,
   ]);
 
+  //Default Showdown case
+  useEffect(() => {
+    if (currentGame && currentGame.stage === "defaultShowdown") {
+      const communityCount = currentGame.communityCards.length;
+      console.log("[Room useEffect] Stage 'defaultShowdown' with communityCards.length:", communityCount);
+      
+      if (communityCount === 0) {
+        // If no community cards yet, deal flop, then turn, then river.
+        console.log("[Room useEffect] No community cards. Emitting handleDealFlop, then turn, then river.");
+        handleDealFlop();
+        setTimeout(() => {
+          handleDealTurn();
+          setTimeout(() => {
+            handleDealRiver();
+          }, 2000);
+        }, 2000);
+      } else if (communityCount === 3) {
+        // If exactly 3 community cards, deal turn then river.
+        console.log("[Room useEffect] 3 community cards. Emitting handleDealTurn, then river.");
+        handleDealTurn();
+        setTimeout(() => {
+          handleDealRiver();
+        }, 2000);
+      } else if (communityCount === 4) {
+        // If 4 community cards, only deal river.
+        console.log("[Room useEffect] 4 community cards. Emitting handleDealRiver.");
+        handleDealRiver();
+      }
+    }
+  }, [currentGame, handleDealFlop, handleDealTurn, handleDealRiver]);
+
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
