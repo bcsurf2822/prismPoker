@@ -1,18 +1,9 @@
 const Game = require("../../models/games");
 const axios = require("axios");
+const {resetPlayerActions, findNextPosition} = require("../../utils/actionHelpers")
 
 // interesting topic about concurrent calls from seperarte browsers
 const updateLocks = {};
-
-const findNextPosition = (startPosition, seats) => {
-  const seatCount = seats.length;
-  let nextPosition = (startPosition + 1) % seatCount;
-
-  while (!seats[nextPosition].player) {
-    nextPosition = (nextPosition + 1) % seatCount;
-  }
-  return nextPosition;
-};
 
 const cardCode = (code) => code.replace("0", "10");
 
@@ -27,14 +18,6 @@ const fetchNewDeck = async () => {
   }));
 };
 
-const resetActionNone = (game) => {
-  game.seats.forEach((seat) => {
-    if (seat.player) {
-      seat.player.action = "none";
-    }
-  });
-};
-
 const updatePositionsAndBlinds = async (gameId) => {
   if (updateLocks[gameId]) {
     return await Game.findById(gameId);
@@ -43,7 +26,7 @@ const updatePositionsAndBlinds = async (gameId) => {
   try {
     const game = await Game.findById(gameId);
 
-    resetActionNone(game);
+    resetPlayerActions(game);
 
     if (!game) {
       throw new Error(`Game with ID: ${gameId} not found!`);
@@ -59,7 +42,6 @@ const updatePositionsAndBlinds = async (gameId) => {
 
     game.gameRunning = true;
     game.winnerData = [];
-    game.communityCards = [];
     game.stage = "preflop";
 
     game.dealerPosition = findNextPosition(game.dealerPosition, game.seats);
@@ -77,11 +59,6 @@ const updatePositionsAndBlinds = async (gameId) => {
       .split("/")
       .map(Number);
 
-    game.seats.forEach((seat) => {
-      if (seat.player) {
-        seat.player.checkBetFold = false;
-      }
-    });
 
     if (game.seats[game.smallBlindPosition].player) {
       game.seats[game.smallBlindPosition].player.chips -= smallBlindAmount;

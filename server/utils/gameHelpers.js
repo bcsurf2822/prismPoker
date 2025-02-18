@@ -19,6 +19,8 @@ const resetForNewRound = (game) => {
   game.gameEnd = true;
   game.gameRunning = false;
   game.currentDeck = [];
+  game.dealtCards = [];
+  game.communityCards = []
   game.highestBet = 0;
   game.betPlaced = false;
   game.stage = "end";

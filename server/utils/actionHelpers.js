@@ -61,25 +61,12 @@ const playersWithCards = (game) => {
 
 const findNextPosition = (startPosition, seats) => {
   const seatCount = seats.length;
-  console.log(
-    "[findNextPosition] startPosition:",
-    startPosition,
-    "seatCount:",
-    seatCount
-  );
 
   let nextPosition = (startPosition + 1) % seatCount;
   let iterations = 0;
 
   while (!seats[nextPosition].player) {
-    console.log(
-      "[findNextPosition] Iteration",
-      iterations,
-      "at position",
-      nextPosition,
-      "seat:",
-      seats[nextPosition]
-    );
+
     nextPosition = (nextPosition + 1) % seatCount;
     iterations++;
     if (iterations > seatCount) {
@@ -91,7 +78,6 @@ const findNextPosition = (startPosition, seats) => {
       break;
     }
   }
-  console.log("[findNextPosition] Returning nextPosition:", nextPosition);
   return nextPosition;
 };
 
