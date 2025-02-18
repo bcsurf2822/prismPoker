@@ -15,7 +15,11 @@ const dealTurnSocket = (io, socket) => {
     try {
       const game = await Game.findById(gameId);
 
-      if (game.stage !== "turn" || game.communityCards.length > 3) {
+      if (
+        game.stage !== "turn" ||
+        game.stage !== "defaultShowdown" ||
+        game.communityCards.length > 3
+      ) {
         return socket.emit("dealTurnError", {
           message: "Conditions not met to deal the turn!",
         });

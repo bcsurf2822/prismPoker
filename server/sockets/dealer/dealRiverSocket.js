@@ -16,7 +16,11 @@ const dealRiverSocket = (io, socket) => {
     try {
       const game = await Game.findById(gameId);
 
-      if (game.stage !== "river" || game.communityCards.length > 4) {
+      if (
+        game.stage !== "river" ||
+        game.stage !== "defaultShowdown" ||
+        game.communityCards.length > 4
+      ) {
         return socket.emit("dealRiverError", {
           message: "Conditions not met to deal the river!",
         });
