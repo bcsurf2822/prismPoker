@@ -9,6 +9,7 @@ export default function BetControl({
   isCurrentPlayer,
   highestBet,
   handleCall,
+  hasCards,
 }) {
   const [betAmount, setBetAmount] = useState(0);
 
@@ -23,39 +24,50 @@ export default function BetControl({
 
   return (
     <div className="w-1/2 h-full flex flex-col gap-1">
-      <div className=" flex justify-evenly">
+      <div className=" flex justify-evenly items-center">
+        <div className="flex flex-col gap-1">
+          <button
+            disabled={!isCurrentPlayer || !hasCards}
+            className="btn btn-info"
+            onClick={() =>
+              handleBet(betAmount, highestBet > 0 ? "raise" : "bet")
+            }
+          >
+            {highestBet > 0
+              ? `Raise $${highestBet + betAmount}`
+              : `Bet $${betAmount}`}
+          </button>
+          <button
+            disabled={!isCurrentPlayer || !hasCards}
+            className="btn btn-info"
+            onClick={() => handleBet(chips, "all-in")}
+          >
+            All in $ {chips}
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          {" "}
+          <button
+            onClick={handleCall}
+            disabled={!isCurrentPlayer || !hasCards || highestBet <= 0}
+            className="btn btn-success"
+          >
+            {!isCurrentPlayer || highestBet <= 0
+              ? "Call"
+              : `Call $${highestBet}`}
+          </button>{" "}
+          <button
+            disabled={!isCurrentPlayer || !hasCards}
+            onClick={handleCheck}
+            className="btn btn-success"
+          >
+            Check
+          </button>
+        </div>
+
         <button
-          disabled={!isCurrentPlayer}
-          className="btn btn-info"
-          onClick={() => handleBet(betAmount, highestBet > 0 ? "raise" : "bet")}
-        >
-          {highestBet > 0
-            ? `Raise $${highestBet + betAmount}`
-            : `Bet $${betAmount}`}
-        </button>
-        <button
-          disabled={!isCurrentPlayer}
-          className="btn btn-info"
-          onClick={() => handleBet(chips, "all-in")}
-        >
-  All in $ {chips}
-        </button>
-        <button
-          disabled={!isCurrentPlayer}
-          onClick={handleCheck}
-          className="btn btn-success"
-        >
-          Check
-        </button>
-        <button
-          onClick={handleCall}
-          disabled={!isCurrentPlayer || highestBet <= 0}
-          className="btn btn-success"
-        >
-          {!isCurrentPlayer || highestBet <= 0 ? "Call" : `Call $${highestBet}`}
-        </button>
-        <button
-          disabled={!isCurrentPlayer}
+          disabled={!isCurrentPlayer || !hasCards}
           onClick={handleFold}
           className="btn btn-error"
         >
@@ -64,7 +76,7 @@ export default function BetControl({
       </div>
       <div className="flex gap-1">
         <input
-          disabled={!isCurrentPlayer}
+          disabled={!isCurrentPlayer || !hasCards}
           type="range"
           min={sliderMin}
           max={sliderMax}
@@ -73,7 +85,7 @@ export default function BetControl({
           className="range range-primary"
         />
         <input
-          disabled={!isCurrentPlayer}
+          disabled={!isCurrentPlayer || !hasCards}
           type="text"
           value={betAmount}
           onChange={handleRangeChange}

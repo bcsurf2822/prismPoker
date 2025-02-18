@@ -51,6 +51,7 @@ export default function Room() {
           seatNumber: seat.seatNumber,
           action: seat.player.action,
           bet: seat.player.bet,
+          handCards: seat.player.handCards
         }
       : null;
   };
@@ -66,7 +67,10 @@ export default function Room() {
   const playerAction = userSeatData && userSeatData.action;
 
   const playerBetAmount = userSeatData && userSeatData.bet;
+  
 
+  const playerCards = userSeatData ? (userSeatData.handCards || []) : [];
+console.log("Player Cards: ", playerCards)
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
@@ -450,6 +454,7 @@ export default function Room() {
           handleCall={handleCall}
           chips={playerChips}
           highestBet={currentGame.highestBet}
+          hasCards={playerCards.length > 0}
         />
       </section>
     </main>
