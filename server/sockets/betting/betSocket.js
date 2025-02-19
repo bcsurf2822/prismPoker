@@ -7,7 +7,7 @@ const {
 
 const betSocket = (io, socket) => {
   socket.on("bet", async (data) => {
-    const { gameId, seatId, bet, action } = data;
+    const { gameId, seatId, bet, action } = data; // action should be "bet"
     let betAmount = Number(bet);
     try {
       const game = await Game.findById(gameId);

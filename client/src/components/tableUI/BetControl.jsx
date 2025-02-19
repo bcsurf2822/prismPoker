@@ -3,6 +3,8 @@ import { useState } from "react";
 
 export default function BetControl({
   handleBet,
+  handleRaise,
+  handleAllIn,
   chips,
   handleFold,
   handleCheck,
@@ -19,7 +21,6 @@ export default function BetControl({
   };
 
   const sliderMin = 1;
-  // When raising, ensure the maximum additional amount doesn't exceed available chips.
   const sliderMax = chips;
 
   return (
@@ -113,6 +114,8 @@ export default function BetControl({
 BetControl.propTypes = {
   handleBet: PropTypes.func.isRequired,
   handleCall: PropTypes.func.isRequired,
+  handleRaise: PropTypes.func.isRequired,
+  handleAllIn: PropTypes.func.isRequired,
   chips: PropTypes.number,
   highestBet: PropTypes.number,
   handleCheck: PropTypes.func.isRequired,

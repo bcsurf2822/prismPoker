@@ -103,12 +103,8 @@ export default function Room() {
     socket.emit("leaveGame", { gameId: roomId, userId });
   };
 
-  const handleBet = (betAmount, action) => {
-    const effectiveBet =
-      action === "raise" ? currentGame.highestBet + betAmount : betAmount;
-    console.log(
-      `[handleBet] Called with betAmount: ${betAmount} and action: ${action}`
-    );
+  const handleBet = (betAmount) => {
+    console.log(`[handleBet] Called with betAmount: ${betAmount}`);
     if (!socket) {
       console.error("[handleBet] Socket is not available.");
       return;
@@ -116,10 +112,44 @@ export default function Room() {
     socket.emit("bet", {
       gameId: roomId,
       seatId: userSeatData.seatId,
-      bet: effectiveBet,
-      action: action,
+      bet: betAmount,
+      action: "bet",
     });
-    console.log("[handleBet] Emitted player_bet event.");
+    console.log("[handleBet] Emitted bet event.");
+  };
+
+  const handleRaise = (betAmount) => {
+    const effectiveBet = currentGame.highestBet + betAmount;
+    console.log(
+      `[handleRaise] Called with additional betAmount: ${betAmount}, effective raise: ${effectiveBet}`
+    );
+    if (!socket) {
+      console.error("[handleRaise] Socket is not available.");
+      return;
+    }
+    socket.emit("raise", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      bet: effectiveBet,
+      action: "raise",
+    });
+    console.log("[handleRaise] Emitted raise event.");
+  };
+
+  const handleAllIn = () => {
+    const allInBet = userSeatData.chips; // the player's total chips
+    console.log(
+      `[handleAllIn] Called for seat ${userSeatData.seatId} with allInBet: ${allInBet}`
+    );
+    if (!socket) {
+      console.error("[handleAllIn] Socket is not available.");
+      return;
+    }
+    socket.emit("allIn", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+    });
+    console.log("[handleAllIn] Emitted allIn event.");
   };
 
   const handleCall = () => {
@@ -437,6 +467,8 @@ export default function Room() {
           handleCheck={handleCheck}
           handleFold={handleFold}
           handleCall={handleCall}
+          handleAllIn={handleAllIn}
+          handleRaise={handleRaise}
           chips={playerChips}
           highestBet={currentGame.highestBet}
           hasCards={playerCards.length > 0}
