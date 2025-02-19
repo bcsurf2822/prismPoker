@@ -50,13 +50,23 @@ export const testGame = {
       },
     },
     // Remaining seats empty
-    { _id: "seat2", seatNumber: 2, player: null },
+    {
+      _id: "seat2",
+      seatNumber: 1,
+      player: {
+        user: { _id: "user3", username: "WillIam" },
+        chips: 40,
+        bet: 0,
+        action: "none",
+        checkBetFold: false,
+        handCards: [],
+      },
+    },
     { _id: "seat3", seatNumber: 3, player: null },
     { _id: "seat4", seatNumber: 4, player: null },
     { _id: "seat5", seatNumber: 5, player: null },
   ],
 };
-
 
 export const testCards3 = [
   { code: "3S", value: "3", suit: "Spades" },
@@ -77,4 +87,14 @@ export const testCards5 = [
   { code: "AD", value: "A", suit: "Diamonds" },
   { code: "KH", value: "K", suit: "Hearts" },
   { code: "QC", value: "Q", suit: "Clubs" },
+];
+
+export const handCards1 = [
+  { code: "2C", value: "2", suit: "Clubs" },
+  { code: "AD", value: "A", suit: "Diamonds" },
+];
+
+export const handCards2 = [
+  { code: "3S", value: "3", suit: "Spades" },
+  { code: "AD", value: "A", suit: "Diamonds" },
 ];

@@ -1,17 +1,15 @@
 import Chat from "./Chat";
-import TestBet from "./TestBet";
+
 import TestSeat from "./TestSeat";
 import TestTable from "./TestTable";
-import {testGame} from "../../data/testData";
+import { testGame } from "../../data/testData";
 
 export default function TestRoom() {
-  // For demonstration purposes, we'll treat testGame as our "currentGame"
   const currentGame = testGame;
 
-  const user = { id: "user1", username: "Alice" };
-  const isInGame = true
-  const handleJoinGame = (seatId, buyIn) => {
-    console.log("Joining seat", seatId, "with buy-in", buyIn);
+  const isInGame = true;
+  const handleJoinGame = () => {
+    console.log("Joining Game");
   };
 
   return (
@@ -23,12 +21,10 @@ export default function TestRoom() {
       <section className="flex flex-col justify-center items-center gap-2 w-full h-[80vh]">
         {/* Top Row */}
         <div className="flex gap-10 h-1/3 w-full items-center justify-center">
-        <TestSeat
+          <TestSeat
             seat={currentGame.seats[0]}
             joinGame={handleJoinGame}
-            user={user}
-            min={currentGame.min}
-            max={currentGame.max}
+
             isDealer={currentGame.dealerPosition === 0}
             isCurrentPlayer={currentGame.currentPlayerTurn === 0}
             isSmallBlind={currentGame.smallBlindPosition === 0}
@@ -38,9 +34,10 @@ export default function TestRoom() {
           <TestSeat
             seat={currentGame.seats[1]}
             joinGame={handleJoinGame}
-            user={user}
-            min={currentGame.min}
-            max={currentGame.max}
+    
+ 
+     
+  
             isDealer={currentGame.dealerPosition === 1}
             isCurrentPlayer={currentGame.currentPlayerTurn === 1}
             isSmallBlind={currentGame.smallBlindPosition === 1}
@@ -53,7 +50,6 @@ export default function TestRoom() {
           <TestSeat
             seat={currentGame.seats[5]}
             joinGame={handleJoinGame}
-            user={user}
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 5}
@@ -69,7 +65,6 @@ export default function TestRoom() {
           <TestSeat
             seat={currentGame.seats[2]}
             joinGame={handleJoinGame}
-            user={user}
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 2}
@@ -84,7 +79,6 @@ export default function TestRoom() {
           <TestSeat
             seat={currentGame.seats[4]}
             joinGame={handleJoinGame}
-            user={user}
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 4}
@@ -96,7 +90,6 @@ export default function TestRoom() {
           <TestSeat
             seat={currentGame.seats[3]}
             joinGame={handleJoinGame}
-            user={user}
             min={currentGame.min}
             max={currentGame.max}
             isDealer={currentGame.dealerPosition === 3}
