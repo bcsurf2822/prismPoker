@@ -8,7 +8,7 @@ const {
 const raiseSocket = (io, socket) => {
   socket.on("raise", async (data) => {
     const { gameId, seatId, bet } = data;
-    let betAmount = Number(bet);
+    const additionalRaise = Number(bet);
     try {
       const game = await Game.findById(gameId);
       if (!game) {
@@ -24,22 +24,26 @@ const raiseSocket = (io, socket) => {
         });
       }
 
-      // Validate that the raise amount is greater than the current highest bet.
-      if (betAmount <= game.highestBet) {
-        console.error(
-          "[raiseSocket] Raise must be higher than the current highest bet:",
-          betAmount,
-          game.highestBet
-        );
+      if (additionalRaise <= 0) {
+        console.error("[raiseSocket] Raise amount must be greater than 0");
         return socket.emit("playerRaiseError", {
-          message: "Raise must be higher than the current highest bet",
+          message: "Raise amount must be greater than 0",
         });
       }
 
-      // Update the game's highest bet with the new raise.
-      game.highestBet = betAmount;
+      // Calculate the new highest bet.
+      const newHighestBet = game.highestBet + additionalRaise;
+      console.log(
+        "[raiseSocket] Current highestBet:",
+        game.highestBet,
+        "Additional raise:",
+        additionalRaise,
+        "New highestBet:",
+        newHighestBet
+      );
+      game.highestBet = newHighestBet;
 
-      // Reset temporary flags (checkBetFold and action) for all other players.
+      // Reset temporary flags for all other players.
       game.seats.forEach((s) => {
         if (s.player && s._id.toString() !== seatId) {
           s.player.checkBetFold = false;
@@ -47,34 +51,28 @@ const raiseSocket = (io, socket) => {
         }
       });
 
-      // Deduct the raise amount from the player's chips, update the pot and player's bet.
-      seat.player.chips -= betAmount;
-      game.pot += betAmount;
-      seat.player.bet += betAmount;
+      // Deduct only the additional raise from the player's chips.
+      seat.player.chips -= additionalRaise;
+      game.pot += additionalRaise;
+      seat.player.bet += additionalRaise;
       seat.player.action = "raise";
       seat.player.checkBetFold = true;
 
       await game.save();
 
       // Check if all players have acted.
-      const allHaveActed = playersHaveActed(game, seatId, "raise");
+      const allHaveActed = playersHaveActed(game);
       if (allHaveActed) {
-        console.log(
-          "[raiseSocket] All players have acted. Proceeding to next stage."
-        );
+        console.log("[raiseSocket] All players have acted. Proceeding to next stage.");
         proceedToNextStage(game);
         await game.save();
       } else {
-        game.currentPlayerTurn = findNextPosition(
-          game.currentPlayerTurn,
-          game.seats
-        );
+        game.currentPlayerTurn = findNextPosition(game.currentPlayerTurn, game.seats);
       }
 
       await game.save();
       console.log("[raiseSocket] Final game state saved.");
 
-      // Emit the updated game to all clients.
       const updatedGame = await Game.findById(gameId).populate(
         "seats.player.user",
         "username"

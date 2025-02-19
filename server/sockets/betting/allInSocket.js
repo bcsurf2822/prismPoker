@@ -23,11 +23,9 @@ const allInSocket = (io, socket) => {
         });
       }
 
-      // For all-in, override betAmount to the player's total chips.
       const betAmount = seat.player.chips;
       game.highestBet = betAmount;
 
-      // Reset checkBetFold and action for all other players.
       game.seats.forEach((s) => {
         if (s.player && s._id.toString() !== seatId) {
           s.player.checkBetFold = false;
@@ -35,7 +33,6 @@ const allInSocket = (io, socket) => {
         }
       });
 
-      // Update the player's state: deduct chips, update pot and bet, mark action.
       seat.player.chips -= betAmount;
       game.pot += betAmount;
       seat.player.bet += betAmount;
@@ -44,7 +41,6 @@ const allInSocket = (io, socket) => {
 
       await game.save();
 
-      // Check if all players have acted. If so, proceed to the next stage.
       if (playersHaveActed(game, seatId, "all-in")) {
         console.log(
           "[allInSocket] All players have acted. Proceeding to next stage."
@@ -52,7 +48,6 @@ const allInSocket = (io, socket) => {
         proceedToNextStage(game);
         await game.save();
       } else {
-        // Otherwise, update the current player's turn.
         game.currentPlayerTurn = findNextPosition(
           game.currentPlayerTurn,
           game.seats
@@ -60,9 +55,7 @@ const allInSocket = (io, socket) => {
       }
 
       await game.save();
-      console.log("[allInSocket] Final game state saved.");
 
-      // Re-fetch game with populated user data and emit update.
       const updatedGame = await Game.findById(gameId).populate(
         "seats.player.user",
         "username"
