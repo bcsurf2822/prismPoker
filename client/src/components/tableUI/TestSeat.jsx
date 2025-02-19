@@ -38,7 +38,7 @@ export default function TestSeat(
           >
             Join
           </button>
-          {/* Render the dialog for joining */}
+
           <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle">
             <div className="modal-box">
               <h3 className="font-bold text-lg">Select Buy-In Amount</h3>
@@ -48,7 +48,7 @@ export default function TestSeat(
               <input
                 type="range"
                 min={0}
-                max={100} // or use your `min` and `max` props
+                max={100}
                 value={buyIn}
                 onChange={(e) => setBuyIn(Number(e.target.value))}
                 className="range range-primary"

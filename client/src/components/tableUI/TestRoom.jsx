@@ -2,21 +2,14 @@ import Chat from "./Chat";
 
 import TestSeat from "./TestSeat";
 import TestTable from "./TestTable";
-import { handCards1, handCards2, testGame } from "../../data/testData";
+import { testGame } from "../../data/testData";
 
 export default function TestRoom() {
-
   const currentGame = testGame;
-  console.log(currentGame);
-  const userAlice = currentGame.seats[0].player;
-  const userBob = currentGame.seats[0].player;
-  const handCardsA = handCards1;
-  const handCardsB = handCards2;
-  console.log(handCardsA[0].code);
 
   const isInGame = true;
-  const handleJoinGame = (seatId, buyIn) => {
-    console.log("Joining seat", seatId, "with buy-in", buyIn);
+  const handleJoinGame = () => {
+    console.log("Joining Game");
   };
 
   return (
@@ -31,9 +24,7 @@ export default function TestRoom() {
           <TestSeat
             seat={currentGame.seats[0]}
             joinGame={handleJoinGame}
-            user={userAlice}
-            min={currentGame.min}
-            max={currentGame.max}
+
             isDealer={currentGame.dealerPosition === 0}
             isCurrentPlayer={currentGame.currentPlayerTurn === 0}
             isSmallBlind={currentGame.smallBlindPosition === 0}
@@ -43,10 +34,10 @@ export default function TestRoom() {
           <TestSeat
             seat={currentGame.seats[1]}
             joinGame={handleJoinGame}
-            user={userBob}
-            min={currentGame.min}
-            handCards={handCardsB}
-            max={currentGame.max}
+    
+ 
+     
+  
             isDealer={currentGame.dealerPosition === 1}
             isCurrentPlayer={currentGame.currentPlayerTurn === 1}
             isSmallBlind={currentGame.smallBlindPosition === 1}

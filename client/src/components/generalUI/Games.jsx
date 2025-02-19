@@ -58,7 +58,7 @@ export default function Games() {
   };
 
   const navigateToTestRoom = () => {
-    const newWindow = window.open(`/room/testRoom`, "_blank");
+    const newWindow = window.open(`/room/test`, "_blank");
     return newWindow;
   };
 

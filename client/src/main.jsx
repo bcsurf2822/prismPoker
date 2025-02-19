@@ -40,13 +40,11 @@ createRoot(document.getElementById("root")).render(
                   <Route path="account" element={<Account />} />
                 </Route>
                 <Route path="/room/:roomId" element={<RoomLayout />}>
-                
                   <Route index element={<Room />} />
                 </Route>
-                <Route path="/room/testRoom" element={<RoomLayout />}>
-                
-                <Route index element={<TestRoom />} />
-              </Route>
+                <Route path="/room/test" element={<RoomLayout />}>
+                  <Route index element={<TestRoom />} />
+                </Route>
               </Routes>
             </BrowserRouter>
           </AppInitializer>

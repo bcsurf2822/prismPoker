@@ -51,17 +51,15 @@ export const testGame = {
     },
     // Remaining seats empty
     {
-      _id: "seat1",
+      _id: "seat2",
       seatNumber: 1,
       player: {
-        user: { _id: "user2", username: "Bob" },
+        user: { _id: "user3", username: "WillIam" },
         chips: 40,
         bet: 0,
         action: "none",
         checkBetFold: false,
-        handCards: [
-
-        ],
+        handCards: [],
       },
     },
     { _id: "seat3", seatNumber: 3, player: null },
@@ -69,7 +67,6 @@ export const testGame = {
     { _id: "seat5", seatNumber: 5, player: null },
   ],
 };
-
 
 export const testCards3 = [
   { code: "3S", value: "3", suit: "Spades" },
