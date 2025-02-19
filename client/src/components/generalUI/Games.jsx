@@ -57,6 +57,11 @@ export default function Games() {
     setOpenWindows((prev) => ({ ...prev, [gameId]: newWindow }));
   };
 
+  const navigateToTestRoom = () => {
+    const newWindow = window.open(`/room/testRoom`, "_blank");
+    return newWindow;
+  };
+
   if (loading) return <p>Loading games...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -99,6 +104,9 @@ export default function Games() {
           })}
         </tbody>
       </table>
+      <div className="mt-10">
+        <button onClick={navigateToTestRoom} className="bg-green-600">To Test Game</button>
+      </div>
     </div>
   );
 }

@@ -19,6 +19,7 @@ import SocketProvider from "./context/SocketProvider.jsx";
 import { Toaster } from "react-hot-toast";
 import AppInitializer from "./context/AppInitializer.jsx";
 import { OpenWindowsProvider } from "./context/WindowContext.jsx";
+import TestRoom from "./components/tableUI/TestRoom.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -39,8 +40,13 @@ createRoot(document.getElementById("root")).render(
                   <Route path="account" element={<Account />} />
                 </Route>
                 <Route path="/room/:roomId" element={<RoomLayout />}>
+                
                   <Route index element={<Room />} />
                 </Route>
+                <Route path="/room/testRoom" element={<RoomLayout />}>
+                
+                <Route index element={<TestRoom />} />
+              </Route>
               </Routes>
             </BrowserRouter>
           </AppInitializer>
