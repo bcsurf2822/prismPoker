@@ -51,7 +51,7 @@ export default function Room() {
           seatNumber: seat.seatNumber,
           action: seat.player.action,
           bet: seat.player.bet,
-          handCards: seat.player.handCards
+          handCards: seat.player.handCards,
         }
       : null;
   };
@@ -67,10 +67,9 @@ export default function Room() {
   const playerAction = userSeatData && userSeatData.action;
 
   const playerBetAmount = userSeatData && userSeatData.bet;
-  
 
-  const playerCards = userSeatData ? (userSeatData.handCards || []) : [];
-console.log("Player Cards: ", playerCards)
+  const playerCards = userSeatData ? userSeatData.handCards || [] : [];
+  console.log("Player Cards: ", playerCards);
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
@@ -308,11 +307,7 @@ console.log("Player Cards: ", playerCards)
   useEffect(() => {
     if (currentGame && currentGame.stage === "defaultShowdown") {
       const communityCount = currentGame.communityCards.length;
-      console.log("[Room useEffect] Stage 'defaultShowdown' with communityCards.length:", communityCount);
-      
       if (communityCount === 0) {
-        // If no community cards yet, deal flop, then turn, then river.
-        console.log("[Room useEffect] No community cards. Emitting handleDealFlop, then turn, then river.");
         handleDealFlop();
         setTimeout(() => {
           handleDealTurn();
@@ -321,15 +316,11 @@ console.log("Player Cards: ", playerCards)
           }, 2000);
         }, 2000);
       } else if (communityCount === 3) {
-        // If exactly 3 community cards, deal turn then river.
-        console.log("[Room useEffect] 3 community cards. Emitting handleDealTurn, then river.");
         handleDealTurn();
         setTimeout(() => {
           handleDealRiver();
         }, 2000);
       } else if (communityCount === 4) {
-        // If 4 community cards, only deal river.
-        console.log("[Room useEffect] 4 community cards. Emitting handleDealRiver.");
         handleDealRiver();
       }
     }
@@ -341,13 +332,7 @@ console.log("Player Cards: ", playerCards)
     <main className="w-full h-screen flex flex-col bg-slate-200">
       <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button
-          onClick={handleDealFlop}
-          className="bg-green-300 rounded-md py-2 px-3"
-        >
-          Start
-        </button>
-        <button className="bg-red-300 rounded-md py-2 px-3">End</button>
+
         <button
           onClick={handleLeaveGame}
           className="bg-red-300 rounded-md py-2 px-3"

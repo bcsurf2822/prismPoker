@@ -11,7 +11,7 @@ export default function BetControl({
   handleCall,
   hasCards,
 }) {
-  const [betAmount, setBetAmount] = useState(0);
+  const [betAmount, setBetAmount] = useState(1);
 
   const handleRangeChange = (e) => {
     const newBet = Number(e.target.value);
@@ -118,4 +118,5 @@ BetControl.propTypes = {
   handleCheck: PropTypes.func.isRequired,
   handleFold: PropTypes.func.isRequired,
   isCurrentPlayer: PropTypes.bool,
+  hasCards: PropTypes.bool,
 };

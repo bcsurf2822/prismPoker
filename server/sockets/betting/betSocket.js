@@ -44,6 +44,12 @@ const playerBetSocket = (io, socket) => {
       if (action === "all-in" || betAmount === seat.player.chips) {
         betAmount = seat.player.chips;
         game.highestBet = betAmount;
+        game.seats.forEach((s) => {
+          if (s.player && s._id.toString() !== seatId) {
+            s.player.checkBetFold = false;
+            s.player.action = "none";
+          }
+        });
       }
 
       // Standard bet or raise handling
