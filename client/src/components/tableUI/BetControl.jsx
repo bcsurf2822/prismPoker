@@ -35,7 +35,7 @@ export default function BetControl({
             }
           >
             {highestBet > 0
-              ? `Raise $${highestBet} + ${betAmount}`
+              ? `Raise $${betAmount} + $${highestBet}`
               : `Bet $${betAmount}`}
           </button>
           <button

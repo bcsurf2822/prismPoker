@@ -81,6 +81,15 @@ const GameSchema = new Schema({
     default: 0,
     set: toDecimal,
   },
+  sidePot: {
+    type: [
+      {
+        potAmount: { type: Number, default: 0, set: toDecimal },
+        eligiblePlayers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+      },
+    ],
+    default: [],
+  },
   betPlaced: {
     type: Boolean,
     default: false,
