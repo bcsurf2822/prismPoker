@@ -12,7 +12,7 @@ export default function TestTable() {
     </section>
     <section className="flex justify-evenly gap-2 mt-10 w-3/4 h-28">
         {[0, 1, 2, 3, 4].map((index) => {
-          const card = communityCards.empty[index];
+          const card = communityCards.river[index];
           return (
             <div
               key={index}
