@@ -57,29 +57,30 @@ const callSocket = (io, socket) => {
       seat.player.checkBetFold = true;
 
       await game.save();
-
-      const allHaveActed = playersHaveActed(game, seatId, action);
-      if (allHaveActed) {
+      // First, check if only one active player remains (i.e. players with chips > 0).
+      const activePlayers = game.seats.filter(
+        (s) => s.player && s.player.chips > 0
+      );
+      if (activePlayers.length === 1) {
         console.log(
-          "[callSocket] All players have acted. Proceeding to next stage."
+          "[callSocket] Only one active player remains, forcing showdown."
         );
-        proceedToNextStage(game);
-        await game.save();
+        game.stage = "defaultShowdown";
       } else {
-        // If not all have acted, check if only one active player remains.
-        const activePlayers = game.seats.filter(
-          (s) => s.player && s.player.chips > 0
-        );
-        if (activePlayers.length === 1) {
+        // Otherwise, check if all players have acted.
+        const allHaveActed = playersHaveActed(game, seatId, action);
+        if (allHaveActed) {
           console.log(
-            "[callSocket] Only one active player remains, forcing showdown."
+            "[callSocket] All players have acted. Proceeding to next stage."
           );
-          game.stage = "defaultShowdown";
+          proceedToNextStage(game);
+          await game.save();
         } else {
           game.currentPlayerTurn = findNextPosition(
             game.currentPlayerTurn,
             game.seats
           );
+          // Loop until a valid active seat is found.
           while (
             !game.seats[game.currentPlayerTurn].player ||
             game.seats[game.currentPlayerTurn].player.handCards.length === 0
