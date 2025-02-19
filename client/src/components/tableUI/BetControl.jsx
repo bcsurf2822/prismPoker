@@ -31,7 +31,7 @@ export default function BetControl({
             disabled={!isCurrentPlayer || !hasCards}
             className="btn btn-info"
             onClick={() =>
-              handleBet(betAmount, highestBet > 0 ? "raise" : "bet")
+              highestBet > 0 ? handleRaise(betAmount) : handleBet(betAmount)
             }
           >
             {highestBet > 0
@@ -41,7 +41,7 @@ export default function BetControl({
           <button
             disabled={!isCurrentPlayer || !hasCards}
             className="btn btn-info"
-            onClick={() => handleBet(chips, "all-in")}
+            onClick={handleAllIn}
           >
             All in $ {chips}
           </button>
@@ -54,9 +54,7 @@ export default function BetControl({
             disabled={!isCurrentPlayer || !hasCards || highestBet <= 0}
             className="btn btn-success"
           >
-            {!isCurrentPlayer || highestBet <= 0
-              ? "Call"
-              : `Call $${highestBet}`}
+            {highestBet > chips ? `All in $${chips}` : `Call $${highestBet}`}
           </button>{" "}
           <button
             disabled={!isCurrentPlayer || !hasCards}

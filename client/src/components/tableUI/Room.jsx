@@ -157,11 +157,17 @@ export default function Room() {
       console.error("handleCheck: Socket is not available.");
       return;
     }
+
+    const effectiveCall =
+      currentGame.highestBet > playerChips
+        ? playerChips
+        : currentGame.highestBet;
+
     socket.emit("call", {
       gameId: roomId,
       seatId: userSeatData.seatId,
       action: "call",
-      bet: currentGame.highestBet,
+      bet: effectiveCall,
     });
   };
 
