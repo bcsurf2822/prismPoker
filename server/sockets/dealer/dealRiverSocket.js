@@ -17,7 +17,7 @@ const dealRiverSocket = (io, socket) => {
       const game = await Game.findById(gameId);
 
       if (
-        (game.stage !== "flop" && game.stage !== "defaultShowdown")  ||
+        (game.stage !== "river" && game.stage !== "defaultShowdown") ||
         game.communityCards.length > 4
       ) {
         return socket.emit("dealRiverError", {
