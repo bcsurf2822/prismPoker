@@ -1,46 +1,52 @@
-const playersHaveActed = (game, currentSeatId, currentAction) => {
-  console.log(
-    "[playersHaveActed] Called with currentSeatId:",
-    currentSeatId,
-    "currentAction:",
-    currentAction
-  );
+// const playersHaveActed = (game, currentSeatId, currentAction) => {
+//   console.log(
+//     "[playersHaveActed] Called with currentSeatId:",
+//     currentSeatId,
+//     "currentAction:",
+//     currentAction
+//   );
 
-  if (currentAction === "raise") {
-    const result = game.seats.every((seat, index) => {
-      const seatId = seat._id ? seat._id.toString() : "undefined";
-      const condition =
-        !seat.player ||
-        seatId === currentSeatId ||
-        seat.player.action === "fold" ||
-        seat.player.action === "all-in" ||
-        (seat.player.bet >= game.highestBet && seat.player.checkBetFold);
-      console.log(
-        `[playersHaveActed] Seat ${index} (ID: ${seatId}) condition:`,
-        condition,
-        "Player:",
-        seat.player
-      );
-      return condition;
-    });
-    console.log("[playersHaveActed] Returning result:", result);
-    return result;
-  } else {
-    const result = game.seats.every((seat, index) => {
-      const seatId = seat._id ? seat._id.toString() : "undefined";
-      const condition =
-        !seat.player || seatId === currentSeatId || seat.player.checkBetFold;
-      console.log(
-        `[playersHaveActed] Seat ${index} (ID: ${seatId}) condition:`,
-        condition,
-        "Player:",
-        seat.player
-      );
-      return condition;
-    });
-    console.log("[playersHaveActed] Returning result:", result);
-    return result;
-  }
+//   if (currentAction === "raise") {
+//     const result = game.seats.every((seat, index) => {
+//       const seatId = seat._id ? seat._id.toString() : "undefined";
+//       const condition =
+//         !seat.player ||
+//         seatId === currentSeatId ||
+//         seat.player.action === "fold" ||
+//         seat.player.action === "all-in" ||
+//         (seat.player.bet >= game.highestBet && seat.player.checkBetFold);
+//       console.log(
+//         `[playersHaveActed] Seat ${index} (ID: ${seatId}) condition:`,
+//         condition,
+//         "Player:",
+//         seat.player
+//       );
+//       return condition;
+//     });
+//     console.log("[playersHaveActed] Returning result:", result);
+//     return result;
+//   } else {
+//     const result = game.seats.every((seat, index) => {
+//       const seatId = seat._id ? seat._id.toString() : "undefined";
+//       const condition =
+//         !seat.player || seatId === currentSeatId || seat.player.checkBetFold;
+//       console.log(
+//         `[playersHaveActed] Seat ${index} (ID: ${seatId}) condition:`,
+//         condition,
+//         "Player:",
+//         seat.player
+//       );
+//       return condition;
+//     });
+//     console.log("[playersHaveActed] Returning result:", result);
+//     return result;
+//   }
+// };
+
+const playersHaveActed = (game) => {
+  return game.seats.every((seat) => {
+    return !seat.player || seat.player.checkBetFold === true;
+  });
 };
 
 const resetPlayerActions = (game) => {
@@ -61,25 +67,11 @@ const playersWithCards = (game) => {
 
 const findNextPosition = (startPosition, seats) => {
   const seatCount = seats.length;
-  console.log(
-    "[findNextPosition] startPosition:",
-    startPosition,
-    "seatCount:",
-    seatCount
-  );
 
   let nextPosition = (startPosition + 1) % seatCount;
   let iterations = 0;
 
   while (!seats[nextPosition].player) {
-    console.log(
-      "[findNextPosition] Iteration",
-      iterations,
-      "at position",
-      nextPosition,
-      "seat:",
-      seats[nextPosition]
-    );
     nextPosition = (nextPosition + 1) % seatCount;
     iterations++;
     if (iterations > seatCount) {
@@ -91,7 +83,6 @@ const findNextPosition = (startPosition, seats) => {
       break;
     }
   }
-  console.log("[findNextPosition] Returning nextPosition:", nextPosition);
   return nextPosition;
 };
 
@@ -120,10 +111,22 @@ const proceedToNextStage = (game) => {
   game.highestBet = 0;
 };
 
+const findNextActivePlayer = (game, startingPosition) => {
+  let nextPosition = startingPosition % game.seats.length;
+  while (
+    game.seats[nextPosition].player == null ||
+    game.seats[nextPosition].player.handCards.length === 0
+  ) {
+    nextPosition = (nextPosition + 1) % game.seats.length;
+  }
+  return nextPosition;
+};
+
 module.exports = {
   playersHaveActed,
   resetPlayerActions,
   playersWithCards,
   findNextPosition,
   proceedToNextStage,
+  findNextActivePlayer,
 };

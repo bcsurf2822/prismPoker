@@ -1,5 +1,5 @@
 const Game = require("../../models/games");
-const { findNextActivePlayer } = require("../../utils/dealHelpers");
+const { findNextActivePlayer } = require("../../utils/actionHelpers");
 
 const dealLocks = {};
 
@@ -16,7 +16,10 @@ const dealRiverSocket = (io, socket) => {
     try {
       const game = await Game.findById(gameId);
 
-      if (game.stage !== "river" || game.communityCards.length > 4) {
+      if (
+        (game.stage !== "river" && game.stage !== "defaultShowdown") ||
+        game.communityCards.length > 4
+      ) {
         return socket.emit("dealRiverError", {
           message: "Conditions not met to deal the river!",
         });
@@ -45,6 +48,10 @@ const dealRiverSocket = (io, socket) => {
         suit: riverCard.suit,
         code: riverCard.code,
       });
+
+      if (game.stage === "defaultShowdown") {
+        game.stage = "showdown";
+      }
 
       game.highestBet = 0;
       game.betPlaced = false;

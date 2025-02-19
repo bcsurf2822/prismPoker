@@ -1,7 +1,5 @@
 const Game = require("../../models/games");
-const {
-  findNextActivePlayer,
-} = require("../../utils/dealHelpers");
+const { findNextActivePlayer } = require("../../utils/actionHelpers");
 
 const dealLocks = {};
 
@@ -19,9 +17,10 @@ const dealFlopSocket = (io, socket) => {
     try {
       const game = await Game.findById(gameId);
 
-
-
-      if (game.stage !== "flop" || game.communityCards.length > 0) {
+      if (
+        (game.stage !== "flop" && game.stage !== "defaultShowdown") ||
+        game.communityCards.length > 0
+      ) {
         return socket.emit("dealFlopError", {
           message: "Conditions not met to deal the flop!",
         });

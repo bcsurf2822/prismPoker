@@ -51,6 +51,7 @@ export default function Room() {
           seatNumber: seat.seatNumber,
           action: seat.player.action,
           bet: seat.player.bet,
+          handCards: seat.player.handCards,
         }
       : null;
   };
@@ -67,6 +68,8 @@ export default function Room() {
 
   const playerBetAmount = userSeatData && userSeatData.bet;
 
+  const playerCards = userSeatData ? userSeatData.handCards || [] : [];
+  console.log("Player Cards: ", playerCards);
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
@@ -100,12 +103,8 @@ export default function Room() {
     socket.emit("leaveGame", { gameId: roomId, userId });
   };
 
-  const handleBet = (betAmount, action) => {
-    const effectiveBet =
-      action === "raise" ? currentGame.highestBet + betAmount : betAmount;
-    console.log(
-      `[handleBet] Called with betAmount: ${betAmount} and action: ${action}`
-    );
+  const handleBet = (betAmount) => {
+    console.log(`[handleBet] Called with betAmount: ${betAmount}`);
     if (!socket) {
       console.error("[handleBet] Socket is not available.");
       return;
@@ -113,10 +112,44 @@ export default function Room() {
     socket.emit("bet", {
       gameId: roomId,
       seatId: userSeatData.seatId,
-      bet: effectiveBet,
-      action: action,
+      bet: betAmount,
+      action: "bet",
     });
-    console.log("[handleBet] Emitted player_bet event.");
+    console.log("[handleBet] Emitted bet event.");
+  };
+
+  const handleRaise = (betAmount) => {
+    const effectiveBet = currentGame.highestBet + betAmount;
+    console.log(
+      `[handleRaise] Called with additional betAmount: ${betAmount}, effective raise: ${effectiveBet}`
+    );
+    if (!socket) {
+      console.error("[handleRaise] Socket is not available.");
+      return;
+    }
+    socket.emit("raise", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+      bet: effectiveBet,
+      action: "raise",
+    });
+    console.log("[handleRaise] Emitted raise event.");
+  };
+
+  const handleAllIn = () => {
+    const allInBet = userSeatData.chips; // the player's total chips
+    console.log(
+      `[handleAllIn] Called for seat ${userSeatData.seatId} with allInBet: ${allInBet}`
+    );
+    if (!socket) {
+      console.error("[handleAllIn] Socket is not available.");
+      return;
+    }
+    socket.emit("allIn", {
+      gameId: roomId,
+      seatId: userSeatData.seatId,
+    });
+    console.log("[handleAllIn] Emitted allIn event.");
   };
 
   const handleCall = () => {
@@ -124,11 +157,17 @@ export default function Room() {
       console.error("handleCheck: Socket is not available.");
       return;
     }
+
+    const effectiveCall =
+      currentGame.highestBet > playerChips
+        ? playerChips
+        : currentGame.highestBet;
+
     socket.emit("call", {
       gameId: roomId,
       seatId: userSeatData.seatId,
       action: "call",
-      bet: currentGame.highestBet,
+      bet: effectiveCall,
     });
   };
 
@@ -300,19 +339,36 @@ export default function Room() {
     handleDealRiver,
   ]);
 
+  //Default Showdown case
+  useEffect(() => {
+    if (currentGame && currentGame.stage === "defaultShowdown") {
+      const communityCount = currentGame.communityCards.length;
+      if (communityCount === 0) {
+        handleDealFlop();
+        setTimeout(() => {
+          handleDealTurn();
+          setTimeout(() => {
+            handleDealRiver();
+          }, 2000);
+        }, 2000);
+      } else if (communityCount === 3) {
+        handleDealTurn();
+        setTimeout(() => {
+          handleDealRiver();
+        }, 2000);
+      } else if (communityCount === 4) {
+        handleDealRiver();
+      }
+    }
+  }, [currentGame, handleDealFlop, handleDealTurn, handleDealRiver]);
+
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
     <main className="w-full h-screen flex flex-col bg-slate-200">
       <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
-        <button
-          onClick={handleDealFlop}
-          className="bg-green-300 rounded-md py-2 px-3"
-        >
-          Start
-        </button>
-        <button className="bg-red-300 rounded-md py-2 px-3">End</button>
+
         <button
           onClick={handleLeaveGame}
           className="bg-red-300 rounded-md py-2 px-3"
@@ -417,8 +473,11 @@ export default function Room() {
           handleCheck={handleCheck}
           handleFold={handleFold}
           handleCall={handleCall}
+          handleAllIn={handleAllIn}
+          handleRaise={handleRaise}
           chips={playerChips}
           highestBet={currentGame.highestBet}
+          hasCards={playerCards.length > 0}
         />
       </section>
     </main>

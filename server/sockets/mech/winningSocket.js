@@ -33,6 +33,7 @@ const winningSocket = (io, socket) => {
             message: "Unexpected number of active players for surrender",
           });
         }
+
         const lastActive = activeSeats[0];
         const potAmount = populatedGame.pot;
         const username = lastActive.player.user.username;
@@ -124,12 +125,6 @@ const winningSocket = (io, socket) => {
           );
           if (winningSeat && winningSeat.player) {
             winningSeat.player.chips += winner.potAmount;
-          }
-        });
-
-        populatedGame.seats.forEach((seat) => {
-          if (seat.player) {
-            seat.player.handCards = [];
           }
         });
 
