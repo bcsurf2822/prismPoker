@@ -33,6 +33,10 @@ const PlayerSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  sitOut: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const SeatSchema = new Schema({
