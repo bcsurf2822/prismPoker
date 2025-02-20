@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { TbCardsFilled } from "react-icons/tb";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useMotionValueEvent,
-} from "motion/react";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
 import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { logoutUser } from "../../features/auth/authenticationSlice";
@@ -30,10 +25,8 @@ const NavBar = () => {
 
   return (
     <nav
-      className={`fixed top-0 z-50 w-full  text-white transition-all duration-300 ease-out ${
-        scrolled
-          ? "bg-neutral-950 py-3 shadow-xl"
-          : "bg-neutral-950/0 py-6 shadow-none"
+      className={`fixed top-0 z-50 w-full text-white transition-all duration-300 ease-out ${
+        scrolled ? "bg-neutral-950 py-3 shadow-xl" : "bg-neutral-950/0 py-6 shadow-none"
       }`}
     >
       <div className="mx-auto flex items-center justify-between bg-neutral w-full px-4">
@@ -51,43 +44,25 @@ const NavBar = () => {
             ))}
           </div>
 
-          {/* Always render this container to maintain consistent height */}
-          <div className="flex items-center justify-center gap-4">
-            {user ? (
-              <>
-                <FlyoutLink to="#" FlyoutContent={SettingsContent}>
-                  Settings
-                </FlyoutLink>
-
-                <div className="text-right">
-                  <p className="font-bold">{user.username}</p>
-                  <p className="font-bold">SC: ${user.accountBalance}</p>
-                </div>
-
-                <button
-                  onClick={handleLogout}
-                  className="btn btn-outline btn-error bg-neutral"
-                >
-                  Log Out
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="invisible">
-                  <FlyoutLink to="#" FlyoutContent={SettingsContent}>
-                    Settings
-                  </FlyoutLink>
-                </div>
-                <div className="invisible text-right">
-                  <p className="font-bold">Placeholder</p>
-                  <p className="font-bold">SC: $0</p>
-                </div>
-                <button className="invisible btn btn-outline btn-error bg-neutral">
-                  Log Out
-                </button>
-              </>
-            )}
-          </div>
+          {user && (
+            <div className="flex items-center gap-4">
+              <FlyoutLink to="#" FlyoutContent={SettingsContent}>
+                Settings
+              </FlyoutLink>
+              
+              <div className="text-right">
+                <p className="font-bold">{user.username}</p>
+                <p className="font-bold">SC: ${user.accountBalance}</p>
+              </div>
+              
+              <button
+                onClick={handleLogout}
+                className="btn btn-outline btn-error bg-neutral"
+              >
+                Log Out
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>
@@ -105,8 +80,8 @@ const FlyoutLink = ({ children, to, FlyoutContent }) => {
     >
       <NavLink
         to={to}
-        className={({ isActive }) =>
-          `relative ${isActive ? "text-indigo-300" : "text-white"}`
+        className={({ isActive }) => 
+          `relative ${isActive ? 'text-indigo-300' : 'text-white'}`
         }
       >
         {children}
@@ -137,14 +112,14 @@ const FlyoutLink = ({ children, to, FlyoutContent }) => {
 const SettingsContent = () => {
   return (
     <div className="w-48 bg-white rounded-lg shadow-lg p-2 text-black">
-      <NavLink
-        to="/profile"
+      <NavLink 
+        to="/profile" 
         className="block px-4 py-2 hover:bg-neutral-100 rounded-md"
       >
         Profile
       </NavLink>
-      <NavLink
-        to="/account"
+      <NavLink 
+        to="/account" 
         className="block px-4 py-2 hover:bg-neutral-100 rounded-md"
       >
         Account
