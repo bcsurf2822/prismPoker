@@ -20,6 +20,7 @@ import { Toaster } from "react-hot-toast";
 import AppInitializer from "./context/AppInitializer.jsx";
 import { OpenWindowsProvider } from "./context/WindowContext.jsx";
 import TestRoom from "./components/tableUI/TestRoom.jsx";
+import NotFound from "./components/generalUI/NotFound.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -45,6 +46,7 @@ createRoot(document.getElementById("root")).render(
                 <Route path="/room/test" element={<RoomLayout />}>
                   <Route index element={<TestRoom />} />
                 </Route>
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
           </AppInitializer>
