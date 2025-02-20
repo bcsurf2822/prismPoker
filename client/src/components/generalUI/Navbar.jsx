@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { logoutUser } from "../../features/auth/authenticationSlice";
 import { useNavigate } from "react-router";
+import PropTypes from "prop-types";
 const NavBar = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
@@ -30,19 +31,15 @@ const NavBar = () => {
   return (
     <nav
       className={`fixed top-0 z-50 w-full text-white transition-all duration-300 ease-out ${
-        scrolled
-          ? "bg-neutral-950 py-3 shadow-xl"
-          : "bg-neutral-950/0 py-6 shadow-none"
+        scrolled ? "bg-neutral-950  shadow-xl" : "bg-neutral-950/0 shadow-none"
       }`}
     >
       <div className="mx-auto flex items-center justify-between bg-neutral w-full px-4">
-        {/* Left: Logo/Title */}
         <NavLink to="/" className="flex items-center gap-2">
           <span className="text-xl">PKR Poker</span>
           <TbCardsFilled className="text-2xl" />
         </NavLink>
 
-        {/* Center: Links (Home, About, Games, Settings) */}
         <div className="flex items-center justify-center gap-6 flex-1">
           {LINKS.map((link) => (
             <FlyoutLink key={link.to} to={link.to}>
@@ -56,7 +53,6 @@ const NavBar = () => {
           )}
         </div>
 
-        {/* Right: User Info and Logout */}
         <div className="flex items-center gap-4">
           {user ? (
             <>
@@ -72,7 +68,6 @@ const NavBar = () => {
               </button>
             </>
           ) : (
-            // Invisible placeholders to maintain consistent spacing
             <>
               <div className="invisible text-right">
                 <p className="font-bold">Placeholder</p>
@@ -127,6 +122,12 @@ const FlyoutLink = ({ children, to, FlyoutContent }) => {
       </AnimatePresence>
     </div>
   );
+};
+
+FlyoutLink.propTypes = {
+  children: PropTypes.node.isRequired,
+  to: PropTypes.string.isRequired,
+  FlyoutContent: PropTypes.elementType,
 };
 
 const SettingsContent = () => {
