@@ -32,7 +32,7 @@ app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
@@ -41,6 +41,8 @@ mongoose
   .connect(MONGO_URI, {})
   .then(() => console.log("Successfully connected to MongoDB Atlas"))
   .catch((error) => console.error("MongoDB connection error:", error));
+
+app.options("*", cors());
 
 setupSockets(io);
 setupRoutes(app);
