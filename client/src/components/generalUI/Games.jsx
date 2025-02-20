@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { FaRegWindowMaximize } from "react-icons/fa";
 import PropTypes from "prop-types";
 
-const EnvelopeAnimation = ({ onComplete }) => {
+const WindowAnimation = ({ onComplete }) => {
   return (
     <motion.div
       initial={{ y: 0, opacity: 1, rotate: 0 }}
@@ -21,7 +21,7 @@ const EnvelopeAnimation = ({ onComplete }) => {
   );
 };
 
-EnvelopeAnimation.propTypes = {
+WindowAnimation.propTypes = {
   onComplete: PropTypes.func.isRequired,
 };
 
@@ -137,7 +137,7 @@ export default function Games() {
         </button>
       </div>
       {animateEnvelope && (
-        <EnvelopeAnimation onComplete={handleAnimationComplete} />
+        <WindowAnimation onComplete={handleAnimationComplete} />
       )}
     </div>
   );
