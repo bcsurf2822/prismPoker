@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
-import aceOfDiamonds from "../../assets/decks/default/AD.png"
-import aceOfSpades from "../../assets/decks/default/AS.png"
-import cardBack from "../../assets/cardBack/blueCard.png"
+import aceOfDiamonds from "../../assets/decks/default/AD.png";
+import aceOfSpades from "../../assets/decks/default/AS.png";
+import cardBack from "../../assets/cardBack/blueCard.png";
 
 export default function Home() {
   const { user, loading, rehydrated } = useSelector((state) => state.auth);
@@ -30,9 +30,7 @@ export default function Home() {
         Welcome back, {user.username}!
       </motion.h1>
 
-
       <div className="flex gap-4">
-     
         <div className="w-24 h-36 relative" style={{ perspective: "1000px" }}>
           <AnimatePresence>
             <motion.div
@@ -65,7 +63,6 @@ export default function Home() {
             />
           </motion.div>
         </div>
-
 
         <div className="w-24 h-36 relative" style={{ perspective: "1000px" }}>
           <AnimatePresence>
