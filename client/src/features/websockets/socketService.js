@@ -10,18 +10,18 @@ class SocketService {
 
   connect() {
     if (!this.socket) {
-      this.socket = io("http://localhost:4000", {
+      this.socket = io(import.meta.env.VITE_SOCKET_URL, {
         transports: ["websocket"],
       });
-// Recieving error after restart on server
-//Error: Uncaught (in promise) TypeError: Cannot read properties of null (reading 'id')
+      // Recieving error after restart on server
+      //Error: Uncaught (in promise) TypeError: Cannot read properties of null (reading 'id')
       this.socket.on("connect", () => {
         console.log("✅ WebSocket connected:", this.socket.id);
       });
 
       this.socket.on("disconnect", () => {
         console.log("❌ WebSocket disconnected");
-        this.socket = null; 
+        this.socket = null;
       });
     }
   }
