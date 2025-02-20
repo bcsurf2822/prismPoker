@@ -66,46 +66,57 @@ export default function Games() {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="overflow-x-auto bg-green-100 rounded-md pr-3">
-      <table className="table">
-        <thead>
-          <tr className="text-center">
-            <th></th>
-            <th>Table</th>
-            <th>Blinds</th>
-            <th>Min/Max</th>
-            <th>Players</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {games.map((game) => {
-            const isOpen = openWindows[game.id] && !openWindows[game.id].closed;
-            return (
-              <tr key={game.id} className="hover">
-                <td></td>
-                <td>{game.name}</td>
-                <td>{game.blinds}</td>
-                <td>
-                  {game.min} / ${game.max}
-                </td>
-                <td>{game.playerCount} / 6</td>
-                <td>
-                  <button
-                    onClick={() => handleNavigateToRoom(game.id)}
-                    className="btn btn-primary"
-                    disabled={isOpen}
-                  >
-                    {isOpen ? "Opened" : "View"}
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <div className="mt-10">
-        <button onClick={navigateToTestRoom} className="bg-green-600">To Test Game</button>
+    <div className="p-4">
+      <div className="overflow-x-auto bg-neutral-50 rounded-lg shadow-sm">
+        <table className="table w-full">
+          <thead className="bg-neutral-100">
+            <tr className="text-neutral-600">
+              <th className="py-3 px-4 text-left">Table</th>
+              <th className="py-3 px-4 text-left">Blinds</th>
+              <th className="py-3 px-4 text-left">Min/Max</th>
+              <th className="py-3 px-4 text-left">Players</th>
+              <th className="py-3 px-4 text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {games.map((game) => {
+              const isOpen = openWindows[game.id] && !openWindows[game.id].closed;
+              return (
+                <tr key={game.id} className="hover:bg-neutral-50 transition-colors">
+                  <td className="py-3 px-4 text-neutral-700">{game.name}</td>
+                  <td className="py-3 px-4 text-neutral-700">{game.blinds}</td>
+                  <td className="py-3 px-4 text-neutral-700">
+                    ${game.min} / ${game.max}
+                  </td>
+                  <td className="py-3 px-4 text-neutral-700">
+                    {game.playerCount} / 6
+                  </td>
+                  <td className="py-3 px-4">
+                    <button
+                      onClick={() => handleNavigateToRoom(game.id)}
+                      className={`btn btn-sm ${
+                        isOpen ? "btn-disabled bg-neutral-200 text-neutral-400" : "btn-primary"
+                      }`}
+                      disabled={isOpen}
+                    >
+                      {isOpen ? "Open" : "View"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* "To Test Game" Button */}
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={navigateToTestRoom}
+          className="btn btn-outline btn-neutral"
+        >
+          To Test Game
+        </button>
       </div>
     </div>
   );
