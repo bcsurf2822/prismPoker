@@ -5,7 +5,7 @@ export default function Layout() {
   return (
     <>
       <NavBar />
-      <main className="flex items-center justify-center min-h-screen bg-blue-100">
+      <main className="flex items-center justify-center min-h-screen bg-gray-100">
         <Outlet />
       </main>
     </>

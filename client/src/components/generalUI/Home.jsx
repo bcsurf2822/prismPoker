@@ -20,8 +20,7 @@ export default function Home() {
 
   if (!user) return null;
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg bg-neutral-50 p-4">
-      {/* Welcome Message */}
+    <div className="flex flex-col items-center justify-center rounded-lg bg-neutral-50 p-4 border-2 border-gray-300 drop-shadow-xl">
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -31,9 +30,9 @@ export default function Home() {
         Welcome back, {user.username}!
       </motion.h1>
 
-      {/* Card Flip Animation */}
+
       <div className="flex gap-4">
-        {/* Ace of Diamonds */}
+     
         <div className="w-24 h-36 relative" style={{ perspective: "1000px" }}>
           <AnimatePresence>
             <motion.div
@@ -67,7 +66,7 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Ace of Spades */}
+
         <div className="w-24 h-36 relative" style={{ perspective: "1000px" }}>
           <AnimatePresence>
             <motion.div
