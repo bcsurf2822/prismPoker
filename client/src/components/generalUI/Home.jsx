@@ -20,7 +20,7 @@ export default function Home() {
 
   if (!user) return null;
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg bg-neutral-50 p-4 border-2 border-gray-300 drop-shadow-xl">
+    <div className="flex flex-col items-center justify-center rounded-lg bg-neutral-50 p-4 border-l-2 border-t-2 border-gray-300 drop-shadow-2xl">
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
