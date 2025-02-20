@@ -13,6 +13,8 @@ export default function Home() {
   }, [rehydrated, user, navigate]);
 
   if (loading || !rehydrated) return <p>Loading...</p>;
+
+  if (!user) return null;
   return (
     <div>
       <h1 className="text-2xl font-bold">Welcome back, {user.username}!</h1>
