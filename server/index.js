@@ -12,7 +12,7 @@ const setupRoutes = require("./routes");
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
@@ -30,7 +30,11 @@ const MONGO_URI = process.env.MONGO_URI;
 
 app.use(express.static("public"));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  })
+);
 
 mongoose
   .connect(MONGO_URI, {})
