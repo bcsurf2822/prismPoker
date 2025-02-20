@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 export default function Layout() {
   const location = useLocation();
   return (
-    <>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <NavBar />
       <AnimatePresence mode="wait">
         <motion.main
@@ -14,13 +14,10 @@ export default function Layout() {
           animate={{ x: 6, opacity: 1 }}
           exit={{ x: "-60%", opacity: 0, transition: { duration: 0.2 } }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-center min-h-screen bg-gray-100"
         >
-          <div>
-            <Outlet />
-          </div>
+          <Outlet />
         </motion.main>
       </AnimatePresence>
-    </>
+    </div>
   );
 }
