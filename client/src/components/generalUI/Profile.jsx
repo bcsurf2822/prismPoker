@@ -6,7 +6,7 @@ export default function Profile() {
   return (
     <div className="card card-side bg-base-100 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title">Profile</h2>
+        <h2 className="card-title font-bold text-center underline">Account</h2>
         <p>
           <span className="font-bold">Username: </span>
           {user.username}

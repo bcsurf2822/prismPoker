@@ -62,7 +62,7 @@ const NavBar = () => {
               </div>
               <button
                 onClick={handleLogout}
-                className="btn btn-outline btn-error bg-neutral"
+                className="btn btn-outline btn-error bg-neutral my-1"
               >
                 Log Out
               </button>
@@ -73,7 +73,7 @@ const NavBar = () => {
                 <p className="font-bold">Placeholder</p>
                 <p className="font-bold">SC: $0</p>
               </div>
-              <button className="invisible btn btn-outline btn-error bg-neutral">
+              <button className="invisible btn btn-outline btn-error bg-neutral my-1">
                 Log Out
               </button>
             </>

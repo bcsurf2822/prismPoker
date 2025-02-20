@@ -38,13 +38,19 @@ export default function Account() {
 
   return (
     <div className="card card-side bg-base-100 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title">Account</h2>
-        <p>Current Balance: ${user.accountBalance}</p>
+      <div className="card-body flex flex-col">
+        <h2 className="card-title font-bold text-center underline">Account</h2>
+        <p>
+          {" "}
+          <span className="font-bold">Current Balance:</span> $
+          {user.accountBalance}
+        </p>
         <div className="card-actions justify-end">
           <label className="form-control w-full max-w-xs">
             <div className="label">
-              <span className="label-text">Enter Funds to Add</span>
+              <span className="label-text font-semibold">
+                Enter Funds to Add
+              </span>
             </div>
             <input
               type="text"

@@ -1,9 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGames } from "../../features/games/gamesSlice";
 import { useOpenWindows } from "../../context/WindowContext";
+import { motion } from "motion/react";
+import { FaRegWindowMaximize } from "react-icons/fa";
+
+const EnvelopeAnimation = ({ onComplete }) => {
+  return (
+    <motion.div
+      initial={{ y: 0, opacity: 1, rotate: 0 }}
+      animate={{ y: -150, opacity: 0, rotate: 360 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+      onAnimationComplete={onComplete}
+      className="fixed top-0 left-1/2 transform -translate-x-1/2 z-50"
+      style={{ width: "50px", height: "50px" }}
+    >
+<FaRegWindowMaximize />
+    </motion.div>
+  );
+};
 
 export default function Games() {
+  const [animateEnvelope, setAnimateEnvelope] = useState(false);
   const dispatch = useDispatch();
   const { openWindows, setOpenWindows } = useOpenWindows();
   const { games, loading, error } = useSelector((state) => state.games);
@@ -67,9 +85,9 @@ export default function Games() {
 
   return (
     <div className="p-4">
-      <div className="overflow-x-auto bg-neutral-50 rounded-lg shadow-sm">
+      <div className="overflow-x-auto bg-neutral-50 rounded-lg shadow-lg border-x-2">
         <table className="table w-full">
-          <thead className="bg-neutral-100">
+          <thead className="bg-neutral-200">
             <tr className="text-neutral-600">
               <th className="py-3 px-4 text-left">Table</th>
               <th className="py-3 px-4 text-left">Blinds</th>
@@ -82,7 +100,7 @@ export default function Games() {
             {games.map((game) => {
               const isOpen = openWindows[game.id] && !openWindows[game.id].closed;
               return (
-                <tr key={game.id} className="hover:bg-neutral-50 transition-colors">
+                <tr key={game.id} className="hover:bg-neutral-100 transition-colors">
                   <td className="py-3 px-4 text-neutral-700">{game.name}</td>
                   <td className="py-3 px-4 text-neutral-700">{game.blinds}</td>
                   <td className="py-3 px-4 text-neutral-700">
