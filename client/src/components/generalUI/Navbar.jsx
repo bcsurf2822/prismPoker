@@ -10,7 +10,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { logoutUser } from "../../features/auth/authenticationSlice";
 import { useNavigate } from "react-router";
-
 const NavBar = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
@@ -30,64 +29,60 @@ const NavBar = () => {
 
   return (
     <nav
-      className={`fixed top-0 z-50 w-full  text-white transition-all duration-300 ease-out ${
+      className={`fixed top-0 z-50 w-full text-white transition-all duration-300 ease-out ${
         scrolled
           ? "bg-neutral-950 py-3 shadow-xl"
           : "bg-neutral-950/0 py-6 shadow-none"
       }`}
     >
       <div className="mx-auto flex items-center justify-between bg-neutral w-full px-4">
+        {/* Left: Logo/Title */}
         <NavLink to="/" className="flex items-center gap-2">
           <span className="text-xl">PKR Poker</span>
           <TbCardsFilled className="text-2xl" />
         </NavLink>
 
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-6">
-            {LINKS.map((link) => (
-              <FlyoutLink key={link.to} to={link.to}>
-                {link.text}
-              </FlyoutLink>
-            ))}
-          </div>
+        {/* Center: Links (Home, About, Games, Settings) */}
+        <div className="flex items-center justify-center gap-6 flex-1">
+          {LINKS.map((link) => (
+            <FlyoutLink key={link.to} to={link.to}>
+              {link.text}
+            </FlyoutLink>
+          ))}
+          {user && (
+            <FlyoutLink to="#" FlyoutContent={SettingsContent}>
+              Settings
+            </FlyoutLink>
+          )}
+        </div>
 
-          {/* Always render this container to maintain consistent height */}
-          <div className="flex items-center justify-center gap-4">
-            {user ? (
-              <>
-                <FlyoutLink to="#" FlyoutContent={SettingsContent}>
-                  Settings
-                </FlyoutLink>
-
-                <div className="text-right">
-                  <p className="font-bold">{user.username}</p>
-                  <p className="font-bold">SC: ${user.accountBalance}</p>
-                </div>
-
-                <button
-                  onClick={handleLogout}
-                  className="btn btn-outline btn-error bg-neutral"
-                >
-                  Log Out
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="invisible">
-                  <FlyoutLink to="#" FlyoutContent={SettingsContent}>
-                    Settings
-                  </FlyoutLink>
-                </div>
-                <div className="invisible text-right">
-                  <p className="font-bold">Placeholder</p>
-                  <p className="font-bold">SC: $0</p>
-                </div>
-                <button className="invisible btn btn-outline btn-error bg-neutral">
-                  Log Out
-                </button>
-              </>
-            )}
-          </div>
+        {/* Right: User Info and Logout */}
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <div className="text-right">
+                <p className="font-bold">{user.username}</p>
+                <p className="font-bold">SC: ${user.accountBalance}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="btn btn-outline btn-error bg-neutral"
+              >
+                Log Out
+              </button>
+            </>
+          ) : (
+            // Invisible placeholders to maintain consistent spacing
+            <>
+              <div className="invisible text-right">
+                <p className="font-bold">Placeholder</p>
+                <p className="font-bold">SC: $0</p>
+              </div>
+              <button className="invisible btn btn-outline btn-error bg-neutral">
+                Log Out
+              </button>
+            </>
+          )}
         </div>
       </div>
     </nav>
