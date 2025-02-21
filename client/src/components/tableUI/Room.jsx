@@ -67,9 +67,14 @@ export default function Room() {
   const playerAction = userSeatData && userSeatData.action;
 
   const playerBetAmount = userSeatData && userSeatData.bet;
+  const disableCheck = currentGame?.highestBet > 0 && playerAction === "none";
+
+  const disableCallForBigBlind =
+    currentGame?.highestBet === currentGame?.blinds.bigBlind &&
+    playerAction === "postBigBlind";
 
   const playerCards = userSeatData ? userSeatData.handCards || [] : [];
-  console.log("Player Cards: ", playerCards);
+
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
@@ -468,6 +473,8 @@ export default function Room() {
       <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
         <BetControl
+          disableCheck={disableCheck}
+          disableCallForBigBlind={disableCallForBigBlind}
           isCurrentPlayer={isCurrentPlayer}
           handleBet={handleBet}
           handleCheck={handleCheck}

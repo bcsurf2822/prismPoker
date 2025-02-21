@@ -12,6 +12,8 @@ export default function BetControl({
   highestBet,
   handleCall,
   hasCards,
+  disableCheck,
+  disableCallForBigBlind,
 }) {
   const [betAmount, setBetAmount] = useState(1);
 
@@ -51,13 +53,18 @@ export default function BetControl({
           {" "}
           <button
             onClick={handleCall}
-            disabled={!isCurrentPlayer || !hasCards || highestBet <= 0}
+            disabled={
+              !isCurrentPlayer ||
+              !hasCards ||
+              highestBet <= 0 ||
+              disableCallForBigBlind
+            }
             className="btn btn-success"
           >
             {highestBet > chips ? `All in $${chips}` : `Call $${highestBet}`}
           </button>{" "}
           <button
-            disabled={!isCurrentPlayer || !hasCards}
+            disabled={!isCurrentPlayer || !hasCards || disableCheck}
             onClick={handleCheck}
             className="btn btn-success"
           >
@@ -120,4 +127,6 @@ BetControl.propTypes = {
   handleFold: PropTypes.func.isRequired,
   isCurrentPlayer: PropTypes.bool,
   hasCards: PropTypes.bool,
+  disableCheck: PropTypes.bool,
+  disableCallForBigBlind: PropTypes.bool,
 };

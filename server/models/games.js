@@ -26,7 +26,7 @@ const PlayerSchema = new Schema({
   bet: { type: Number, required: true, set: toDecimal },
   action: {
     type: String,
-    enum: ["check", "call", "bet", "all-in", "fold", "raise", "none"],
+    enum: ["postBigBlind", "check", "call", "bet", "all-in", "fold", "raise", "none"],
     default: "none",
   },
   checkBetFold: {
@@ -57,8 +57,8 @@ const GameSchema = new Schema({
     required: true,
   },
   blinds: {
-    type: String,
-    required: true,
+    smallBlind: { type: Number, required: true, set: toDecimal },
+    bigBlind: { type: Number, required: true, set: toDecimal },
   },
   min: {
     type: Number,

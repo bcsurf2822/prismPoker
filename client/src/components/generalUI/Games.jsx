@@ -102,7 +102,7 @@ export default function Games() {
                   className="hover:bg-neutral-100 transition-colors"
                 >
                   <td className="py-3 px-4 text-neutral-700">{game.name}</td>
-                  <td className="py-3 px-4 text-neutral-700">{game.blinds}</td>
+                  <td className="py-3 px-4 text-neutral-700">${game.blinds.smallBlind} / ${game.blinds.bigBlind}</td>
                   <td className="py-3 px-4 text-neutral-700">
                     ${game.min} / ${game.max}
                   </td>
