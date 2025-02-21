@@ -67,13 +67,14 @@ export default function Room() {
   const playerAction = userSeatData && userSeatData.action;
 
   const playerBetAmount = userSeatData && userSeatData.bet;
-  const disableCheck =
-    currentGame?.highestBet > 0 && playerAction === "none";
-    const disableCallForBigBlind = currentGame?.highestBet === currentGame?.blinds.bigBlind && playerAction === "postBigBlind"
+  const disableCheck = currentGame?.highestBet > 0 && playerAction === "none";
 
+  const disableCallForBigBlind =
+    currentGame?.highestBet === currentGame?.blinds.bigBlind &&
+    playerAction === "postBigBlind";
 
   const playerCards = userSeatData ? userSeatData.handCards || [] : [];
-  console.log("Player Cards: ", playerCards);
+
   const handleJoinGame = (seatId, buyIn) => {
     if (!socket) return;
 
