@@ -59,7 +59,7 @@ const positionsAndBlindsSocket = (io, socket) => {
         game.pot += bigBlindAmount;
       }
 
-      game.gameEnd = false;
+      game.highestBet = bigBlindAmount;
 
       await game.save();
 
