@@ -69,7 +69,8 @@ export default function Room() {
   const playerBetAmount = userSeatData && userSeatData.bet;
   const disableCheck =
     currentGame?.highestBet > 0 && playerAction === "none";
-    // const disableCallForBigBlind = currentGame.highestBet   
+    const disableCallForBigBlind = currentGame?.highestBet === currentGame?.blinds.bigBlind && playerAction === "postBigBlind"
+
 
   const playerCards = userSeatData ? userSeatData.handCards || [] : [];
   console.log("Player Cards: ", playerCards);
@@ -472,6 +473,7 @@ export default function Room() {
         <Chat />
         <BetControl
           disableCheck={disableCheck}
+          disableCallForBigBlind={disableCallForBigBlind}
           isCurrentPlayer={isCurrentPlayer}
           handleBet={handleBet}
           handleCheck={handleCheck}
