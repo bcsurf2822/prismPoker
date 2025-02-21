@@ -67,6 +67,8 @@ export default function Room() {
   const playerAction = userSeatData && userSeatData.action;
 
   const playerBetAmount = userSeatData && userSeatData.bet;
+  const disableCheck =
+    currentGame?.highestBet > 0 && userSeatData?.action === "none";
 
   const playerCards = userSeatData ? userSeatData.handCards || [] : [];
   console.log("Player Cards: ", playerCards);
@@ -468,6 +470,7 @@ export default function Room() {
       <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
         <BetControl
+          disableCheck={disableCheck}
           isCurrentPlayer={isCurrentPlayer}
           handleBet={handleBet}
           handleCheck={handleCheck}
