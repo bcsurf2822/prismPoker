@@ -12,7 +12,7 @@ const setupRoutes = require("./routes");
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL, 
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
