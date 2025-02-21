@@ -47,13 +47,14 @@ const positionsAndBlindsSocket = (io, socket) => {
         game.seats
       );
 
-      const [smallBlindAmount, bigBlindAmount] = game.blinds
-        .split("/")
-        .map(Number);
+      const smallBlindAmount = game.blinds.smallBlind;
+      const bigBlindAmount = game.blinds.bigBlind;
+      
       if (game.seats[game.smallBlindPosition].player) {
         game.seats[game.smallBlindPosition].player.chips -= smallBlindAmount;
         game.pot += smallBlindAmount;
       }
+      
       if (game.seats[game.bigBlindPosition].player) {
         game.seats[game.bigBlindPosition].player.action = "postBigBlind";
         game.seats[game.bigBlindPosition].player.chips -= bigBlindAmount;
