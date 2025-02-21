@@ -55,7 +55,7 @@ const positionsAndBlindsSocket = (io, socket) => {
         game.pot += smallBlindAmount;
       }
       if (game.seats[game.bigBlindPosition].player) {
-        game.seats[game.bigBlindPosition].player.action = "bet";
+        game.seats[game.bigBlindPosition].player.action = "postBigBlind";
         game.seats[game.bigBlindPosition].player.chips -= bigBlindAmount;
         game.pot += bigBlindAmount;
       }
