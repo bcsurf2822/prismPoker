@@ -57,8 +57,8 @@ const GameSchema = new Schema({
     required: true,
   },
   blinds: {
-    type: String,
-    required: true,
+    smallBlind: { type: Number, required: true, set: toDecimal },
+    bigBlind: { type: Number, required: true, set: toDecimal },
   },
   min: {
     type: Number,

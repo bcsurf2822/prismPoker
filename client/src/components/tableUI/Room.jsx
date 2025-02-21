@@ -68,7 +68,8 @@ export default function Room() {
 
   const playerBetAmount = userSeatData && userSeatData.bet;
   const disableCheck =
-    currentGame?.highestBet > 0 && userSeatData?.action === "none";
+    currentGame?.highestBet > 0 && playerAction === "none";
+    // const disableCallForBigBlind = currentGame.highestBet   
 
   const playerCards = userSeatData ? userSeatData.handCards || [] : [];
   console.log("Player Cards: ", playerCards);
