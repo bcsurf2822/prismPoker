@@ -36,6 +36,7 @@ export default function LoginForm() {
               type="text"
               name="username"
               placeholder="Username"
+              autoComplete="username"
               value={formData.username}
               onChange={handleChange}
               required
@@ -59,6 +60,7 @@ export default function LoginForm() {
               type="password"
               name="password"
               placeholder="Password"
+              autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
               required
