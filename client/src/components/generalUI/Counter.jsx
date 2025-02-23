@@ -1,6 +1,6 @@
 import { animate } from 'motion/react';
-import React, { useEffect, useRef } from 'react'
-
+import  { useEffect, useRef } from 'react'
+// Counter comp
 export default function Counter({ value, duration = 1, decimals = 2 }) {
   const ref = useRef(null);
 

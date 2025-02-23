@@ -54,6 +54,7 @@ const gamesSlice = createSlice({
       state.errorMessage = null;
     },
     gameLeft: (state) => {
+
       state.successMessage = "Successfully left the game!";
       state.errorMessage = null;
     },
