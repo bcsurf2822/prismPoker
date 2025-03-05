@@ -13,6 +13,8 @@ export default function Seat({
   isSmallBlind,
   isBigBlind,
   isInGame,
+  position,
+  extraClasses,
 }) {
   const modalRef = useRef(null);
   const [buyIn, setBuyIn] = useState(0);
@@ -38,93 +40,160 @@ export default function Seat({
     closeModal();
   };
 
-  return (
-    <div
-      className={`bg-white rounded-full w-1/4 h-5/6 flex flex-col justify-center items-center ${
-        isCurrentPlayer ? "border-4 border-green-500" : ""
-      }`}
-    >
-      {!seat.player ? (
-        <>
-          <button
-            onClick={openModal}
-            disabled={isInGame}
-            className={`rounded-md py-2 px-3 ${
-              isInGame ? "bg-gray-300 cursor-not-allowed" : "bg-blue-300"
-            }`}
-          >
-            Join
-          </button>
-          <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg">Select Buy-In Amount</h3>
-              <p className="py-4">
-                Use the slider to choose how much you want to buy in for:
-              </p>
-              <input
-                type="range"
-                min={min}
-                max={max}
-                value={buyIn}
-                onChange={(e) => setBuyIn(Number(e.target.value))}
-                className="range range-primary"
-              />
-              <p className="text-center">Buy-In: ${buyIn}</p>
-              <div className="modal-action">
-                <button onClick={closeModal} className="btn">
-                  Cancel
-                </button>
-                <button onClick={handleConfirm} className="btn btn-primary">
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </dialog>
-        </>
-      ) : (
-        <div className="relative flex flex-col items-center">
-          {/* Cards Container */}
-          <div className="flex w-7/12 gap-2 justify-center items-center">
-            {/* First card container */}
-            <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
-              {cardCodes && cardCodes.length > 0 && cardCodes[0] ? (
-                <Card cardCode={cardCodes[0]} />
-              ) : (
-                <CardBack />
-              )}
-            </div>
-
-            {/* Second card container */}
-            <div className="card bg-base-300 rounded-box grid h-20 flex-grow place-items-center">
-              {cardCodes && cardCodes.length > 1 && cardCodes[1] ? (
-                <Card cardCode={cardCodes[1]} />
-              ) : (
-                <CardBack />
-              )}
-            </div>
-          </div>
-          {/* Username / Pot container */}
-          <div className="absolute top-10 left-5 w-5/6 h-full flex flex-col items-center justify-center z-10 pointer-events-none bg-white border border-neutral-300">
-            <div className="badge badge-neutral mb-2">
-              {seat.player?.user?.username}
-            </div>
-            <span className="text-md font-bold bg-white/80 px-1 rounded">
-              ${seat.player?.chips}
-            </span>
-            <div className="flex justify-center items-center">
-              {isDealer && (
-                <div className="badge badge-primary badge-sm">D</div>
-              )}
-              {isSmallBlind && <p className="text-sm font-bold">S. B.</p>}
-              {isBigBlind && <p className="text-sm font-bold">B. B.</p>}
+  if (!seat.player) {
+    return (
+      <>
+        <div
+          className={`absolute ${position} transform ${extraClasses} z-10 pointer-events-auto`}
+        >
+          <div className="bg-white/20 backdrop-blur-sm p-2 md:p-3 rounded-lg shadow-lg flex flex-col items-center">
+            <button
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                isInGame
+                  ? "bg-gray-500 cursor-not-allowed text-gray-300"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
+              onClick={openModal}
+              disabled={isInGame}
+            >
+              Join
+            </button>
+            <div className="text-white text-xs mt-1">
+              Seat {seat.seatNumber}
             </div>
           </div>
         </div>
-      )}
+
+        {/* Buy-in Modal - using dialog for better accessibility */}
+        <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle">
+          <div className="modal-box bg-gray-800 rounded-lg shadow-xl border border-gray-700">
+            <h3 className="text-white text-lg font-bold">
+              Select Buy-In Amount
+            </h3>
+            <p className="py-4 text-gray-300">
+              Use the slider to choose how much you want to buy in for:
+            </p>
+            <input
+              type="range"
+              min={min}
+              max={max}
+              value={buyIn}
+              onChange={(e) => setBuyIn(Number(e.target.value))}
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
+            <p className="text-center text-white mt-2">Buy-In: ${buyIn}</p>
+            <div className="modal-action">
+              <button
+                onClick={closeModal}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </dialog>
+      </>
+    );
+  }
+
+  // If there is a player in this seat, show the player info
+  const hasCards = seat.player.handCards && seat.player.handCards.length > 0;
+
+  return (
+    <div
+      className={`absolute ${position} transform ${extraClasses} z-10 pointer-events-auto`}
+    >
+      <div
+        className={`bg-white/20 backdrop-blur-sm p-2 md:p-3 rounded-lg shadow-lg flex flex-col items-center 
+        ${isCurrentPlayer ? "ring-2 ring-yellow-400" : ""}`}
+      >
+        {/* Cards container */}
+        <div className="flex space-x-1 mb-1 md:mb-2">
+          {hasCards ? (
+            <>
+              <div className="w-10 md:w-14">
+                {seat.player.handCards && seat.player.handCards.length > 0 ? (
+                  <Card
+                    card={`${seat.player.handCards[0].value}${seat.player.handCards[0].suit[0]}`}
+                  />
+                ) : (
+                  <CardBack />
+                )}
+              </div>
+              <div className="w-10 md:w-14">
+                {seat.player.handCards && seat.player.handCards.length > 1 ? (
+                  <Card
+                    card={`${seat.player.handCards[1].value}${seat.player.handCards[1].suit[0]}`}
+                  />
+                ) : (
+                  <CardBack />
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="w-[calc(16vw+40px)] h-[calc(11vw+28px)] min-w-20 min-h-14 max-w-40 max-h-28 flex justify-center items-center">
+              <span className="text-white/50 text-xs">No cards</span>
+            </div>
+          )}
+        </div>
+
+        {/* Player's chip count */}
+        <div className="text-white bg-gray-800 px-2 py-1 rounded-md mb-1 md:mb-2 text-xs md:text-sm font-bold">
+          ${seat.player.chips || 0}
+        </div>
+
+        {/* Player's name */}
+        <div className="text-white text-xs md:text-base font-semibold">
+          {seat.player.user?.username || "Player"}
+        </div>
+
+        {/* Action indicator */}
+        {seat.player.action && seat.player.action !== "none" && (
+          <div className="text-white text-xs md:text-sm mt-1">
+            {seat.player.action}
+          </div>
+        )}
+
+        {/* Position indicators */}
+        <div className="flex gap-1 mt-1">
+          {/* Dealer button */}
+          {isDealer && (
+            <div className="bg-white text-black rounded-full w-6 h-6 md:w-7 md:h-7 flex items-center justify-center text-xs font-bold border-2 border-blue-500">
+              D
+            </div>
+          )}
+
+          {/* Small blind indicator */}
+          {isSmallBlind && (
+            <div className="bg-yellow-500 text-black rounded-full w-6 h-6 md:w-7 md:h-7 flex items-center justify-center text-xs font-bold">
+              SB
+            </div>
+          )}
+
+          {/* Big blind indicator */}
+          {isBigBlind && (
+            <div className="bg-orange-500 text-black rounded-full w-6 h-6 md:w-7 md:h-7 flex items-center justify-center text-xs font-bold">
+              BB
+            </div>
+          )}
+        </div>
+
+        {/* Current bet amount */}
+        {seat.player.bet > 0 && (
+          <div className="absolute -bottom-5 md:-bottom-6 left-1/2 -translate-x-1/2 bg-yellow-500 text-black px-2 py-1 rounded-full text-xs md:text-sm font-semibold">
+            ${seat.player.bet}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-
 Seat.propTypes = {
   seat: PropTypes.shape({
     _id: PropTypes.string.isRequired,
