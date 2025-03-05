@@ -17,12 +17,20 @@ export default function Room() {
   );
 
   const seatPositions = [
-    { id: 1, position: 'top-[-1.5%] left-[35%] -translate-x-1/2' },
-    { id: 2, position: 'top-[-1.5%] left-[65%] -translate-x-1/2' },
-    { id: 3, position: 'right-[-3%] top-1/2 -translate-y-1/2', extraClasses: 'mr-[5%] sm:mr-[3%]' },
-    { id: 4, position: 'bottom-[-1.5%] left-[65%] -translate-x-1/2' },
-    { id: 5, position: 'bottom-[-1.5%] left-[35%] -translate-x-1/2' },
-    { id: 6, position: 'left-[-3%] top-1/2 -translate-y-1/2', extraClasses: 'ml-[5%] sm:ml-[3%]' },
+    { id: 1, position: "top-[-1.5%] left-[35%] -translate-x-1/2" },
+    { id: 2, position: "top-[-1.5%] left-[65%] -translate-x-1/2" },
+    {
+      id: 3,
+      position: "right-[-3%] top-1/2 -translate-y-1/2",
+      extraClasses: "mr-[5%] sm:mr-[3%]",
+    },
+    { id: 4, position: "bottom-[-1.5%] left-[65%] -translate-x-1/2" },
+    { id: 5, position: "bottom-[-1.5%] left-[35%] -translate-x-1/2" },
+    {
+      id: 6,
+      position: "left-[-3%] top-1/2 -translate-y-1/2",
+      extraClasses: "ml-[5%] sm:ml-[3%]",
+    },
   ];
 
   const user = useSelector((state) => state.auth.user);
@@ -384,103 +392,49 @@ export default function Room() {
       <section className="h-[5vh] flex justify-between items-center px-4 bg-slate-100">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
 
-        <button onClick={handleLeaveGame} className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
-
+        <button
+          onClick={handleLeaveGame}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded"
+        >
           Leave
         </button>
       </section>
       {/* Table and Seats */}
-      <section className="flex flex-col justify-center items-center gap-2 w-full h-[80vh]">
-        {/* top */}
-        <div className="flex gap-10 h-1/3 w-full items-center justify-center">
-          <Seat
-            seat={currentGame.seats[0]}
-            joinGame={handleJoinGame}
-            user={user}
-            min={currentGame.min}
-            max={currentGame.max}
-            isDealer={currentGame.dealerPosition === 0}
-            isCurrentPlayer={currentGame.currentPlayerTurn === 0}
-            isSmallBlind={currentGame.smallBlindPosition === 0}
-            isBigBlind={currentGame.bigBlindPosition === 0}
-            isInGame={isInGame}
-          />
-          <Seat
-            seat={currentGame.seats[1]}
-            joinGame={handleJoinGame}
-            user={user}
-            min={currentGame.min}
-            max={currentGame.max}
-            isDealer={currentGame.dealerPosition === 1}
-            isCurrentPlayer={currentGame.currentPlayerTurn === 1}
-            isSmallBlind={currentGame.smallBlindPosition === 1}
-            isBigBlind={currentGame.bigBlindPosition === 1}
-            isInGame={isInGame}
-          />
-        </div>
-        {/* mid */}
-        <div className="flex gap-5 w-full h-1/3 justify-center text-center px-4">
-          <Seat
-            seat={currentGame.seats[5]}
-            joinGame={handleJoinGame}
-            user={user}
-            min={currentGame.min}
-            max={currentGame.max}
-            isDealer={currentGame.dealerPosition === 5}
-            isCurrentPlayer={currentGame.currentPlayerTurn === 5}
-            isSmallBlind={currentGame.smallBlindPosition === 5}
-            isBigBlind={currentGame.bigBlindPosition === 5}
-            isInGame={isInGame}
-          />
+      <div className="h-[80vh] flex-1 relative flex items-center justify-center p-2 overflow-hidden">
+        <Table communityCards={currentGame.communityCards} potAmount={currentGame.pot} />
 
-          <Table
-            communityCards={currentGame.communityCards}
-            pot={currentGame.pot}
-          />
+        {/* Seats positioned relative to the container */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="relative w-full h-full max-w-5xl mx-auto">
+            <div className="relative w-full aspect-[1.7/1] mx-auto">
+              {currentGame.seats.map((seat, index) => {
+                // Get the corresponding position data (adjusting for zero-based indexing)
+                const positionData = seatPositions[index] || seatPositions[0]; // Fallback in case index is out of bounds
 
-          <Seat
-            seat={currentGame.seats[2]}
-            joinGame={handleJoinGame}
-            user={user}
-            min={currentGame.min}
-            max={currentGame.max}
-            isDealer={currentGame.dealerPosition === 2}
-            isCurrentPlayer={currentGame.currentPlayerTurn === 2}
-            isSmallBlind={currentGame.smallBlindPosition === 2}
-            isBigBlind={currentGame.bigBlindPosition === 2}
-            isInGame={isInGame}
-          />
+                return (
+                  <Seat
+                    key={index}
+                    seat={seat}
+                    joinGame={handleJoinGame}
+                    user={user}
+                    min={currentGame.min}
+                    max={currentGame.max}
+                    isDealer={currentGame.dealerPosition === index}
+                    isCurrentPlayer={currentGame.currentPlayerTurn === index}
+                    isSmallBlind={currentGame.smallBlindPosition === index}
+                    isBigBlind={currentGame.bigBlindPosition === index}
+                    isInGame={isInGame}
+                    position={positionData.position}
+                    extraClasses={positionData.extraClasses || ""}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
-        {/* btm */}
-        <div className="flex gap-10 h-1/3 w-full items-center justify-center">
-          <Seat
-            seat={currentGame.seats[4]}
-            joinGame={handleJoinGame}
-            user={user}
-            min={currentGame.min}
-            max={currentGame.max}
-            isDealer={currentGame.dealerPosition === 4}
-            isCurrentPlayer={currentGame.currentPlayerTurn === 4}
-            isSmallBlind={currentGame.smallBlindPosition === 4}
-            isBigBlind={currentGame.bigBlindPosition === 4}
-            isInGame={isInGame}
-          />
-          <Seat
-            seat={currentGame.seats[3]}
-            joinGame={handleJoinGame}
-            user={user}
-            min={currentGame.min}
-            max={currentGame.max}
-            isDealer={currentGame.dealerPosition === 3}
-            isCurrentPlayer={currentGame.currentPlayerTurn === 3}
-            isSmallBlind={currentGame.smallBlindPosition === 3}
-            isBigBlind={currentGame.bigBlindPosition === 3}
-            isInGame={isInGame}
-          />
-        </div>
-      </section>
+      </div>
       {/* Bet Controls and Chat. */}
-      <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
+      <section className="h-[15vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
         <BetControl
           disableCheck={disableCheck}
@@ -500,3 +454,92 @@ export default function Room() {
     </main>
   );
 }
+// <section className="flex flex-col justify-center items-center gap-2 w-full h-[80vh]">
+//   {/* top */}
+//   <div className="flex gap-10 h-1/3 w-full items-center justify-center">
+//     <Seat
+//       seat={currentGame.seats[0]}
+//       joinGame={handleJoinGame}
+//       user={user}
+//       min={currentGame.min}
+//       max={currentGame.max}
+//       isDealer={currentGame.dealerPosition === 0}
+//       isCurrentPlayer={currentGame.currentPlayerTurn === 0}
+//       isSmallBlind={currentGame.smallBlindPosition === 0}
+//       isBigBlind={currentGame.bigBlindPosition === 0}
+//       isInGame={isInGame}
+//     />
+//     <Seat
+//       seat={currentGame.seats[1]}
+//       joinGame={handleJoinGame}
+//       user={user}
+//       min={currentGame.min}
+//       max={currentGame.max}
+//       isDealer={currentGame.dealerPosition === 1}
+//       isCurrentPlayer={currentGame.currentPlayerTurn === 1}
+//       isSmallBlind={currentGame.smallBlindPosition === 1}
+//       isBigBlind={currentGame.bigBlindPosition === 1}
+//       isInGame={isInGame}
+//     />
+//   </div>
+//   {/* mid */}
+//   <div className="flex gap-5 w-full h-1/3 justify-center text-center px-4">
+//     <Seat
+//       seat={currentGame.seats[5]}
+//       joinGame={handleJoinGame}
+//       user={user}
+//       min={currentGame.min}
+//       max={currentGame.max}
+//       isDealer={currentGame.dealerPosition === 5}
+//       isCurrentPlayer={currentGame.currentPlayerTurn === 5}
+//       isSmallBlind={currentGame.smallBlindPosition === 5}
+//       isBigBlind={currentGame.bigBlindPosition === 5}
+//       isInGame={isInGame}
+//     />
+
+//     <Table
+//       communityCards={currentGame.communityCards}
+//       pot={currentGame.pot}
+//     />
+
+//     <Seat
+//       seat={currentGame.seats[2]}
+//       joinGame={handleJoinGame}
+//       user={user}
+//       min={currentGame.min}
+//       max={currentGame.max}
+//       isDealer={currentGame.dealerPosition === 2}
+//       isCurrentPlayer={currentGame.currentPlayerTurn === 2}
+//       isSmallBlind={currentGame.smallBlindPosition === 2}
+//       isBigBlind={currentGame.bigBlindPosition === 2}
+//       isInGame={isInGame}
+//     />
+//   </div>
+//   {/* btm */}
+//   <div className="flex gap-10 h-1/3 w-full items-center justify-center">
+//     <Seat
+//       seat={currentGame.seats[4]}
+//       joinGame={handleJoinGame}
+//       user={user}
+//       min={currentGame.min}
+//       max={currentGame.max}
+//       isDealer={currentGame.dealerPosition === 4}
+//       isCurrentPlayer={currentGame.currentPlayerTurn === 4}
+//       isSmallBlind={currentGame.smallBlindPosition === 4}
+//       isBigBlind={currentGame.bigBlindPosition === 4}
+//       isInGame={isInGame}
+//     />
+//     <Seat
+//       seat={currentGame.seats[3]}
+//       joinGame={handleJoinGame}
+//       user={user}
+//       min={currentGame.min}
+//       max={currentGame.max}
+//       isDealer={currentGame.dealerPosition === 3}
+//       isCurrentPlayer={currentGame.currentPlayerTurn === 3}
+//       isSmallBlind={currentGame.smallBlindPosition === 3}
+//       isBigBlind={currentGame.bigBlindPosition === 3}
+//       isInGame={isInGame}
+//     />
+//   </div>
+// </section>
