@@ -16,6 +16,15 @@ export default function Room() {
     (state) => state.games
   );
 
+  const seatPositions = [
+    { id: 1, position: 'top-[-1.5%] left-[35%] -translate-x-1/2' },
+    { id: 2, position: 'top-[-1.5%] left-[65%] -translate-x-1/2' },
+    { id: 3, position: 'right-[-3%] top-1/2 -translate-y-1/2', extraClasses: 'mr-[5%] sm:mr-[3%]' },
+    { id: 4, position: 'bottom-[-1.5%] left-[65%] -translate-x-1/2' },
+    { id: 5, position: 'bottom-[-1.5%] left-[35%] -translate-x-1/2' },
+    { id: 6, position: 'left-[-3%] top-1/2 -translate-y-1/2', extraClasses: 'ml-[5%] sm:ml-[3%]' },
+  ];
+
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
 
