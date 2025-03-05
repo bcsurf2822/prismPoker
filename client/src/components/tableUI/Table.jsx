@@ -3,6 +3,14 @@ import cardsMap from "../../utils/cards";
 import Card from "./Card";
 
 export default function Table({ potAmount, communityCards = [] }) {
+  const communityCardSlots = Array(5).fill(null);
+  
+  // Fill the slots with actual cards when available
+  communityCards.forEach((card, index) => {
+    if (index < 5) {
+      communityCardSlots[index] = card;
+    }
+  });
   return (
     <div className="relative w-full h-full max-w-5xl mx-auto flex items-center justify-center py-2">
       <div className="relative w-full aspect-[1.7/1] mx-auto">
@@ -13,8 +21,12 @@ export default function Table({ potAmount, communityCards = [] }) {
             
             {/* Community cards */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-1 sm:gap-2 md:gap-3">
-              {communityCards.map((card, index) => (
-                <Card key={index} card={card} faceDown={!card} />
+            {communityCardSlots.map((card, index) => (
+                <Card 
+                  key={index} 
+                  card={card} 
+                  faceDown={!card} 
+                />
               ))}
             </div>
             
