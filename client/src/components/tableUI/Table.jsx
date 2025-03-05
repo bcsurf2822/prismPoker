@@ -3,13 +3,15 @@ import cardsMap from "../../utils/cards";
 
 export default function Table({ pot, communityCards = [] }) {
   return (
-    <main className="bg-green-600 border-2 border-black w-full rounded-full flex flex-col justify-evenly items-center ">
+    <main className="bg-green-600 border-4 border-green-800 w-full rounded-full flex flex-col justify-evenly items-center relative shadow-xl">
       <section>
         <p className="text-white">
           <span className="font-bold">Pot:</span> ${pot}
         </p>
       </section>
-      <section className="flex justify-evenly gap-2 mt-10 w-3/4 h-28">
+      
+      {/* Community cards */}
+      <section className="flex justify-evenly gap-2 mt-2 w-3/4 h-28">
         {[0, 1, 2, 3, 4].map((index) => {
           const card = communityCards[index];
           return (

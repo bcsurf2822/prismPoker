@@ -15,7 +15,7 @@ export default function Seat({
   isInGame,
 }) {
   const modalRef = useRef(null);
-  const [buyIn, setBuyIn] = useState(0);
+  const [buyIn, setBuyIn] = useState(min || 0);
 
   const cardCodes = seat.player?.handCards.map((card) => card.code);
 

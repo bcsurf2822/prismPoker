@@ -371,19 +371,19 @@ export default function Room() {
 
   return (
     <main className="w-full h-screen flex flex-col bg-slate-200">
-      <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
+      {/* Title And Exit */}
+      <section className="h-[5vh] flex justify-between items-center px-4 bg-slate-100">
         <h1 className="text-2xl font-bold">{currentGame.name}</h1>
 
-        <button
-          onClick={handleLeaveGame}
-          className="bg-red-300 rounded-md py-2 px-3"
-        >
+        <button onClick={handleLeaveGame} className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">
+
           Leave
         </button>
       </section>
-      <section className="  flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
+      {/* Table and Seats */}
+      <section className="flex flex-col justify-center items-center gap-2 w-full h-[80vh]">
         {/* top */}
-        <div className=" flex gap-10 h-1/3  w-full items-center justify-center">
+        <div className="flex gap-10 h-1/3 w-full items-center justify-center">
           <Seat
             seat={currentGame.seats[0]}
             joinGame={handleJoinGame}
@@ -410,7 +410,7 @@ export default function Room() {
           />
         </div>
         {/* mid */}
-        <div className="flex gap-5 w-full h-1/3 justify-center  text-center px-4">
+        <div className="flex gap-5 w-full h-1/3 justify-center text-center px-4">
           <Seat
             seat={currentGame.seats[5]}
             joinGame={handleJoinGame}
@@ -470,6 +470,7 @@ export default function Room() {
           />
         </div>
       </section>
+      {/* Bet Controls and Chat. */}
       <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
         <Chat />
         <BetControl
