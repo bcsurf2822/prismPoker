@@ -8,7 +8,6 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { clearMessages, fetchGameById } from "../../features/games/gamesSlice";
 import { SocketContext } from "../../context/SocketProvider";
 import toast from "react-hot-toast";
-import { seatStyling } from "../../data/seatStyle";
 
 export default function Room() {
   let { roomId } = useParams();
@@ -16,7 +15,7 @@ export default function Room() {
   const { currentGame, successMessage, errorMessage } = useSelector(
     (state) => state.games
   );
-console.log("C Game", currentGame)
+
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
 
@@ -371,64 +370,108 @@ console.log("C Game", currentGame)
   if (!currentGame) return <p>Loading game...</p>;
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900">
-      {/* Top section - 5vh - Title and Exit Button */}
-      <div className="h-[5vh] min-h-[40px] bg-gray-800 flex justify-between items-center px-4 border-b border-gray-700">
-        <h1 className="text-white text-xl font-bold">
-          {currentGame.name}
-        </h1>
-        <div className="flex items-center space-x-4">
-          <div className="text-white text-sm">
-            <span className="text-gray-400">Blinds:</span> {currentGame.smallBlind} / {currentGame.bigBlind}
-          </div>
-          <button 
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded"
-            onClick={handleLeaveGame}
-          >
-            Exit
-          </button>
-        </div>
-      </div>
+    <main className="w-full h-screen flex flex-col bg-slate-200">
+      <section className="h-[12.5vh] flex justify-between items-center px-4 bg-slate-100">
+        <h1 className="text-2xl font-bold">{currentGame.name}</h1>
 
-      {/* Middle section - 80vh - Table and seats */}
-      <div className="h-[80vh] flex-1 relative flex items-center justify-center p-2 overflow-hidden">
-        <Table 
-          communityCards={currentGame.communityCards} 
-          pot={currentGame.pot}
-        />
-        
-        {/* Seats positioned relative to the container */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="relative w-full h-full max-w-5xl mx-auto">
-            <div className="relative w-full aspect-[1.7/1] mx-auto">
-              {seatStyling.map(style => {
-                const seat = currentGame.seats[style.seatPosition];
-                
-                return (
-                  <Seat 
-                    key={style.seatPosition}
-                    seat={seat}
-                    position={style.position}
-                    extraClasses={style.extraClasses}
-                    isDealer={currentGame.dealerPosition === seat.seatNumber}
-                    isCurrentPlayer={currentGame.currentPlayerTurn === seat.seatNumber}
-                    isSmallBlind={currentGame.smallBlindPosition === seat.seatNumber}
-                    isBigBlind={currentGame.bigBlindPosition === seat.seatNumber}
-                    joinGame={handleJoinGame}
-                    min={currentGame.min}
-                    max={currentGame.max}
-                    isInGame={isInGame} // You'll need to set this based on your actual app logic
-                  />
-                );
-              })}
-            </div>
-          </div>
+        <button
+          onClick={handleLeaveGame}
+          className="bg-red-300 rounded-md py-2 px-3"
+        >
+          Leave
+        </button>
+      </section>
+      <section className="  flex flex-col justify-center  items-center gap-2 w-full h-[80vh] ">
+        {/* top */}
+        <div className=" flex gap-10 h-1/3  w-full items-center justify-center">
+          <Seat
+            seat={currentGame.seats[0]}
+            joinGame={handleJoinGame}
+            user={user}
+            min={currentGame.min}
+            max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 0}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 0}
+            isSmallBlind={currentGame.smallBlindPosition === 0}
+            isBigBlind={currentGame.bigBlindPosition === 0}
+            isInGame={isInGame}
+          />
+          <Seat
+            seat={currentGame.seats[1]}
+            joinGame={handleJoinGame}
+            user={user}
+            min={currentGame.min}
+            max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 1}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 1}
+            isSmallBlind={currentGame.smallBlindPosition === 1}
+            isBigBlind={currentGame.bigBlindPosition === 1}
+            isInGame={isInGame}
+          />
         </div>
-      </div>
+        {/* mid */}
+        <div className="flex gap-5 w-full h-1/3 justify-center  text-center px-4">
+          <Seat
+            seat={currentGame.seats[5]}
+            joinGame={handleJoinGame}
+            user={user}
+            min={currentGame.min}
+            max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 5}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 5}
+            isSmallBlind={currentGame.smallBlindPosition === 5}
+            isBigBlind={currentGame.bigBlindPosition === 5}
+            isInGame={isInGame}
+          />
 
-      {/* Bottom section - 15vh - Chat and Bet controls */}
-      <div className="h-[15vh] min-h-[120px] bg-gray-800 border-t border-gray-700">
-      <Chat />
+          <Table
+            communityCards={currentGame.communityCards}
+            pot={currentGame.pot}
+          />
+
+          <Seat
+            seat={currentGame.seats[2]}
+            joinGame={handleJoinGame}
+            user={user}
+            min={currentGame.min}
+            max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 2}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 2}
+            isSmallBlind={currentGame.smallBlindPosition === 2}
+            isBigBlind={currentGame.bigBlindPosition === 2}
+            isInGame={isInGame}
+          />
+        </div>
+        {/* btm */}
+        <div className="flex gap-10 h-1/3 w-full items-center justify-center">
+          <Seat
+            seat={currentGame.seats[4]}
+            joinGame={handleJoinGame}
+            user={user}
+            min={currentGame.min}
+            max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 4}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 4}
+            isSmallBlind={currentGame.smallBlindPosition === 4}
+            isBigBlind={currentGame.bigBlindPosition === 4}
+            isInGame={isInGame}
+          />
+          <Seat
+            seat={currentGame.seats[3]}
+            joinGame={handleJoinGame}
+            user={user}
+            min={currentGame.min}
+            max={currentGame.max}
+            isDealer={currentGame.dealerPosition === 3}
+            isCurrentPlayer={currentGame.currentPlayerTurn === 3}
+            isSmallBlind={currentGame.smallBlindPosition === 3}
+            isBigBlind={currentGame.bigBlindPosition === 3}
+            isInGame={isInGame}
+          />
+        </div>
+      </section>
+      <section className="h-[25vh] flex justify-between items-center px-4 bg-slate-100">
+        <Chat />
         <BetControl
           disableCheck={disableCheck}
           disableCallForBigBlind={disableCallForBigBlind}
@@ -443,7 +486,7 @@ console.log("C Game", currentGame)
           highestBet={currentGame.highestBet}
           hasCards={playerCards.length > 0}
         />
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
