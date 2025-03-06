@@ -26,16 +26,7 @@ const PlayerSchema = new Schema({
   bet: { type: Number, required: true, set: toDecimal },
   action: {
     type: String,
-    enum: [
-      "postBigBlind",
-      "check",
-      "call",
-      "bet",
-      "all-in",
-      "fold",
-      "raise",
-      "none",
-    ],
+    enum: ["postBigBlind", "check", "call", "bet", "all-in", "fold", "raise", "none"],
     default: "none",
   },
   checkBetFold: {
@@ -172,38 +163,10 @@ const GameSchema = new Schema({
   },
   seats: {
     type: [SeatSchema],
-    default: [
-      {
-        seatNumber: 0,
-        player: null,
-        style: "top-0 -translate-y-[50%] left-[35%] -translate-x-1/2",
-      },
-      {
-        seatNumber: 1,
-        player: null,
-        style: "top-0 -translate-y-[50%] left-[65%] -translate-x-1/2",
-      },
-      {
-        seatNumber: 2,
-        player: null,
-        style: "right-[-5%] top-1/2 -translate-y-1/2",
-      },
-      {
-        seatNumber: 3,
-        player: null,
-        style: "bottom-0 left-[65%] -translate-x-1/2 translate-y-[100%]",
-      },
-      {
-        seatNumber: 4,
-        player: null,
-        style: "bottom-0 left-[35%] -translate-x-1/2 translate-y-[100%]",
-      },
-      {
-        seatNumber: 5,
-        player: null,
-        style: "left-[-5%] top-1/2 -translate-y-1/2",
-      },
-    ],
+    default: Array.from({ length: 6 }, (_, i) => ({
+      seatNumber: i,
+      player: null,
+    })),
   },
 });
 
