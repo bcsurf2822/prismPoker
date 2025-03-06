@@ -259,6 +259,7 @@ export default function Room() {
       const playerCount = currentGame.playerCount;
 
       if (playerCount >= 2 && !currentGame.gameRunning && !hasEmittedStart) {
+    
         socket.emit("updatePositionsAndBlinds", { gameId: roomId });
         setHasEmittedStart(true);
 

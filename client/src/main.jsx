@@ -12,6 +12,7 @@ import Room from "./components/tableUI/Room.jsx";
 import { Provider } from "react-redux";
 import { store } from "./app/store.js";
 import RoomLayout from "./layouts/RoomLayout.jsx";
+import TestLayout from "./layouts/TestLayout.jsx"
 import Profile from "./components/generalUI/Profile.jsx";
 import Account from "./components/generalUI/Account.jsx";
 import Home from "./components/generalUI/Home.jsx";
@@ -21,7 +22,7 @@ import AppInitializer from "./context/AppInitializer.jsx";
 import { OpenWindowsProvider } from "./context/WindowContext.jsx";
 import TestRoom from "./components/tableUI/TestRoom.jsx";
 import NotFound from "./components/generalUI/NotFound.jsx";
-import NewLayout from "./layouts/NewLayout.jsx";
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -41,14 +42,12 @@ createRoot(document.getElementById("root")).render(
                   <Route path="profile" element={<Profile />} />
                   <Route path="account" element={<Account />} />
                 </Route>
-                {/* <Route path="/room/:roomId" element={<RoomLayout />}>
-                  <Route index element={<Room />} />
-                </Route> */}
-                <Route path="/room/:roomId" element={<NewLayout />}>
+      
+                <Route path="/room/:roomId" element={<RoomLayout />}>
                   <Route index element={<Room />} />
                 </Route>
            
-                <Route path="/room/test" element={<RoomLayout />}>
+                <Route path="/room/test" element={<TestLayout />}>
                   <Route index element={<TestRoom />} />
                 </Route>
                 
