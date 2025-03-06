@@ -404,8 +404,7 @@ export default function Room() {
           <Seat
             key={seat.seatNumber}
             seat={seat}
-            position={style.position}
-            extraClasses={style.extraClasses}
+            seatStyle={style.style}
             isDealer={currentGame.dealerPosition === seat.seatNumber}
             isCurrentPlayer={currentGame.currentPlayerTurn === seat.seatNumber}
             isSmallBlind={currentGame.smallBlindPosition === seat.seatNumber}
