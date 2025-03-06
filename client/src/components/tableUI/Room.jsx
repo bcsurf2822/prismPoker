@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
+import ChatBetSection from "./ChatBet"
 import Chat from "./Chat";
 import TableDetails from "./TableDetails";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -380,13 +381,13 @@ export default function Room() {
 
   return (
     <div className="relative w-full h-full">
-      {/* Room information (displayed inside the table layout) */}
       <div className="absolute top-2 left-0 right-0 flex justify-center">
         <div className="bg-black/40 text-white px-3 py-1 rounded-full text-sm">
           <span>{currentGame.name}</span>
           <span className="mx-2">•</span>
           <span>
-            Blinds: {currentGame.blinds.smallBlind} / {currentGame.blinds.bigBlind}
+            Blinds: {currentGame.blinds.smallBlind} /{" "}
+            {currentGame.blinds.bigBlind}
           </span>
         </div>
       </div>
@@ -418,14 +419,15 @@ export default function Room() {
       })}
 
       {/* Chat/Bet controls are now moved to the layout bottom section */}
-      {/* <div className="absolute -bottom-[15vh] left-0 right-0 h-[15vh]">
-        <ChatBetSection
+      <div className="absolute -bottom-[15vh] left-0 right-0 h-[15vh]">
+
+        {/* <ChatBetSection
           isInGame={true}
           highestBet={currentGame.highestBet}
           gameStage={currentGame.stage}
           gameRunning={currentGame.gameRunning}
-        />
-      </div> */}
+        /> */}
+      </div>
     </div>
   );
 }

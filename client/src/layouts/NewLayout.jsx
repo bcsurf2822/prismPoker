@@ -1,6 +1,8 @@
 import { Outlet } from "react-router";
 
 const NewLayout = () => {
+
+  
   return (
     <div className="min-h-screen bg-gray-900">
       <header className="h-[5vh] min-h-[40px] bg-gray-800 flex justify-between items-center px-4 border-b border-gray-700">
@@ -15,7 +17,6 @@ const NewLayout = () => {
             <div className="absolute inset-0 bg-green-800 rounded-[45%] border-4 md:border-8 border-amber-900 shadow-xl flex items-center justify-center">
               {/* Inner felt */}
               <div className="absolute inset-[5%] bg-green-700 rounded-[40%]">
-                {/* The Outlet will render the nested route (Room component) */}
                 <Outlet />
               </div>
             </div>
