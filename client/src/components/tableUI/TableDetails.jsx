@@ -2,9 +2,9 @@ import React from 'react';
 import Card from './Card';
 import CardBack from './CardBack';
 
-// This component only contains the community cards and pot display
+
 const TableDetails = ({ communityCards = [], pot = 0 }) => {
-  // If no community cards are provided, display 5 empty spaces
+
   const displayCards = communityCards.length > 0 
     ? communityCards 
     : [null, null, null, null, null];

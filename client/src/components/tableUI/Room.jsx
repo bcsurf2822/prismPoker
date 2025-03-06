@@ -69,9 +69,6 @@ export default function Room() {
   const userSeatData =
     currentGame && user ? seatData(currentGame, user.id) : null;
 
-  const isCurrentPlayer =
-    userSeatData && userSeatData.seatNumber === currentGame.currentPlayerTurn;
-
   const playerChips = userSeatData && userSeatData.chips;
 
   const playerAction = userSeatData && userSeatData.action;
@@ -389,6 +386,7 @@ export default function Room() {
             Blinds: {currentGame.blinds.smallBlind} /{" "}
             {currentGame.blinds.bigBlind}
           </span>
+   
         </div>
       </div>
 
@@ -396,7 +394,7 @@ export default function Room() {
         communityCards={currentGame.communityCards}
         pot={currentGame.pot}
       />
-
+       <button onClick={handleLeaveGame} className="bg-red-500 text-white w-1/3 h-5">Leave Game</button>
       {/* Seats positioned relative to the table */}
       {currentGame.seats.map((seat) => {
         const style = seatStyles[seat.seatNumber];
