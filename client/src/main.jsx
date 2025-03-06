@@ -21,6 +21,7 @@ import AppInitializer from "./context/AppInitializer.jsx";
 import { OpenWindowsProvider } from "./context/WindowContext.jsx";
 import TestRoom from "./components/tableUI/TestRoom.jsx";
 import NotFound from "./components/generalUI/NotFound.jsx";
+import NewLayout from "./layouts/NewLayout.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -40,12 +41,17 @@ createRoot(document.getElementById("root")).render(
                   <Route path="profile" element={<Profile />} />
                   <Route path="account" element={<Account />} />
                 </Route>
-                <Route path="/room/:roomId" element={<RoomLayout />}>
+                {/* <Route path="/room/:roomId" element={<RoomLayout />}>
+                  <Route index element={<Room />} />
+                </Route> */}
+                <Route path="/room/:roomId" element={<NewLayout />}>
                   <Route index element={<Room />} />
                 </Route>
+           
                 <Route path="/room/test" element={<RoomLayout />}>
                   <Route index element={<TestRoom />} />
                 </Route>
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
