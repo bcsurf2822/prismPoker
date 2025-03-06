@@ -1,9 +1,8 @@
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-// import Table from "./Table";
 import Seat from "./Seat";
 import BetControl from "./BetControl";
-import ChatBetSection from "./ChatBet"
+import ChatBetSection from "./ChatBet";
 import Chat from "./Chat";
 import TableDetails from "./TableDetails";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -386,7 +385,6 @@ export default function Room() {
             Blinds: {currentGame.blinds.smallBlind} /{" "}
             {currentGame.blinds.bigBlind}
           </span>
-   
         </div>
       </div>
 
@@ -394,8 +392,13 @@ export default function Room() {
         communityCards={currentGame.communityCards}
         pot={currentGame.pot}
       />
-       <button onClick={handleLeaveGame} className="bg-red-500 text-white w-1/3 h-5">Leave Game</button>
-      {/* Seats positioned relative to the table */}
+      <button
+        onClick={handleLeaveGame}
+        className="bg-red-500 text-white w-1/3 h-5"
+      >
+        Leave Game
+      </button>
+      {/* Seats */}
       {currentGame.seats.map((seat) => {
         const style = seatStyles[seat.seatNumber];
 
@@ -416,9 +419,7 @@ export default function Room() {
         );
       })}
 
-      {/* Chat/Bet controls are now moved to the layout bottom section */}
       <div className="absolute -bottom-[15vh] left-0 right-0 h-[15vh]">
-
         {/* <ChatBetSection
           isInGame={true}
           highestBet={currentGame.highestBet}

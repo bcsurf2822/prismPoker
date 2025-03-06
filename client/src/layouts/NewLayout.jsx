@@ -1,8 +1,6 @@
 import { Outlet } from "react-router";
 
 const NewLayout = () => {
-
-  
   return (
     <div className="min-h-screen bg-gray-900">
       <header className="h-[5vh] min-h-[40px] bg-gray-800 flex justify-between items-center px-4 border-b border-gray-700">
