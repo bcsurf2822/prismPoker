@@ -1,4 +1,5 @@
-import cardsMap from "../../utils/cardsMap";
+import cardsMap from "../../utils/cards";
+
 
 const Card = ({ card, faceDown }) => {
   if (faceDown || !card) {
