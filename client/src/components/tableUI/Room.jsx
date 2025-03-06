@@ -18,10 +18,18 @@ export default function Room() {
 
   const user = useSelector((state) => state.auth.user);
   const socket = useContext(SocketContext);
-
+  console.log("CurrentGame: ", currentGame);
   const [hasEmittedStart, setHasEmittedStart] = useState(false);
   const [dealtStage, setDealtStage] = useState("");
 
+  const seatStyles = {
+    0: { style: "top-0 -translate-y-[50%] left-[35%] -translate-x-1/2" },
+    1: { style: "top-0 -translate-y-[50%] left-[65%] -translate-x-1/2" },
+    2: { style: "right-[-5%] top-1/2 -translate-y-1/2" },
+    3: { style: "bottom-0 left-[65%] -translate-x-1/2 translate-y-[100%]" },
+    4: { style: "bottom-0 left-[35%] -translate-x-1/2 translate-y-[100%]" },
+    5: { style: "left-[-5%] top-1/2 -translate-y-1/2" },
+  };
   // Boolean telling if user is in game
   const isUserInGame = (user, roomId) =>
     !!(
